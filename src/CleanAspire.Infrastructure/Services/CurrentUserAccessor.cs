@@ -16,9 +16,9 @@ public class CurrentUserAccessor : ICurrentUserAccessor
 {
     private readonly ClaimsPrincipal _user;
 
-    public CurrentUserAccessor(ClaimsPrincipal user)
+    public CurrentUserAccessor()
     {
-        _user = user;
+        _user = new ClaimsPrincipal();
     }
     public string? UserId => _user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     public string? TenantId => _user.FindFirst(ClaimTypes.GroupSid)?.Value;

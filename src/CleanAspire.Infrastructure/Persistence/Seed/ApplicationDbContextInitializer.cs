@@ -1,5 +1,5 @@
 ﻿using CleanAspire.Domain.Entities;
-using CleanAspire.Domain.Idenities;
+using CleanAspire.Domain.Identities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,8 +17,8 @@ public class ApplicationDbContextInitializer
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger,
-    ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger, ApplicationDbContext context,
+      UserManager<ApplicationUser> userManager)
     {
         _logger = logger;
         _context = context;

@@ -6,7 +6,7 @@
 using CleanAspire.Domain.Common;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanAspire.Domain.Idenities;
+namespace CleanAspire.Domain.Identities;
 
 public class ApplicationUser : IdentityUser, IAuditableEntity
 {

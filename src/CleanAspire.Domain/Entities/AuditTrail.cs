@@ -3,7 +3,7 @@
 
 
 using CleanAspire.Domain.Common;
-using CleanAspire.Domain.Idenities;
+using CleanAspire.Domain.Identities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CleanAspire.Domain.Entities;

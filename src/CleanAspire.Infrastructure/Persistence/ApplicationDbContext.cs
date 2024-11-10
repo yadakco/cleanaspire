@@ -1,7 +1,7 @@
 ﻿using CleanAspire.Application.Common.Interfaces;
 using CleanAspire.Domain.Common;
 using CleanAspire.Domain.Entities;
-using CleanAspire.Domain.Idenities;
+using CleanAspire.Domain.Identities;
 using CleanAspire.Infrastructure.Persistence.Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +28,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     {
         base.ConfigureConventions(configurationBuilder);
         configurationBuilder.Properties<string>().HaveMaxLength(450);
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite("Data Source=CleanAspireDb.db");
     }
 }
 

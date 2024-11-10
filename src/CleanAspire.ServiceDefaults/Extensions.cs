@@ -1,15 +1,20 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using CleanAspire.Infrastructure;
 using CleanAspire.Infrastructure.Persistence.Seed;
+using Microsoft.AspNetCore.Identity;
+using CleanAspire.Domain.Identities;
+using CleanAspire.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Routing;
+using System.Reflection;
+
 namespace Microsoft.Extensions.Hosting;
 
 // Adds common .NET Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
@@ -19,11 +24,22 @@ public static class Extensions
 {
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-       
+
         builder.ConfigureOpenTelemetry();
 
         builder.AddDefaultHealthChecks();
+        builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+        builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
+        builder.Services.AddAuthorizationBuilder();
+
         builder.Services.AddDatabase(builder.Configuration);
+        builder.Services.AddIdentityCore<ApplicationUser>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+        })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddApiEndpoints();
+
         builder.Services.AddOpenApi();
         builder.Services.AddServiceDiscovery();
 
@@ -103,6 +119,7 @@ public static class Extensions
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
+        app.MapIdentityApi<ApplicationUser>();
         app.MapOpenApi();
 
         // Adding health checks endpoints to applications in non-development environments has security implications.
@@ -120,7 +137,7 @@ public static class Extensions
 
             app.MapScalarApiReference();
         }
-       
+
         return app;
     }
     public static async Task InitializeDatabaseAsync(this WebApplication app)
@@ -128,7 +145,7 @@ public static class Extensions
         using (var scope = app.Services.CreateScope())
         {
             var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
-            await initializer.InitialiseAsync().ConfigureAwait(false);
+            await initializer.InitialiseAsync();
 
             var env = app.Services.GetRequiredService<IHostEnvironment>();
             if (env.IsDevelopment())

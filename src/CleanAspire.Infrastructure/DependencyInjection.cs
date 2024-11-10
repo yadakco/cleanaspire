@@ -17,7 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using CleanAspire.Infrastructure.Persistence.Interceptors;
 using CleanAspire.Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
-
+using Microsoft.AspNetCore.Identity;
+using CleanAspire.Infrastructure.Services;
 namespace CleanAspire.Infrastructure;
 
 public static class DependencyInjection
@@ -34,17 +35,25 @@ public static class DependencyInjection
     {
         services.Configure<DatabaseSettings>(configuration.GetSection(DATABASE_SETTINGS_KEY))
             .AddSingleton(s => s.GetRequiredService<IOptions<DatabaseSettings>>().Value);
-     
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>()
+        services.AddScoped<IDateTime, UtcDateTime>()
+            .AddScoped<ICurrentUserAccessor, CurrentUserAccessor>()
+            .AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>()
             .AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+   
 
         if (configuration.GetValue<bool>(USE_IN_MEMORY_DATABASE_KEY))
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ApplicationDbContext>((p,options) =>
+            {
+                options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME);
+                options.AddInterceptors(p.GetServices<ISaveChangesInterceptor>());
+                options.EnableSensitiveDataLogging();
+            });
+            services.AddDbContextFactory<ApplicationDbContext>(options =>
             {
                 options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME);
                 options.EnableSensitiveDataLogging();
-            });
+            }, ServiceLifetime.Scoped);
         }
         else
         {
@@ -55,15 +64,24 @@ public static class DependencyInjection
                 m.UseExceptionProcessor(databaseSettings.DBProvider);
                 m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
             });
+            services.AddDbContextFactory<ApplicationDbContext>((p,options) =>
+            {
+                var databaseSettings = p.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+                options.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
+                options.EnableSensitiveDataLogging();
+            }, ServiceLifetime.Scoped);
         }
 
 
-        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+        services.AddScoped<IDbContextFactory<ApplicationDbContext>, BlazorContextFactory<ApplicationDbContext>>();
+        services.AddScoped<IApplicationDbContext>(provider =>
+            provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext());
         services.AddScoped<ApplicationDbContextInitializer>();
 
         return services;
     }
 
+ 
     private static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider,
             string connectionString)
     {
