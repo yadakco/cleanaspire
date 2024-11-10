@@ -1,4 +1,4 @@
-﻿namespace CleanAspire.Infrastructure
+﻿namespace Migrators.PostgreSQL
 {
     public class Class1
     {

@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/Solution Items/" />
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/CleanAspire.Api/CleanAspire.Api.csproj" Id="ded5e19f-db6b-c4ee-e692-cffe0619c173" />
     <Project Path="src/CleanAspire.AppHost/CleanAspire.AppHost.csproj" />
@@ -8,6 +10,11 @@
     <Project Path="src/CleanAspire.Infrastructure/CleanAspire.Infrastructure.csproj" Id="abe1716e-889c-48b6-8aa0-51d688f3c480" />
     <Project Path="src/CleanAspire.PWA/CleanAspire.PWA.csproj" Id="3fc79b0c-9d07-0c1f-fc23-ea8c2e02c02c" />
     <Project Path="src/CleanAspire.ServiceDefaults/CleanAspire.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/Migrators/" Id="c983071d-42d7-4326-a379-ce622e29d307">
+    <Project Path="src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj" Id="2e671cbd-fcc7-4be8-b3aa-71c296ac5317" />
+    <Project Path="src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj" Id="7d6e47cc-90f1-4c19-af96-1de7eed7928c" />
+    <Project Path="src/Migrators/Migrators.SQLite/Migrators.SQLite.csproj" Id="67226f2c-5d75-4b76-b5f8-e42a4bc1bbb1" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CleanAspire.Tests/CleanAspire.Tests.csproj" />

@@ -10,7 +10,6 @@ namespace CleanAspire.Domain.Idenities;
 
 public class ApplicationUser : IdentityUser, IAuditableEntity
 {
-   
     public string? Nickname { get; set; }
     public string? Provider { get; set; } = "Local";
     public string? TenantId { get; set; }
@@ -24,10 +23,6 @@ public class ApplicationUser : IdentityUser, IAuditableEntity
     public ApplicationUser? Superior { get; set; } = null;
     public DateTime? Created { get; set; }
     public string? CreatedBy { get; set; }
-    public ApplicationUser? CreatedByUser { get; set; } = null;
     public DateTime? LastModified { get; set; }
     public string? LastModifiedBy { get; set; }
-    public ApplicationUser? LastModifiedByUser { get; set; } = null;
-
-  
 }

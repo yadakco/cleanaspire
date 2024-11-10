@@ -8,7 +8,8 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
-
+using CleanAspire.Infrastructure;
+using CleanAspire.Infrastructure.Persistence.Seed;
 namespace Microsoft.Extensions.Hosting;
 
 // Adds common .NET Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
@@ -22,6 +23,7 @@ public static class Extensions
         builder.ConfigureOpenTelemetry();
 
         builder.AddDefaultHealthChecks();
+        builder.Services.AddDatabase(builder.Configuration);
         builder.Services.AddOpenApi();
         builder.Services.AddServiceDiscovery();
 
@@ -120,5 +122,19 @@ public static class Extensions
         }
        
         return app;
+    }
+    public static async Task InitializeDatabaseAsync(this WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+            await initializer.InitialiseAsync().ConfigureAwait(false);
+
+            var env = app.Services.GetRequiredService<IHostEnvironment>();
+            if (env.IsDevelopment())
+            {
+                await initializer.SeedAsync().ConfigureAwait(false);
+            }
+        }
     }
 }

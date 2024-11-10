@@ -23,4 +23,8 @@
     <PackageReference Include="Scalar.AspNetCore" Version="1.2.34" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CleanAspire.Infrastructure\CleanAspire.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
