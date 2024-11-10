@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using CleanAspire.Infrastructure.Persistence.Interceptors;
-using CleanArchitecture.Blazor.Infrastructure.Configurations;
+using CleanAspire.Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 
 namespace CleanAspire.Infrastructure;

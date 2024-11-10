@@ -1,7 +1,6 @@
-﻿
-using CleanArchitecture.Blazor.Domain.Entities;
-using CleanAspire.Application.Common.Interfaces;
+﻿using CleanAspire.Application.Common.Interfaces;
 using CleanAspire.Domain.Common;
+using CleanAspire.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;

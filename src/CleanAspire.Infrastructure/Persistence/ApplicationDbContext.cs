@@ -1,5 +1,4 @@
-﻿using CleanArchitecture.Blazor.Domain.Entities;
-using CleanAspire.Application.Common.Interfaces;
+﻿using CleanAspire.Application.Common.Interfaces;
 using CleanAspire.Domain.Common;
 using CleanAspire.Domain.Entities;
 using CleanAspire.Domain.Idenities;

@@ -6,7 +6,7 @@ using CleanAspire.Domain.Common;
 using CleanAspire.Domain.Idenities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace CleanArchitecture.Blazor.Domain.Entities;
+namespace CleanAspire.Domain.Entities;
 
 public class AuditTrail : IEntity<string>
 {

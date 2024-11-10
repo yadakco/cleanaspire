@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CleanArchitecture.Blazor.Infrastructure.Configurations;
+namespace CleanAspire.Infrastructure.Configurations;
 
 /// <summary>
 ///     Configuration wrapper for the database section
