@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <RootNamespace>CleanAspire.Api</RootNamespace>
+	  <AssemblyName>CleanAspire.Api</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CleanAspire.ServiceDefaults\CleanAspire.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>
