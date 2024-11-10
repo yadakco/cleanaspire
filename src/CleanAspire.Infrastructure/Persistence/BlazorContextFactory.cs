@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanAspire.Infrastructure.Persistence;
@@ -14,10 +15,7 @@ public class BlazorContextFactory<TContext> : IDbContextFactory<TContext> where 
 
     public TContext CreateDbContext()
     {
-        if (_provider == null)
-            throw new InvalidOperationException(
-                "You must configure an instance of IServiceProvider");
-
-        return ActivatorUtilities.CreateInstance<TContext>(_provider);
+        var scope = _provider.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<TContext>();
     }
 }

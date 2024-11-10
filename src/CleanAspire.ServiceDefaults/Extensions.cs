@@ -33,10 +33,7 @@ public static class Extensions
         builder.Services.AddAuthorizationBuilder();
 
         builder.Services.AddDatabase(builder.Configuration);
-        builder.Services.AddIdentityCore<ApplicationUser>(options =>
-        {
-            options.SignIn.RequireConfirmedAccount = true;
-        })
+        builder.Services.AddIdentityCore<ApplicationUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddApiEndpoints();
 

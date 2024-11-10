@@ -10,7 +10,7 @@ namespace CleanAspire.Domain.Entities;
 
 public class AuditTrail : IEntity<string>
 {
-    public string Id { get; set; } = Guid.CreateVersion7().ToString();
+    public string Id { get; set; }
     public string? UserId { get; set; }
     public virtual ApplicationUser? Owner { get; set; }
     public AuditType AuditType { get; set; }
