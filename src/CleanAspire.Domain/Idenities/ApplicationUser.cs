@@ -4,14 +4,13 @@
 
 
 using CleanAspire.Domain.Common;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanAspire.Domain.Idenities;
 
 public class ApplicationUser : IdentityUser, IAuditableEntity
 {
    
-
     public string? Nickname { get; set; }
     public string? Provider { get; set; } = "Local";
     public string? TenantId { get; set; }
