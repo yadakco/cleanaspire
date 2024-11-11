@@ -26,7 +26,7 @@ public static class DependencyInjection
     private const string DATABASE_SETTINGS_KEY = "DatabaseSettings";
     private const string NPGSQL_ENABLE_LEGACY_TIMESTAMP_BEHAVIOR = "Npgsql.EnableLegacyTimestampBehavior";
     private const string MSSQL_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.MSSQL";
-    private const string SQLITE_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.SqLite";
+    private const string SQLITE_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.SQLite";
     private const string POSTGRESQL_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.PostgreSQL";
     private const string USE_IN_MEMORY_DATABASE_KEY = "UseInMemoryDatabase";
     private const string IN_MEMORY_DATABASE_NAME = "CleanAspireDb";
@@ -49,11 +49,7 @@ public static class DependencyInjection
                 options.AddInterceptors(p.GetServices<ISaveChangesInterceptor>());
                 options.EnableSensitiveDataLogging();
             });
-            services.AddDbContextFactory<ApplicationDbContext>(options =>
-            {
-                options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME);
-                options.EnableSensitiveDataLogging();
-            }, ServiceLifetime.Scoped);
+  
         }
         else
         {
@@ -64,12 +60,7 @@ public static class DependencyInjection
                 m.UseExceptionProcessor(databaseSettings.DBProvider);
                 m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
             });
-            services.AddDbContextFactory<ApplicationDbContext>((p,options) =>
-            {
-                var databaseSettings = p.GetRequiredService<IOptions<DatabaseSettings>>().Value;
-                options.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
-                options.EnableSensitiveDataLogging();
-            }, ServiceLifetime.Scoped);
+  
         }
 
 

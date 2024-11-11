@@ -11,7 +11,7 @@ public abstract class BaseEntity : IEntity<string>
 
     [NotMapped] public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    public virtual string Id { get; set; }
+    public virtual string Id { get; set; } = Guid.CreateVersion7().ToString();
 
     public void AddDomainEvent(DomainEvent domainEvent)
     {

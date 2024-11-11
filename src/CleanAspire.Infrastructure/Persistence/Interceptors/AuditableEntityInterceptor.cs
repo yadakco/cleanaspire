@@ -153,6 +153,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     {
         var auditTrail = new AuditTrail
         {
+            Id=Guid.CreateVersion7().ToString(),
             TableName = entry.Entity.GetType().Name,
             UserId = userId,
             DateTime = now,
