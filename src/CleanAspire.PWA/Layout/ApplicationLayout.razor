@@ -4,8 +4,8 @@
 @inherits LayoutComponentBase
 @layout MainLayout
 <MudLayout>
-   @*  <AuthorizeView>
-        <Authorized> *@
+    <AuthorizeView>
+        <Authorized>
             <Appbar></Appbar>
             <Navbar></Navbar>
             <MudMainContent>
@@ -13,11 +13,11 @@
                     @Body
                 </MudContainer>
             </MudMainContent>
-     @*    </Authorized>
+        </Authorized>
         <NotAuthorized>
             <RedirectToSignIn />
         </NotAuthorized>
-    </AuthorizeView> *@
+    </AuthorizeView>
 </MudLayout>
 @code {
 

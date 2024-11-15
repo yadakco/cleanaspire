@@ -29,7 +29,7 @@ public static class Extensions
 
         builder.AddDefaultHealthChecks();
         builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-        builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
+        builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme).AddIdentityCookies();
         builder.Services.AddAuthorizationBuilder();
 
         builder.Services.AddDatabase(builder.Configuration);
