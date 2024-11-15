@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.2.24474.1"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.2.24474.1" />
+    <PackageReference Include="Scalar.AspNetCore" Version="1.2.37" />
     
   </ItemGroup>
 
@@ -17,6 +19,9 @@
 
   <ItemGroup>
       <ProjectReference Include="..\CleanAspire.ServiceDefaults\CleanAspire.ServiceDefaults.csproj" />
+      <ProjectReference Include="..\Migrators\Migrators.MSSQL\Migrators.MSSQL.csproj" />
+      <ProjectReference Include="..\Migrators\Migrators.PostgreSQL\Migrators.PostgreSQL.csproj" />
+      <ProjectReference Include="..\Migrators\Migrators.SQLite\Migrators.SQLite.csproj" />
    
   </ItemGroup>
 

@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "clients": {
+    "ApiClient": {
+      "language": "CSharp",
+      "typeAccessModifier": "Public",
+      "structuredMimeTypes": [
+        "application/json",
+        "text/plain;q=0.9",
+        "application/x-www-form-urlencoded;q=0.2",
+        "multipart/form-data;q=0.1"
+      ],
+      "clientNamespaceName": "CleanAspire.Api.Client",
+      "usesBackingStore": false,
+      "includeAdditionalData": true,
+      "excludeBackwardCompatible": false,
+      "disabledValidationRules": [],
+      "descriptionLocation": "c:\\Users\\neo_z\\Downloads\\v1.json",
+      "includePatterns": [
+        "/",
+        "/confirmEmail",
+        "/forgotPassword",
+        "/login",
+        "/manage",
+        "/manage/2fa",
+        "/manage/info",
+        "/refresh",
+        "/register",
+        "/resendConfirmationEmail",
+        "/resetPassword",
+        "/weatherforecast"
+      ],
+      "excludePatterns": [],
+      "outputPath": "./."
+    }
+  },
+  "plugins": {}
+}

@@ -19,6 +19,7 @@ using CleanAspire.Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using CleanAspire.Infrastructure.Services;
+using Microsoft.Extensions.Hosting;
 namespace CleanAspire.Infrastructure;
 
 public static class DependencyInjection
@@ -116,6 +117,23 @@ public static class DependencyInjection
 
             default:
                 throw new InvalidOperationException($"DB Provider {dbProvider} is not supported.");
+        }
+    }
+
+
+
+    public static async Task InitializeDatabaseAsync(this IHost host)
+    {
+        using (var scope = host.Services.CreateScope())
+        {
+            var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+            await initializer.InitialiseAsync().ConfigureAwait(false);
+
+            var env = host.Services.GetRequiredService<IHostEnvironment>();
+            if (env.IsDevelopment())
+            {
+                await initializer.SeedAsync().ConfigureAwait(false);
+            }
         }
     }
 }

@@ -10,8 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0-rc.2.24474.3" />
+
 
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.0.0-preview.9.24507.7" />
     <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="9.0.0-rc.1.24511.1" />
@@ -20,13 +19,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="1.2.34" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Migrators\Migrators.MSSQL\Migrators.MSSQL.csproj" />
-    <ProjectReference Include="..\Migrators\Migrators.PostgreSQL\Migrators.PostgreSQL.csproj" />
-    <ProjectReference Include="..\Migrators\Migrators.SQLite\Migrators.SQLite.csproj" />
   </ItemGroup>
 
 </Project>

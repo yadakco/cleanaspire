@@ -1,0 +1,59 @@
+{
+  "applicationName": "application",
+  "apiDependencies": {
+    "ApiClient": {
+      "apiDescriptionUrl": "c:\\Users\\neo_z\\Downloads\\v1.json",
+      "apiDeploymentBaseUrl": "https://localhost:53681/",
+      "requests": [
+        {
+          "method": "GET",
+          "uriTemplate": "weatherforecast"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "register"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "login"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "refresh"
+        },
+        {
+          "method": "GET",
+          "uriTemplate": "confirmEmail"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "resendConfirmationEmail"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "forgotPassword"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "resetPassword"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "manage/2fa"
+        },
+        {
+          "method": "GET",
+          "uriTemplate": "manage/info"
+        },
+        {
+          "method": "POST",
+          "uriTemplate": "manage/info"
+        }
+      ],
+      "extensions": {
+        "x-ms-kiota-hash": "CC75185E60C67EAA7CDED4CB518AF92061F004E0C5BD010BBFAAEA66D076458B",
+        "x-ms-kiota-version": "1.20.0"
+      }
+    }
+  }
+}

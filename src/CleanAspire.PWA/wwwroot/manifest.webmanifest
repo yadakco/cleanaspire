@@ -1,6 +1,6 @@
 {
-  "name": "BlazorPocket.WebAssembly",
-  "short_name": "BlazorPocket.WebAssembly",
+  "name": "CleanAspire.PWA",
+  "short_name": "CleanAspire.PWA",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
