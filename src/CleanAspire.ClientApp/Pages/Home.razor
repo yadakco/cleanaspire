@@ -82,6 +82,10 @@
         .fs-5 {
             font-size: 1.25rem !important;
         }
+
+        .text-muted {
+            color: var(--mud-palette-text-secondary);
+        }
     </style>
     <div class="d-flex flex-row gap-3">
         <div class="d-flex flex-column">
@@ -149,6 +153,32 @@
 
 </MudPaper>
 
+<MudPaper Class="pa-4 mb-3">
+    <MudText Typo="Typo.h5">Orders List</MudText>
+
+    <MudDataGrid T="Order" Items="Orders" Dense="true" Hover="true">
+        <Columns>
+            <PropertyColumn Title="Order Number" Property="x => x.OrderNumber" />
+            <PropertyColumn Title="Product" Property="x => x.Product" />
+            <PropertyColumn Title="Amount" Property="x => x.Amount" CellStyle="text-align:right" HeaderStyle="text-align:right">
+                <CellTemplate>
+                    @context.Item.Amount.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")).Replace("€", "EUR ")
+                </CellTemplate>
+                <FooterTemplate>
+                    <MudText Typo="Typo.subtitle1"> @($"Total: {Orders.Sum(x => x.Amount).ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")).Replace("€", "EUR ")}")</MudText>
+                </FooterTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Status" Property="x => x.Status" />
+            <PropertyColumn Title="Customer Name" Property="x => x.CustomerName" />
+            <PropertyColumn Title="Order Date" Property="x => x.OrderDate" Format="yyyy-MM-dd" />
+            
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Order" />
+        </PagerContent>
+    </MudDataGrid>
+</MudPaper>
+
 <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 pa-2" Elevation="0">
     <MudPaper Class="mud-theme-primary" Width="64px" Height="64px" />
     <MudPaper Class="mud-theme-secondary" Width="64px" Height="64px" />
@@ -160,7 +190,14 @@
     <MudPaper Class="mud-theme-dark" Width="64px" Height="64px" />
     <MudPaper Class="mud-theme-surface" Width="64px" Height="64px" />
 </MudPaper>
-
+<MudPaper Class="d-flex flex-row flex-grow-1 gap-4 pa-2" Elevation="0">
+    <MudButton Variant="Variant.Filled">Default</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary">Primary</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info">Info</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Error">Error</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary">Secondary</MudButton>
+    <MudButton Variant="Variant.Filled" Disabled="true">Disabled</MudButton>
+</MudPaper>
 <MudPaper Class="d-flex flex-column flex-grow-1 gap-0 pa-2" Elevation="0">
     <MudText Typo="Typo.h1">H1 Title</MudText>
     <MudText Typo="Typo.h2">H2 Title</MudText>
@@ -172,14 +209,7 @@
     <MudText Typo="Typo.subtitle1"> Subtitle1 Blazor</MudText>
     <MudText Typo="Typo.subtitle2"> Subtitle2 Blazor</MudText>
     <MudText Typo="Typo.button"> Button Text</MudText>
-    <div class="d-flex flex-row gap-3">
-        <MudButton Variant="Variant.Filled">Default</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary">Primary</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Info">Info</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Error">Error</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary">Secondary</MudButton>
-        <MudButton Variant="Variant.Filled" Disabled="true">Disabled</MudButton>
-    </div>
+
     <MudText Typo="Typo.body1"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
     <MudText Typo="Typo.body2"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
     <MudText Typo="Typo.overline"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
@@ -193,11 +223,50 @@
     <MudText Typo="Typo.body1" Class="mud-dark-text"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
     <MudText Typo="Typo.body1" Class="mud-tertiary-text"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
 </MudPaper>
-@code{
+@code {
+    public List<Order> Orders = new List<Order>
+        {
+            new Order { OrderNumber = "ORD0001", Amount = 150.50M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-1), CustomerName = "Alice", ShippingAddress = "123 Main St", Product = "Apple iPhone 15 Pro Max, 256GB, Blue Titanium" },
+            new Order { OrderNumber = "ORD0002", Amount = 220.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 1-6 days", OrderDate = DateTime.Now.AddDays(-5), CustomerName = "Bob", ShippingAddress = "456 Oak Rd", Product = "Samsung Galaxy S23 Ultra, 512GB, Phantom Black" },
+            new Order { OrderNumber = "ORD0003", Amount = 340.75M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 7-13 days", OrderDate = DateTime.Now.AddDays(-10), CustomerName = "Charlie", ShippingAddress = "789 Pine Ln", Product = "Sony WH-1000XM5 Wireless Noise Cancelling Headphones" },
+            new Order { OrderNumber = "ORD0004", Amount = 89.99M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-3), CustomerName = "David", ShippingAddress = "101 Maple Dr", Product = "Logitech MX Master 3S Wireless Mouse" },
+            new Order { OrderNumber = "ORD0005", Amount = 430.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 14-29 days", OrderDate = DateTime.Now.AddDays(-20), CustomerName = "Eva", ShippingAddress = "202 Birch Blvd", Product = "Razer BlackWidow V3 Mechanical Gaming Keyboard" },
+            new Order { OrderNumber = "ORD0006", Amount = 560.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-15), CustomerName = "Frank", ShippingAddress = "303 Cedar Ct", Product = "Dell UltraSharp U2723QE 27-inch 4K USB-C Monitor" },
+            new Order { OrderNumber = "ORD0007", Amount = 99.99M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 30 days or more", OrderDate = DateTime.Now.AddDays(-40), CustomerName = "Grace", ShippingAddress = "404 Elm Ave", Product = "Canon PIXMA TS9120 Wireless Inkjet Printer" },
+            new Order { OrderNumber = "ORD0008", Amount = 205.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-25), CustomerName = "Hannah", ShippingAddress = "505 Willow St", Product = "Apple iPad Air, 64GB, Space Gray" },
+            new Order { OrderNumber = "ORD0009", Amount = 312.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 1-6 days", OrderDate = DateTime.Now.AddDays(-2), CustomerName = "Isaac", ShippingAddress = "606 Fir Ln", Product = "Fitbit Charge 5 Fitness Tracker" },
+            new Order { OrderNumber = "ORD0010", Amount = 420.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-7), CustomerName = "John", ShippingAddress = "707 Maple Ave", Product = "GoPro HERO11 Black Action Camera" },
+            new Order { OrderNumber = "ORD0011", Amount = 188.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 7-13 days", OrderDate = DateTime.Now.AddDays(-12), CustomerName = "Kathy", ShippingAddress = "808 Oak St", Product = "Bose QuietComfort 45 Wireless Noise Cancelling Headphones" },
+            new Order { OrderNumber = "ORD0012", Amount = 500.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-18), CustomerName = "Liam", ShippingAddress = "909 Pine Blvd", Product = "Xbox Series X 1TB Console" },
+            new Order { OrderNumber = "ORD0013", Amount = 139.99M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 14-29 days", OrderDate = DateTime.Now.AddDays(-30), CustomerName = "Mia", ShippingAddress = "1010 Birch Ln", Product = "Samsung T7 Portable SSD, 1TB" },
+            new Order { OrderNumber = "ORD0014", Amount = 249.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-9), CustomerName = "Noah", ShippingAddress = "1111 Cedar Ave", Product = "Anker PowerCore 26800 PD Portable Charger" },
+            new Order { OrderNumber = "ORD0015", Amount = 700.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 30 days or more", OrderDate = DateTime.Now.AddDays(-35), CustomerName = "Olivia", ShippingAddress = "1212 Elm Dr", Product = "Bose SoundLink Revolve+ Bluetooth Speaker" },
+            new Order { OrderNumber = "ORD0016", Amount = 355.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-5), CustomerName = "Paul", ShippingAddress = "1313 Willow Rd", Product = "Herman Miller Aeron Chair" },
+            new Order { OrderNumber = "ORD0017", Amount = 850.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 1-6 days", OrderDate = DateTime.Now.AddDays(-4), CustomerName = "Quincy", ShippingAddress = "1414 Fir Blvd", Product = "Samsung Odyssey G9 49-inch Curved Gaming Monitor" },
+            new Order { OrderNumber = "ORD0018", Amount = 175.00M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-6), CustomerName = "Rita", ShippingAddress = "1515 Maple St", Product = "JBL Flip 6 Bluetooth Speaker" },
+            new Order { OrderNumber = "ORD0019", Amount = 450.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 7-13 days", OrderDate = DateTime.Now.AddDays(-11), CustomerName = "Samuel", ShippingAddress = "1616 Oak Ln", Product = "Epson EcoTank ET-8550 Wireless All-in-One Printer" },
+            new Order { OrderNumber = "ORD0020", Amount = 999.99M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-2), CustomerName = "Tina", ShippingAddress = "1717 Pine Ave", Product = "Apple MacBook Pro 14-inch, M2 Pro, 16GB RAM, 512GB SSD" }
+        };
     private string weather = "";
     protected override async Task OnInitializedAsync()
     {
-       var weatherres = await ApiClient.Weatherforecast.GetAsync();
+        var weatherres = await ApiClient.Weatherforecast.GetAsync();
         weather = System.Text.Json.JsonSerializer.Serialize(weatherres);
+    }
+
+
+
+
+    public class Order
+    {
+        public string OrderNumber { get; set; }
+        public decimal Amount { get; set; }
+        public string Currency { get; set; }
+        public string Status { get; set; }
+        public string OverdueStatus { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string CustomerName { get; set; }
+        public string ShippingAddress { get; set; }
+        public string Product { get; set; }
     }
 }
