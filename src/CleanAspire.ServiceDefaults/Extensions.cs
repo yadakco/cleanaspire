@@ -3,17 +3,10 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using Scalar.AspNetCore;
-using CleanAspire.Infrastructure;
-using CleanAspire.Infrastructure.Persistence.Seed;
-using Microsoft.AspNetCore.Identity;
-using CleanAspire.Domain.Identities;
-using CleanAspire.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Routing;
-using System.Reflection;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -24,20 +17,10 @@ public static class Extensions
 {
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-
         builder.ConfigureOpenTelemetry();
 
         builder.AddDefaultHealthChecks();
-        builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-        builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
-        builder.Services.AddAuthorizationBuilder();
 
-        builder.Services.AddDatabase(builder.Configuration);
-        builder.Services.AddIdentityCore<ApplicationUser>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddApiEndpoints();
-
-        builder.Services.AddOpenApi();
         builder.Services.AddServiceDiscovery();
 
         builder.Services.ConfigureHttpClientDefaults(http =>
@@ -116,9 +99,6 @@ public static class Extensions
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
-        app.MapIdentityApi<ApplicationUser>();
-        app.MapOpenApi();
-
         // Adding health checks endpoints to applications in non-development environments has security implications.
         // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
         if (app.Environment.IsDevelopment())
@@ -131,24 +111,8 @@ public static class Extensions
             {
                 Predicate = r => r.Tags.Contains("live")
             });
-
-            app.MapScalarApiReference();
         }
 
         return app;
-    }
-    public static async Task InitializeDatabaseAsync(this WebApplication app)
-    {
-        using (var scope = app.Services.CreateScope())
-        {
-            var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
-            await initializer.InitialiseAsync();
-
-            var env = app.Services.GetRequiredService<IHostEnvironment>();
-            if (env.IsDevelopment())
-            {
-                await initializer.SeedAsync().ConfigureAwait(false);
-            }
-        }
     }
 }

@@ -13,12 +13,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CleanAspire.Api\CleanAspire.Api.csproj" />
-    <ProjectReference Include="..\CleanAspire.PWA\CleanAspire.PWA.csproj" />
+    <ProjectReference Include="..\CleanAspire.ClientApp\CleanAspire.ClientApp.csproj" />
+    <ProjectReference Include="..\Migrators\Migrators.MSSQL\Migrators.MSSQL.csproj" />
+    <ProjectReference Include="..\Migrators\Migrators.PostgreSQL\Migrators.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Migrators\Migrators.SQLite\Migrators.SQLite.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0-rc.1.24511.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.2.24474.1"/>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.2.24474.1" />
   </ItemGroup>
  
 </Project>

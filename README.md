@@ -1,8 +1,9 @@
 ## CleanAspire - Modern .NET 9 Minimal API + Blazor WebAssembly PWA Template
-
+![blazorclient](https://github.com/user-attachments/assets/013b167b-59fa-42d7-a2f7-ffec301c4e11)
 ### Overview
 
 **CleanAspire** is a cutting-edge open-source project combining the latest .NET 9 Minimal API with Blazor WebAssembly, all organized with the principles of **Clean Architecture**. This template is built to accelerate the development of scalable and maintainable Progressive Web Applications (PWA) while keeping the codebase neat, modular, and future-proof.
+
 
 ### Features
 

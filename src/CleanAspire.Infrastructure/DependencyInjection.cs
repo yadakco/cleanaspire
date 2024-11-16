@@ -19,6 +19,8 @@ using CleanAspire.Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using CleanAspire.Infrastructure.Services;
+using Microsoft.Extensions.Hosting;
+using CleanAspire.Application.Common.Services;
 namespace CleanAspire.Infrastructure;
 
 public static class DependencyInjection
@@ -36,20 +38,23 @@ public static class DependencyInjection
         services.Configure<DatabaseSettings>(configuration.GetSection(DATABASE_SETTINGS_KEY))
             .AddSingleton(s => s.GetRequiredService<IOptions<DatabaseSettings>>().Value);
         services.AddScoped<IDateTime, UtcDateTime>()
+             .AddScoped<ICurrentUserContext, CurrentUserContext>();
+        services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>()
+             .AddScoped<ICurrentUserContextSetter, CurrentUserContextSetter>()
             .AddScoped<ICurrentUserAccessor, CurrentUserAccessor>()
             .AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>()
             .AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
-   
+
 
         if (configuration.GetValue<bool>(USE_IN_MEMORY_DATABASE_KEY))
         {
-            services.AddDbContext<ApplicationDbContext>((p,options) =>
+            services.AddDbContext<ApplicationDbContext>((p, options) =>
             {
                 options.UseInMemoryDatabase(IN_MEMORY_DATABASE_NAME);
                 options.AddInterceptors(p.GetServices<ISaveChangesInterceptor>());
                 options.EnableSensitiveDataLogging();
             });
-  
+
         }
         else
         {
@@ -60,7 +65,7 @@ public static class DependencyInjection
                 m.UseExceptionProcessor(databaseSettings.DBProvider);
                 m.UseDatabase(databaseSettings.DBProvider, databaseSettings.ConnectionString);
             });
-  
+
         }
 
 
@@ -72,7 +77,7 @@ public static class DependencyInjection
         return services;
     }
 
- 
+
     private static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider,
             string connectionString)
     {
@@ -116,6 +121,23 @@ public static class DependencyInjection
 
             default:
                 throw new InvalidOperationException($"DB Provider {dbProvider} is not supported.");
+        }
+    }
+
+
+
+    public static async Task InitializeDatabaseAsync(this IHost host)
+    {
+        using (var scope = host.Services.CreateScope())
+        {
+            var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+            await initializer.InitialiseAsync().ConfigureAwait(false);
+
+            var env = host.Services.GetRequiredService<IHostEnvironment>();
+            if (env.IsDevelopment())
+            {
+                await initializer.SeedAsync().ConfigureAwait(false);
+            }
         }
     }
 }
