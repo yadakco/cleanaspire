@@ -1,7 +1,7 @@
 ﻿@using CleanAspire.ClientApp.Services.Identity
 @using Microsoft.AspNetCore.Components.Authorization
 @inject IIdentityManagement IdentityManagement
-@implements IDisposable
+
 <MudMenu Class="ml-1" PositionAtCursor="false" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.BottomLeft">
     <ActivatorContent>
         <MudStack Row="true" AlignItems="AlignItems.Center">
@@ -54,13 +54,6 @@
 
     private UserInfo? userModel { get; set; } = new();
     private string? GetAvatarUrl() => userModel?.Avatar;
-
-    protected override async Task OnInitializedAsync()
-    {
-
-
-    }
-
     private async Task OnSignOut()
     {
         await IdentityManagement.LogoutAsync();

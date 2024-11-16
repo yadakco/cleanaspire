@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CleanAspire.Api\CleanAspire.Api.csproj" />
     <ProjectReference Include="..\CleanAspire.ClientApp\CleanAspire.ClientApp.csproj" />
-    <ProjectReference Include="..\CleanAspire.PWA\CleanAspire.PWA.csproj" />
     <ProjectReference Include="..\Migrators\Migrators.MSSQL\Migrators.MSSQL.csproj" />
     <ProjectReference Include="..\Migrators\Migrators.PostgreSQL\Migrators.PostgreSQL.csproj" />
     <ProjectReference Include="..\Migrators\Migrators.SQLite\Migrators.SQLite.csproj" />

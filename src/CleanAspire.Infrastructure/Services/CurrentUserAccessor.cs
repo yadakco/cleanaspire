@@ -1,26 +1,33 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using CleanAspire.Application.Common.Interfaces;
+using CleanArchitecture.Blazor.Infrastructure.Extensions;
+using CleanAspire.Application.Common.Services;
 
 namespace CleanAspire.Infrastructure.Services;
 
+/// <summary>
+/// Provides access to the current user's session information.
+/// </summary>
 public class CurrentUserAccessor : ICurrentUserAccessor
 {
-    private readonly ClaimsPrincipal _user;
+    private readonly ICurrentUserContext _currentUserContext;
 
-    public CurrentUserAccessor()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CurrentUserAccessor"/> class.
+    /// </summary>
+    /// <param name="currentUserContext">The current user context.</param>
+    public CurrentUserAccessor(ICurrentUserContext currentUserContext)
     {
-        _user = new ClaimsPrincipal();
+        _currentUserContext = currentUserContext;
     }
-    public string? UserId => _user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    public string? TenantId => _user.FindFirst(ClaimTypes.GroupSid)?.Value;
+
+    /// <summary>
+    /// Gets the session information of the current user.
+    /// </summary>
+    public ClaimsPrincipal? User => _currentUserContext.GetCurrentUser();
+
+    public string? UserId => User?.GetUserId();
+
+    public string? TenantId => User?.GetTenantId();
 }
 

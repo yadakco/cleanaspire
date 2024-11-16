@@ -1,11 +1,16 @@
 ﻿using CleanAspire.Api;
 using CleanAspire.Application;
+using CleanAspire.Application.Common.Interfaces;
+using CleanAspire.Application.Common.Services;
+using CleanAspire.Domain.Entities;
 using CleanAspire.Domain.Identities;
 using CleanAspire.Infrastructure;
 using CleanAspire.Infrastructure.Persistence;
 using CleanAspire.Infrastructure.Persistence.Seed;
+using CleanAspire.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Mono.TextTemplating;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
- 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplication();
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 builder.Services.AddAuthorizationBuilder();
@@ -49,9 +54,11 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 app.UseCors("wasm");
-app.MapGet("/weatherforecast", ( ) =>
+app.MapGet("/weatherforecast", async (IApplicationDbContext db) =>
 {
-   
+    var product = new Product() { Id = Guid.CreateVersion7().ToString(), Name = "test" + Guid.CreateVersion7().ToString(), Description = "test", Currency = "USD", Price = 100, Quantity = 99, UOM = "EA" };
+    db.Products.Add(product);
+    await db.SaveChangesAsync();
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
@@ -61,6 +68,20 @@ app.MapGet("/weatherforecast", ( ) =>
         ))
         .ToArray();
     return forecast;
+});
+
+app.Use(async (context, next) =>
+{
+    var currentUserContextSetter = context.RequestServices.GetRequiredService<ICurrentUserContextSetter>();
+    try
+    {
+        currentUserContextSetter.SetCurrentUser(context.User);
+        await next.Invoke();
+    }
+    finally
+    {
+        currentUserContextSetter.Clear();
+    }
 });
 
 app.MapDefaultEndpoints();
