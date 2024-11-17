@@ -48,24 +48,28 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient) : Authentica
         return new AuthenticationState(user);
     }
 
-    public async Task<AccessTokenResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
+    public async Task<AccessTokenResponse> LoginAsync(LoginRequest request, bool remember = false, CancellationToken cancellationToken = default)
     {
         try
         {
             // login with cookies
-            await apiClient.Login.PostAsync(request, options => options.QueryParameters.UseCookies = true, cancellationToken);
-                // need to refresh auth state
+            await apiClient.Login.PostAsync(request, options =>
+            {
+                options.QueryParameters.UseCookies = remember;
+                options.QueryParameters.UseSessionCookies = !remember;
+            }, cancellationToken);
+            // need to refresh auth state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-             
+
         }
         catch { }
         return new AccessTokenResponse();
-      
+
     }
 
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
-        await apiClient.Logout.PostAsync(cancellationToken:cancellationToken);
+        await apiClient.Logout.PostAsync(cancellationToken: cancellationToken);
         // need to refresh auth state
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }

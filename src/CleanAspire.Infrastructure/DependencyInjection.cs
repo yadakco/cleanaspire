@@ -17,14 +17,18 @@ using Microsoft.Extensions.DependencyInjection;
 using CleanAspire.Infrastructure.Persistence.Interceptors;
 using CleanAspire.Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Identity;
 using CleanAspire.Infrastructure.Services;
 using Microsoft.Extensions.Hosting;
 using CleanAspire.Application.Common.Services;
+
+
 namespace CleanAspire.Infrastructure;
 
 public static class DependencyInjection
 {
+    private const string SMTP_CLIENT_OPTIONS_KEY = "SmtpClientOptions";
+    private const string SMTP_CLIENT_OPTIONS_DEFAULT_FROM_EMAIL = "SmtpClientOptions:DefaultFromEmail";
+    private const string DEFAULT_FROM_EMAIL = "noreply@blazorserver.com";
     private const string DATABASE_SETTINGS_KEY = "DatabaseSettings";
     private const string NPGSQL_ENABLE_LEGACY_TIMESTAMP_BEHAVIOR = "Npgsql.EnableLegacyTimestampBehavior";
     private const string MSSQL_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.MSSQL";
@@ -32,7 +36,18 @@ public static class DependencyInjection
     private const string POSTGRESQL_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.PostgreSQL";
     private const string USE_IN_MEMORY_DATABASE_KEY = "UseInMemoryDatabase";
     private const string IN_MEMORY_DATABASE_NAME = "CleanAspireDb";
-    public static IServiceCollection AddDatabase(this IServiceCollection services,
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services
+            .AddDatabase(configuration);
+ 
+
+        return services;
+    }
+
+    private static IServiceCollection AddDatabase(this IServiceCollection services,
    IConfiguration configuration)
     {
         services.Configure<DatabaseSettings>(configuration.GetSection(DATABASE_SETTINGS_KEY))
