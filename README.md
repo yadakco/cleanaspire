@@ -1,5 +1,6 @@
 ## CleanAspire - Modern .NET 9 Minimal API + Blazor WebAssembly PWA Template
 [![.NET](https://github.com/neozhu/cleanaspire/actions/workflows/dotnet.yml/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/dotnet.yml)
+[![CodeQL](https://github.com/neozhu/cleanaspire/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/github-code-scanning/codeql)
 
 ![blazorclient](https://github.com/user-attachments/assets/013b167b-59fa-42d7-a2f7-ffec301c4e11)
 ### Overview
