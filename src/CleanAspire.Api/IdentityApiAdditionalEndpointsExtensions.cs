@@ -16,7 +16,10 @@ public static class IdentityApiAdditionalEndpointsExtensions
         {
             await signInManager.SignOutAsync();
             return Results.Ok();
-        }).RequireAuthorization();
+        }).RequireAuthorization()
+        .WithTags("Authentication", "Identity Management")
+        .WithSummary("Log out the current user.")
+        .WithDescription("Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.");
 
         return endpoints;
     }

@@ -8,7 +8,7 @@ namespace CleanAspire.ClientApp.Services.Identity;
 
 public interface IIdentityManagement
 {
-    public Task<AccessTokenResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
+    public Task<AccessTokenResponse> LoginAsync(LoginRequest request,bool remember=false, CancellationToken cancellationToken = default);
     public Task LogoutAsync(CancellationToken cancellationToken = default);
     public Task<Stream> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
 }

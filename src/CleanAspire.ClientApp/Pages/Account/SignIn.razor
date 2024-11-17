@@ -23,7 +23,7 @@
                 </MudTextField>
                 <MudTextField InputType="@PasswordInput" @bind-Value="model.Password" For="@(() => model.Password)" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonPasswordClick" AdornmentAriaLabel="Show Password"></MudTextField>
                 <div class="d-flex flex-row align-center justify-space-between">
-                    <MudCheckBox T="bool">@L["remember me"]</MudCheckBox>
+                    <MudCheckBox T="bool" @bind-Value="model.RememberMe">@L["remember me"]</MudCheckBox>
                     <MudLink Href="/account/forgetpassword">@L["forget password?"]</MudLink>
                 </div>
                 <MudButton ButtonType="ButtonType.Submit" FullWidth="true" Color="Color.Primary" >@L["Sign In"]</MudButton>
@@ -47,7 +47,7 @@
         try
         {
      
-            var result = await IdentityManagement.LoginAsync(new Api.Client.Models.LoginRequest() { Email = model.Username, Password = model.Password });
+            var result = await IdentityManagement.LoginAsync(new Api.Client.Models.LoginRequest() { Email = model.Username, Password = model.Password }, model.RememberMe);
             StateHasChanged();
           
         }
@@ -83,6 +83,7 @@
         [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{6,}$", ErrorMessage = "Password must be at least 6 characters long and contain at least one letter, one number, and one special character.")]
         public string Password { get; set; } = string.Empty;
+        public bool RememberMe { get; set; }
 
     }
 }
