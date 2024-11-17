@@ -29,26 +29,6 @@
         }
       }
     },
-    "/logout": {
-      "post": {
-        "tags": [
-          "Authentication",
-          "Identity Management"
-        ],
-        "summary": "Log out the current user.",
-        "description": "Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "Identity.Application": [ ]
-          }
-        ]
-      }
-    },
     "/register": {
       "post": {
         "tags": [
@@ -407,6 +387,66 @@
           }
         ]
       }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "Authentication",
+          "Identity Management"
+        ],
+        "summary": "Log out the current user.",
+        "description": "Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "Authentication",
+          "Identity Management"
+        ],
+        "summary": "Retrieve the profile information",
+        "description": "This endpoint fetches the profile information of the currently authenticated user based on their claims. If the user is not found in the system, it returns a 404 Not Found status. The endpoint requires authorization and utilizes Identity Management for user retrieval and profile generation.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -540,6 +580,58 @@
           "password": "P@ssw0rd!"
         }
       },
+      "ProfileResponse": {
+        "required": [
+          "userId",
+          "username",
+          "email",
+          "isEmailConfirmed"
+        ],
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "nullable": true
+          },
+          "provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatar": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isEmailConfirmed": {
+            "type": "boolean"
+          },
+          "timeZoneId": {
+            "type": "string",
+            "nullable": true
+          },
+          "languageCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "superiorId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "RefreshRequest": {
         "required": [
           "refreshToken"
@@ -566,7 +658,7 @@
           }
         },
         "example": {
-          "email": "Nils_Schumm@gmail.com",
+          "email": "Julio_Schuppe36@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -679,12 +771,6 @@
           }
         }
       }
-    },
-    "securitySchemes": {
-      "Identity.Application": {
-        "type": "http",
-        "description": "Use this cookie to authenticate the user."
-      }
     }
   },
   "tags": [
@@ -692,13 +778,13 @@
       "name": "Weather"
     },
     {
+      "name": "CleanAspire.Api"
+    },
+    {
       "name": "Authentication"
     },
     {
       "name": "Identity Management"
-    },
-    {
-      "name": "CleanAspire.Api"
     }
   ]
 }
