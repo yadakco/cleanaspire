@@ -36,11 +36,15 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
+
 // add a CORS policy for the client
+var allowedCorsOrigins = builder.Configuration.GetValue<string>("AllowedCorsOrigins")?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? new[] { "https://localhost:7341", "https://localhost:7123" };
 builder.Services.AddCors(
     options => options.AddPolicy(
         "wasm",
-        policy => policy.WithOrigins("localhost", "https://localhost:7341", "https://localhost:7123")
+        policy => policy.WithOrigins(allowedCorsOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()));
