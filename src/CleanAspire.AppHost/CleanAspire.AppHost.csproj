@@ -10,7 +10,7 @@
     <IsAspireHost>true</IsAspireHost>
       <IsPublishable>true</IsPublishable>
       <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-      <ContainerRepository>cleanaspire</ContainerRepository>
+      <ContainerRepository>blazordevlab\cleanaspire</ContainerRepository>
     <UserSecretsId>ac63aff4-1f44-46a9-9c5d-0b26b517e142</UserSecretsId>
   
   </PropertyGroup>
