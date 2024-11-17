@@ -21,6 +21,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 // register the cookie handler
 builder.Services.AddTransient<CookieHandler>();
+builder.Services.AddSingleton<UserProfileStore>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings);

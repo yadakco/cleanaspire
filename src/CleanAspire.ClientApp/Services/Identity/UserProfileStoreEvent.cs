@@ -6,19 +6,19 @@ using CleanAspire.Api.Client.Models;
 
 namespace CleanAspire.ClientApp.Services.Identity;
 
-public class AuthStoreEvent
+public class UserProfileStoreEvent
 {
-    public AccessTokenResponse? AccessTokenResponse { get; private set; }
+    public ProfileResponse? Profile { get; private set; }
 
 
-    public AuthStoreEvent(AccessTokenResponse? accessTokenResponse)
+    public UserProfileStoreEvent(ProfileResponse? profile)
     {
-        AccessTokenResponse = accessTokenResponse;
+        Profile = profile;
     }
 
     public override string ToString()
     {
-        return $"token: {AccessTokenResponse?.AccessToken}";
+        return $"userId: {Profile?.UserId}";
     }
 }
 

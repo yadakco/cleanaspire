@@ -16,7 +16,8 @@
         <PackageReference Include="MailKit" Version="4.8.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.2.24474.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.0" />
         <PackageReference Include="Scalar.AspNetCore" Version="1.2.37" />
 
     </ItemGroup>

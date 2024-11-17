@@ -49,7 +49,7 @@
                 @L["Please type your username to confirm. Your current username is:"]
             </span>
             <span class="mud-typography mud-typography-caption mud-error-text" style="font-weight:500">
-                @userInfo?.Username
+                @userModel?.Username
             </span>
         </div>
         
@@ -71,7 +71,7 @@
     private string? newEmailAddress;
 
     private DialogOptions dialogOptions = new() { MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey=true, CloseButton=true};
-    private UserInfo? userInfo;
+    private ProfileResponse? userModel => UserProfileStore.Profile;
     protected override async Task OnInitializedAsync()
     {
         //userInfo = await PocketbaseClient.GetCurrentUserAsync();
@@ -118,7 +118,7 @@
 
     private string? userNameMatch(string? arg)
     {
-        if (userInfo?.Username!= arg)
+        if (userModel?.Username != arg)
             return L["Username does not match"];
         return null;
     }

@@ -46,10 +46,10 @@
     {
         try
         {
-     
+
             var result = await IdentityManagement.LoginAsync(new Api.Client.Models.LoginRequest() { Email = model.Username, Password = model.Password }, model.RememberMe);
             StateHasChanged();
-          
+
         }
         catch (Exception e)
         {
@@ -83,7 +83,7 @@
         [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{6,}$", ErrorMessage = "Password must be at least 6 characters long and contain at least one letter, one number, and one special character.")]
         public string Password { get; set; } = string.Empty;
-        public bool RememberMe { get; set; }
+        public bool RememberMe { get; set; } = true;
 
     }
 }

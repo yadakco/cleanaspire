@@ -5,6 +5,7 @@ using CleanAspire.Api.Client.ForgotPassword;
 using CleanAspire.Api.Client.Login;
 using CleanAspire.Api.Client.Logout;
 using CleanAspire.Api.Client.Manage;
+using CleanAspire.Api.Client.Profile;
 using CleanAspire.Api.Client.Refresh;
 using CleanAspire.Api.Client.Register;
 using CleanAspire.Api.Client.ResendConfirmationEmail;
@@ -49,6 +50,11 @@ namespace CleanAspire.Api.Client
         {
             get => new global::CleanAspire.Api.Client.Manage.ManageRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The profile property</summary>
+        public global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder Profile
+        {
+            get => new global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The refresh property</summary>
         public global::CleanAspire.Api.Client.Refresh.RefreshRequestBuilder Refresh
         {
@@ -80,11 +86,6 @@ namespace CleanAspire.Api.Client
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
         public ApiClient(IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}", new Dictionary<string, object>())
         {
-            if (string.IsNullOrEmpty(RequestAdapter.BaseUrl))
-            {
-                RequestAdapter.BaseUrl = "https://localhost:60243";
-            }
-            PathParameters.TryAdd("baseurl", RequestAdapter.BaseUrl);
         }
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CleanAspire.ClientApp.Services.Identity;
 
-public class CookieAuthenticationStateProvider(ApiClient apiClient) : AuthenticationStateProvider, IIdentityManagement
+public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileStore profileStore) : AuthenticationStateProvider, IIdentityManagement
 {
     private bool authenticated = false;
     private readonly ClaimsPrincipal unauthenticated = new(new ClaimsIdentity());
@@ -25,15 +25,17 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient) : Authentica
         try
         {
             // the user info endpoint is secured, so if the user isn't logged in this will fail
-            var infoResponse = await apiClient.Manage.Info.GetAsync();
-            Console.WriteLine(infoResponse);
-            if (infoResponse != null)
+            var profileResponse = await apiClient.Profile.GetAsync();
+            Console.WriteLine(profileResponse);
+            profileStore.Set(profileResponse);
+            if (profileResponse != null)
             {
                 // in this example app, name and email are the same
                 var claims = new List<Claim>
                     {
-                        new(ClaimTypes.Name, infoResponse.Email),
-                        new(ClaimTypes.Email, infoResponse.Email),
+                        new(ClaimTypes.NameIdentifier,profileResponse.UserId),
+                        new(ClaimTypes.Name,profileResponse.Username),
+                        new(ClaimTypes.Email, profileResponse.Email),
                     };
 
                 // set the principal

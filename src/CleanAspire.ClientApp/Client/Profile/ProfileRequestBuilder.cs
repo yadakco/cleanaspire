@@ -9,51 +9,55 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace CleanAspire.Api.Client.Weatherforecast
+namespace CleanAspire.Api.Client.Profile
 {
     /// <summary>
-    /// Builds and executes requests for operations under \weatherforecast
+    /// Builds and executes requests for operations under \profile
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    public partial class WeatherforecastRequestBuilder : BaseRequestBuilder
+    public partial class ProfileRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WeatherforecastRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/weatherforecast", pathParameters)
+        public ProfileRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/profile", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WeatherforecastRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/weatherforecast", rawUrl)
+        public ProfileRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/profile", rawUrl)
         {
         }
         /// <summary>
-        /// Returns an array of weather forecast data including the date, temperature, and weather summary for the next 5 days. Each forecast entry provides information about the expected temperature and a brief summary of the weather conditions.
+        /// This endpoint fetches the profile information of the currently authenticated user based on their claims. If the user is not found in the system, it returns a 404 Not Found status. The endpoint requires authorization and utilizes Identity Management for user retrieval and profile generation.
         /// </summary>
-        /// <returns>A List&lt;global::CleanAspire.Api.Client.Models.WeatherForecast&gt;</returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.Models.ProfileResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 400 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<List<global::CleanAspire.Api.Client.Models.WeatherForecast>?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::CleanAspire.Api.Client.Models.ProfileResponse?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<List<global::CleanAspire.Api.Client.Models.WeatherForecast>> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::CleanAspire.Api.Client.Models.ProfileResponse> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
-            var collectionResult = await RequestAdapter.SendCollectionAsync<global::CleanAspire.Api.Client.Models.WeatherForecast>(requestInfo, global::CleanAspire.Api.Client.Models.WeatherForecast.CreateFromDiscriminatorValue, default, cancellationToken).ConfigureAwait(false);
-            return collectionResult?.AsList();
+            var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
+            {
+                { "400", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
+            };
+            return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.ProfileResponse>(requestInfo, global::CleanAspire.Api.Client.Models.ProfileResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns an array of weather forecast data including the date, temperature, and weather summary for the next 5 days. Each forecast entry provides information about the expected temperature and a brief summary of the weather conditions.
+        /// This endpoint fetches the profile information of the currently authenticated user based on their claims. If the user is not found in the system, it returns a 404 Not Found status. The endpoint requires authorization and utilizes Identity Management for user retrieval and profile generation.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -74,18 +78,18 @@ namespace CleanAspire.Api.Client.Weatherforecast
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder WithUrl(string rawUrl)
+        public global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder(rawUrl, RequestAdapter);
+            return new global::CleanAspire.Api.Client.Profile.ProfileRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WeatherforecastRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
+        public partial class ProfileRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

@@ -10,22 +10,22 @@
                 <MudText Typo="Typo.h4"> @L["Basic info"]</MudText>
                 <MudText Typo="Typo.body1">@L["Some info may be visible to other people using Google services. Learn more"]</MudText>
             </MudListSubheader>
-            @if (userInfo is not null)
+            @if (userModel is not null)
             {
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["Profile picture"]</MudText>
                                  <MudText Style="min-width:200px">@L["Add a profile picture to personalize your account"]</MudText>
-                        @if (userInfo?.Avatar != null)
+                        @if (userModel?.Avatar != null)
                         {
                             <MudAvatar Size="Size.Large">
-                                <MudImage Src="@userInfo?.Avatar"></MudImage>
+                                <MudImage Src="@userModel?.Avatar"></MudImage>
                             </MudAvatar>
                         }
                         else
                         {
                             <MudAvatar Size="Size.Large">
-                                @userInfo?.Username?.FirstOrDefault()
+                                @userModel?.Username?.FirstOrDefault()
                             </MudAvatar>
                         }
                        
@@ -34,14 +34,14 @@
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["User name"]</MudText>
-                        <MudText Style="min-width:200px">@userInfo?.Username</MudText>
+                        <MudText Style="min-width:200px">@userModel?.Username</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
                     </div>
                 </MudListItem>
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["Name"]</MudText>
-                        <MudText Style="min-width:200px">@userInfo?.Nickname</MudText>
+                        <MudText Style="min-width:200px">@userModel?.Nickname</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
                     </div>
                 </MudListItem>
@@ -52,9 +52,6 @@
     </MudPaper>
 </div>
 @code {
-    private UserInfo? userInfo;
-    protected override async Task OnInitializedAsync()
-    {
-        //userInfo = await PocketbaseClient.GetCurrentUserAsync();
-    }
+    private ProfileResponse? userModel => UserProfileStore.Profile;
+ 
 }
