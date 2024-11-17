@@ -42,7 +42,7 @@ jobs:
 
       - name: Publish Docker image using .NET SDK
         run: |
-          dotnet publish "src/CleanAspire.AppHost/CleanAspire.AppHost.csproj" -c Release /p:PublishProfile=DefaultContainer /p:ContainerRepository=${{ secrets.DOCKER_USERNAME }}/cleanaspire /p:ContainerTag=${{ steps.version.outputs.version }}
+          dotnet publish --os linux --arch x64 "src/CleanAspire.AppHost/CleanAspire.AppHost.csproj" -c Release /p:PublishProfile=DefaultContainer /p:ContainerRepository=${{ secrets.DOCKER_USERNAME }}/cleanaspire /p:ContainerTag=${{ steps.version.outputs.version }}
 
       - name: Push Docker image to Docker Hub
         run: |
