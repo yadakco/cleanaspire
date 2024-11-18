@@ -6,6 +6,15 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using CleanAspire.Domain.Identities;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using CleanAspire.Api.Identity;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text.Encodings.Web;
+using System.Text;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -14,16 +23,19 @@ public static class IdentityApiAdditionalEndpointsExtensions
             where TUser : class, new()
     {
         ArgumentNullException.ThrowIfNull(endpoints);
-        var routeGroup = endpoints.MapGroup("");
-        routeGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
+        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
+        var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
+        string? confirmEmailEndpointName = null;
+        var identityGroup = endpoints.MapGroup("/identity").RequireAuthorization().WithTags("Authentication", "Identity Management");
+        identityGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
         {
             await signInManager.SignOutAsync();
             return Results.Ok();
-        }).RequireAuthorization()
-        .WithTags("Authentication", "Identity Management")
+        })
         .WithSummary("Log out the current user.")
         .WithDescription("Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.");
-        routeGroup.MapGet("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
+
+        identityGroup.MapGet("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
             (ClaimsPrincipal claimsPrincipal, HttpContext context, IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -33,15 +45,122 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         }).RequireAuthorization()
-        .WithTags("Authentication", "Identity Management")
         .WithSummary("Retrieve the profile information")
         .WithDescription("This endpoint fetches the profile information of the currently authenticated user based on their claims. " +
                  "If the user is not found in the system, it returns a 404 Not Found status. " +
                  "The endpoint requires authorization and utilizes Identity Management for user retrieval and profile generation.");
+
+
+
+        var routeGroup = endpoints.MapGroup("/account").WithTags("Authentication", "Identity Management");
+        routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
+            ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var user = new TUser();
+            if (!userManager.SupportsUserEmail)
+            {
+                throw new NotSupportedException($"{nameof(MapIdentityApiAdditionalEndpoints)} requires a user store with email support.");
+            }
+            if (user is not ApplicationUser appUser)
+                throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
+            appUser.Email = request.Email;
+            appUser.UserName = request.Email;
+            appUser.Nickname = request.Nickname;
+            appUser.Provider = request.Provider;
+            appUser.TenantId = request.TenantId;
+            appUser.TimeZoneId = request.TimeZoneId;
+            appUser.LanguageCode = request.LanguageCode;
+            var result = await userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                return CreateValidationProblem(result);
+            }
+            await SendConfirmationEmailAsync(user, userManager, context, request.Email);
+            return TypedResults.Ok();
+        });
+
+        routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
+            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            if (await userManager.FindByIdAsync(userId) is not { } user)
+            {
+                // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
+                return TypedResults.Unauthorized();
+            }
+
+            try
+            {
+                code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            }
+            catch (FormatException)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            IdentityResult result;
+
+            if (string.IsNullOrEmpty(changedEmail))
+            {
+                result = await userManager.ConfirmEmailAsync(user, code);
+            }
+            else
+            {
+                // As with Identity UI, email and user name are one and the same. So when we update the email,
+                // we need to update the user name.
+                result = await userManager.ChangeEmailAsync(user, changedEmail, code);
+
+                if (result.Succeeded)
+                {
+                    result = await userManager.SetUserNameAsync(user, changedEmail);
+                }
+            }
+
+            if (!result.Succeeded)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            return TypedResults.Text("Thank you for confirming your email.");
+        })
+        .Add(endpointBuilder =>
+        {
+            var finalPattern = ((RouteEndpointBuilder)endpointBuilder).RoutePattern.RawText;
+            confirmEmailEndpointName = $"{nameof(MapIdentityApiAdditionalEndpoints)}-{finalPattern}";
+            endpointBuilder.Metadata.Add(new EndpointNameMetadata(confirmEmailEndpointName));
+        });
+
+
+        async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
+        {
+            if (confirmEmailEndpointName is null)
+            {
+                throw new NotSupportedException("No email confirmation endpoint was registered!");
+            }
+            var code = isChange
+                ? await userManager.GenerateChangeEmailTokenAsync(user, email)
+                : await userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+            var userId = await userManager.GetUserIdAsync(user);
+            var routeValues = new RouteValueDictionary()
+            {
+                ["userId"] = userId,
+                ["code"] = code,
+            };
+
+            if (isChange)
+            {
+                // This is validated by the /confirmEmail endpoint on change.
+                routeValues.Add("changedEmail", email);
+            }
+            var confirmEmailUrl = linkGenerator.GetUriByName(context, confirmEmailEndpointName, routeValues)
+            ?? throw new NotSupportedException($"Could not find endpoint named '{confirmEmailEndpointName}'.");
+
+            await emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
+        }
         return endpoints;
-
-
-
     }
     private static async Task<ProfileResponse> CreateInfoResponseAsync<TUser>(TUser user, UserManager<TUser> userManager)
         where TUser : class
@@ -60,8 +179,37 @@ public static class IdentityApiAdditionalEndpointsExtensions
             Provider = appUser.Provider,
             SuperiorId = appUser.SuperiorId,
             TimeZoneId = appUser.TimeZoneId,
-            Avatar = appUser.Avatar
+            AvatarUrl = appUser.AvatarUrl
         };
+    }
+
+
+    private static ValidationProblem CreateValidationProblem(IdentityResult result)
+    {
+        // We expect a single error code and description in the normal case.
+        // This could be golfed with GroupBy and ToDictionary, but perf! :P
+        Debug.Assert(!result.Succeeded);
+        var errorDictionary = new Dictionary<string, string[]>(1);
+
+        foreach (var error in result.Errors)
+        {
+            string[] newDescriptions;
+
+            if (errorDictionary.TryGetValue(error.Code, out var descriptions))
+            {
+                newDescriptions = new string[descriptions.Length + 1];
+                Array.Copy(descriptions, newDescriptions, descriptions.Length);
+                newDescriptions[descriptions.Length] = error.Description;
+            }
+            else
+            {
+                newDescriptions = [error.Description];
+            }
+
+            errorDictionary[error.Code] = newDescriptions;
+        }
+
+        return TypedResults.ValidationProblem(errorDictionary);
     }
 }
 
@@ -70,7 +218,7 @@ public sealed class ProfileResponse
     public string? Nickname { get; init; }
     public string? Provider { get; init; }
     public string? TenantId { get; init; }
-    public byte[]? Avatar { get; set; }
+    public string? AvatarUrl { get; set; }
     public required string UserId { get; init; }
     public required string Username { get; init; }
     public required string Email { get; init; }
@@ -79,4 +227,41 @@ public sealed class ProfileResponse
     public string? LanguageCode { get; init; }
     public string? SuperiorId { get; init; }
 }
+public sealed class SignupRequest
+{
+    [Required]
+    [Description("User's email address. Must be in a valid email format.")]
+    [MaxLength(80, ErrorMessage = "Email cannot exceed 80 characters.")]
+    [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
+    public required string Email { get; init; }
+
+    [Required]
+    [Description("User's password. Must meet the security criteria.")]
+    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+    [MaxLength(20, ErrorMessage = "Password cannot exceed 20 characters.")]
+    [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,50}$", ErrorMessage = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.")]
+    public required string Password { get; init; }
+
+    [Description("User's preferred nickname.")]
+    [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+    public string? Nickname { get; set; }
+
+    [Description("Authentication provider, e.g., Local or Google.")]
+    [MaxLength(20, ErrorMessage = "Provider cannot exceed 20 characters.")]
+    public string? Provider { get; set; } = "Local";
+
+    [Description("Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.")]
+    [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+    public string? TenantId { get; set; }
+
+    [Description("User's time zone identifier, e.g., 'UTC', 'America/New_York'.")]
+    [MaxLength(50, ErrorMessage = "TimeZoneId cannot exceed 50 characters.")]
+    public string? TimeZoneId { get; set; }
+
+    [Description("User's preferred language code, e.g., 'en-US'.")]
+    [MaxLength(10, ErrorMessage = "LanguageCode cannot exceed 10 characters.")]
+    [RegularExpression("^[a-z]{2,3}(-[A-Z]{2})?$", ErrorMessage = "Invalid language code format.")]
+    public string? LanguageCode { get; set; }
+}
+
 

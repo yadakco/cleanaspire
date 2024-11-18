@@ -76,6 +76,16 @@ public static class OpenApiTransformersExtensions
                 ["email"] = new OpenApiString(_faker.Internet.Email()),
                 ["password"] = new OpenApiString("P@ssw0rd!")
             };
+            _examples[typeof(SignupRequest)] = new OpenApiObject
+            {
+                ["Email"] = new OpenApiString(_faker.Internet.Email()),
+                ["Password"] = new OpenApiString("P@ssw0rd!"),
+                ["Nickname"] = new OpenApiString("exampleNickname"),
+                ["Provider"] = new OpenApiString("Local"),
+                ["TenantId"] = new OpenApiString("123e4567-e89b-47d3-a456-426614174000"),
+                ["TimeZoneId"] = new OpenApiString("America/New_York"),
+                ["LanguageCode"] = new OpenApiString("en-US")
+            };
 
         }
         public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)

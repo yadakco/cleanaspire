@@ -388,7 +388,7 @@
         ]
       }
     },
-    "/logout": {
+    "/identity/logout": {
       "post": {
         "tags": [
           "Authentication",
@@ -408,7 +408,7 @@
         ]
       }
     },
-    "/profile": {
+    "/identity/profile": {
       "get": {
         "tags": [
           "Authentication",
@@ -446,6 +446,78 @@
             "Identity.Application": [ ]
           }
         ]
+      }
+    },
+    "/account/signup": {
+      "post": {
+        "tags": [
+          "Authentication",
+          "Identity Management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/confirmEmail": {
+      "get": {
+        "tags": [
+          "Authentication",
+          "Identity Management"
+        ],
+        "operationId": "MapIdentityApiAdditionalEndpoints-/account/confirmEmail",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "changedEmail",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     }
   },
@@ -601,9 +673,8 @@
             "type": "string",
             "nullable": true
           },
-          "avatar": {
+          "avatarUrl": {
             "type": "string",
-            "format": "byte",
             "nullable": true
           },
           "userId": {
@@ -658,7 +729,7 @@
           }
         },
         "example": {
-          "email": "Trudie_Nitzsche@hotmail.com",
+          "email": "Eddie.Torp73@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -690,6 +761,68 @@
           "newPassword": {
             "type": "string"
           }
+        }
+      },
+      "SignupRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 80,
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "type": "string",
+            "description": "User's email address. Must be in a valid email format."
+          },
+          "password": {
+            "maxLength": 20,
+            "minLength": 8,
+            "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,50}$",
+            "type": "string",
+            "description": "User's password. Must meet the security criteria."
+          },
+          "nickname": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "User's preferred nickname.",
+            "nullable": true
+          },
+          "provider": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Authentication provider, e.g., Local or Google.",
+            "nullable": true
+          },
+          "tenantId": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+            "nullable": true
+          },
+          "timeZoneId": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "User's time zone identifier, e.g., 'UTC', 'America/New_York'.",
+            "nullable": true
+          },
+          "languageCode": {
+            "maxLength": 10,
+            "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$",
+            "type": "string",
+            "description": "User's preferred language code, e.g., 'en-US'.",
+            "nullable": true
+          }
+        },
+        "example": {
+          "Email": "Matteo_Breitenberg46@hotmail.com",
+          "Password": "P@ssw0rd!",
+          "Nickname": "exampleNickname",
+          "Provider": "Local",
+          "TenantId": "123e4567-e89b-47d3-a456-426614174000",
+          "TimeZoneId": "America/New_York",
+          "LanguageCode": "en-US"
         }
       },
       "TwoFactorRequest": {
@@ -770,6 +903,14 @@
             "format": "int32"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "Identity.Application": {
+        "type": "apiKey",
+        "description": "Use this cookie to authenticate the user.",
+        "name": "Identity.Application",
+        "in": "cookie"
       }
     }
   },

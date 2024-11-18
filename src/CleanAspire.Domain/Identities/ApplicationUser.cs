@@ -13,7 +13,7 @@ public class ApplicationUser : IdentityUser, IAuditableEntity
     public string? Nickname { get; set; }
     public string? Provider { get; set; } = "Local";
     public string? TenantId { get; set; }
-    public byte[]? Avatar { get; set; }
+    public string? AvatarUrl { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpiryTime { get; set; }
 
