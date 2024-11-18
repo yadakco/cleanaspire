@@ -20,7 +20,8 @@ public static class OpenApiTransformersExtensions
         var scheme = new OpenApiSecurityScheme
         {
             Name = IdentityConstants.ApplicationScheme,
-            Type = SecuritySchemeType.Http,
+            Type = SecuritySchemeType.ApiKey,
+            In = ParameterLocation.Cookie,
             Description = "Use this cookie to authenticate the user.",
             Reference = new OpenApiReference
             {
@@ -28,17 +29,23 @@ public static class OpenApiTransformersExtensions
                 Id = IdentityConstants.ApplicationScheme
             }
         };
-        //options.AddDocumentTransformer((document, context, ct) =>
-        //{
-        //    document.Components ??= new();
-        //    document.Components.SecuritySchemes.Add(IdentityConstants.ApplicationScheme, scheme);
-        //    return Task.CompletedTask;
-        //});
+        options.AddDocumentTransformer((document, context, ct) =>
+        {
+            document.Components ??= new();
+            document.Components.SecuritySchemes.Add(IdentityConstants.ApplicationScheme, scheme);
+            return Task.CompletedTask;
+        });
         options.AddOperationTransformer((operation, context, ct) =>
         {
             if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
             {
-                operation.Security = [new() { [scheme] = [] }];
+                operation.Security = new List<OpenApiSecurityRequirement>
+            {
+                new OpenApiSecurityRequirement
+                {
+                    [scheme] = new List<string>()
+                }
+            };
             }
             return Task.CompletedTask;
         });
