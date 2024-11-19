@@ -15,10 +15,19 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
+using CleanAspire.Application.Common.Interfaces;
+using CleanAspire.Infrastructure.Services;
+using static System.Net.Mime.MediaTypeNames;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
 {
+    // Validate the email address using DataAnnotations like the UserValidator does when RequireUniqueEmail = true.
+    private static readonly EmailAddressAttribute _emailAddressAttribute = new();
+
     public static IEndpointRouteBuilder MapIdentityApiAdditionalEndpoints<TUser>(this IEndpointRouteBuilder endpoints)
             where TUser : class, new()
     {
@@ -44,11 +53,64 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 return TypedResults.NotFound();
             }
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
-        }).RequireAuthorization()
-        .WithSummary("Retrieve the profile information")
-        .WithDescription("This endpoint fetches the profile information of the currently authenticated user based on their claims. " +
-                 "If the user is not found in the system, it returns a 404 Not Found status. " +
-                 "The endpoint requires authorization and utilizes Identity Management for user retrieval and profile generation.");
+        })
+        .WithSummary("Retrieve the user's profile")
+        .WithDescription("Fetches the profile information of the authenticated user. " +
+         "Returns 404 if the user is not found. Requires authorization.");
+        identityGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
+            {
+                return TypedResults.NotFound();
+            }
+
+            if (!string.IsNullOrEmpty(request.Email) && !_emailAddressAttribute.IsValid(request.Email))
+            {
+                return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(request.Email)));
+            }
+            if (user is not ApplicationUser appUser)
+                throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
+
+            appUser.UserName = request.Username;
+            appUser.Nickname = request.Nickname;
+            appUser.TimeZoneId = request.TimeZoneId;
+            appUser.LanguageCode = request.LanguageCode;
+            appUser.SuperiorId = request.SuperiorId;
+            if (request.Avatar != null)
+            {
+                var avatarUrl = string.Empty;
+                var uploadService = sp.GetRequiredService<IUploadService>();
+                var filestream = request.Avatar.OpenReadStream();
+                var imgstream = new MemoryStream();
+                await filestream.CopyToAsync(imgstream);
+                imgstream.Position = 0;
+                using (var outStream = new MemoryStream())
+                {
+                    using (var image = SixLabors.ImageSharp.Image.Load(imgstream))
+                    {
+                        image.Mutate(i => i.Resize(new ResizeOptions { Mode = ResizeMode.Crop, Size = new Size(128, 128) }));
+                        image.Save(outStream, PngFormat.Instance);
+                        avatarUrl = await uploadService.UploadAsync(new UploadRequest($"{appUser.Id}_{DateTime.UtcNow.Ticks}.png", UploadType.ProfilePicture, outStream.ToArray(), true));
+                    }
+                }
+                appUser.AvatarUrl = avatarUrl;
+            }
+            await userManager.UpdateAsync(user).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(request.Email))
+            {
+                var email = await userManager.GetEmailAsync(user);
+
+                if (email != request.Email)
+                {
+                    await SendConfirmationEmailAsync(user, userManager, context, request.Email, isChange: true);
+                }
+            }
+
+            return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
+        }).WithSummary("Update user profile information.")
+        .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
 
 
@@ -213,6 +275,35 @@ public static class IdentityApiAdditionalEndpointsExtensions
     }
 }
 
+public sealed class ProfileRequest
+{
+    [Description("User's preferred nickname.")]
+    [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+    [RegularExpression("^[a-zA-Z0-9_]*$", ErrorMessage = "Nickname can only contain letters, numbers, and underscores.")]
+    public string? Nickname { get; init; }
+
+    [Description("Unique username for the user.")]
+    [MaxLength(50, ErrorMessage = "Username cannot exceed 50 characters.")]
+    [RegularExpression("^[a-zA-Z0-9_]*$", ErrorMessage = "Username can only contain letters, numbers, and underscores.")]
+    public required string Username { get; init; }
+    [Required]
+    [Description("User's email address. Must be in a valid email format.")]
+    [MaxLength(80, ErrorMessage = "Email cannot exceed 80 characters.")]
+    [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
+    public required string Email { get; init; }
+    public IFormFile? Avatar { get; init; }
+    [Description("User's time zone identifier, e.g., 'UTC', 'America/New_York'.")]
+    [MaxLength(50, ErrorMessage = "TimeZoneId cannot exceed 50 characters.")]
+    public string? TimeZoneId { get; set; }
+
+    [Description("User's preferred language code, e.g., 'en-US'.")]
+    [MaxLength(10, ErrorMessage = "LanguageCode cannot exceed 10 characters.")]
+    [RegularExpression("^[a-z]{2,3}(-[A-Z]{2})?$", ErrorMessage = "Invalid language code format.")]
+    public string? LanguageCode { get; set; }
+    [Description("Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.")]
+    [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+    public string? SuperiorId { get; init; }
+}
 public sealed class ProfileResponse
 {
     public string? Nickname { get; init; }

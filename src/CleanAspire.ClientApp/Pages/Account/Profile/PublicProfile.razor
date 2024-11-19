@@ -1,4 +1,4 @@
-﻿ 
+﻿
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <div class="d-flex flex-row gap-3">
@@ -7,7 +7,7 @@
             <MudTextField Label="@L["Name"]" @bind-Value="model.Name" For="@(() => model.Name)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit" HelperText="@L["Your name may appear around application where you contribute or are mentioned. You can remove it at any time."]"></MudTextField>
             <MudTextField Label="@L["User name"]" @bind-Value="model.Username" For="@(() => model.Username)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit"></MudTextField>
             <MudTextField Label="@L["Email"]" @bind-Value="model.Email" For="@(() => model.Email)" ShrinkLabel="true" ReadOnly></MudTextField>
-            <MudButton ButtonType="ButtonType.Submit"  Color="Color.Primary" Class="ml-auto">@L["Save Profile"]</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Class="ml-auto">@L["Save Profile"]</MudButton>
         </div>
         <div class="d-flex flex-column  gap-1 px-4">
             @if (!string.IsNullOrEmpty(model.AvatarUrl))
@@ -23,10 +23,8 @@
             <div class="flex-grow-0" style="margin-left:auto;margin-top:-35px;margin-right:20px">
                 <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                     <ActivatorContent>
-                        <MudIconButton
-                                       Color="Color.Info"
-                                       Icon="@Icons.Material.Filled.PhotoCamera"
-                                       >
+                        <MudIconButton Color="Color.Info"
+                                       Icon="@Icons.Material.Filled.PhotoCamera">
                         </MudIconButton>
                     </ActivatorContent>
                 </MudFileUpload>
@@ -45,13 +43,13 @@
     {
 
         model = new ProfileModel
-        {
-            Id = userModel?.UserId ?? string.Empty,
-            Email = userModel?.Email?? string.Empty,
-            Name = userModel?.Nickname ?? string.Empty,
-            Username = userModel?.Username ?? string.Empty,
-            Avatar = userModel?.Avatar,
-        };
+            {
+                Id = userModel?.UserId ?? string.Empty,
+                Email = userModel?.Email ?? string.Empty,
+                Name = userModel?.Nickname ?? string.Empty,
+                Username = userModel?.Username ?? string.Empty,
+                AvatarUrl = userModel?.AvatarUrl,
+            };
     }
 
     private async Task UploadFiles(IBrowserFile file)

@@ -16,10 +16,10 @@
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["Profile picture"]</MudText>
                                  <MudText Style="min-width:200px">@L["Add a profile picture to personalize your account"]</MudText>
-                        @if (userModel?.Avatar != null)
+                        @if (userModel?.AvatarUrl != null)
                         {
                             <MudAvatar Size="Size.Large">
-                                <MudImage Src="@userModel?.Avatar"></MudImage>
+                                <MudImage Src="@userModel?.AvatarUrl"></MudImage>
                             </MudAvatar>
                         }
                         else
@@ -40,12 +40,25 @@
                 </MudListItem>
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
-                        <MudText Style="min-width:120px">@L["Name"]</MudText>
+                        <MudText Style="min-width:120px">@L["Nickname"]</MudText>
                         <MudText Style="min-width:200px">@userModel?.Nickname</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
                     </div>
                 </MudListItem>
-                 
+                <MudListItem>
+                    <div class="d-flex flex-row justify-space-between align-content-center gap-3">
+                        <MudText Style="min-width:120px">@L["Language"]</MudText>
+                        <MudText Style="min-width:200px">@Localization.SupportedLanguages.FirstOrDefault(x=>x.Code== userModel?.LanguageCode)?.DisplayName</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
+                    </div>
+                </MudListItem>
+                <MudListItem>
+                    <div class="d-flex flex-row justify-space-between align-content-center gap-3">
+                        <MudText Style="min-width:120px">@L["Time zone"]</MudText>
+                        <MudText Style="min-width:200px">@TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(x => x.Id == userModel?.TimeZoneId)?.DisplayName</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
+                    </div>
+                </MudListItem>
             }
             
         </MudList>

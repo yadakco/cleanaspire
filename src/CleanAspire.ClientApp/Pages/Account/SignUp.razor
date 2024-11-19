@@ -1,6 +1,8 @@
 ﻿@page "/account/signup"
 
 @using System.ComponentModel.DataAnnotations
+@using CleanAspire.ClientApp.Components.Autocompletes
+
 <PageTitle>@L["Signup"]</PageTitle>
 <MudPaper Elevation="3" Class="pa-8" Width="100%" MaxWidth="500px">
     <div class="d-flex flex-row  align-center gap-3 my-3">
@@ -15,31 +17,40 @@
             <DataAnnotationsValidator />
             <div class="d-flex flex-column gap-2">
                 <MudTextField @bind-Value="model.Email" For="@(() => model.Email)" Label="@L["Email"]" Placeholder="Email" Required="true" RequiredError="@L["Email is required"]"></MudTextField>
+                <MudTextField @bind-Value="model.Nickname" For="@(() => model.Nickname)" Label="@L["Nickname"]" Placeholder="Nickname"></MudTextField>
                 <MudTextField @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" Label="@L["Password"]" Placeholder="Password" Required="true" RequiredError="@L["Password is required"]"></MudTextField>
                 <MudTextField @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" T="string" Label="@L["Confirm password"]" Placeholder="@L["Confirm password"]" Required="true" RequiredError="@L["Confirm password is required"]"></MudTextField>
+                <TimeZoneAutocomplete T="string" For="@(() => model.TimeZoneId)"  @bind-Value="model.TimeZoneId" Label="@L["Time Zone"]" ></TimeZoneAutocomplete>
+                <LanguageAutocomplete T="string" For="@(() => model.LanguageCode)" @bind-Value="model.LanguageCode" Label="@L["Language"]"></LanguageAutocomplete>
                 <div class="d-flex flex-row align-center justify-space-between">
                     <MudCheckBox @bind-Value="model.CheckPrivacy" For="@(() => model.CheckPrivacy)">@L["I agree to the terms and privacy"]</MudCheckBox>
                 </div>
-                <MudButton ButtonType="ButtonType.Submit" FullWidth="true" Color="Color.Primary">@L["Signup"]</MudButton>
+                <MudButton Disabled="@waiting" ButtonType="ButtonType.Submit" Color="Color.Primary">@L["Signup"]</MudButton>
             </div>
         </EditForm>
     </div>
 
 </MudPaper>
 @code {
+    private bool waiting = false;
     private SignupModel model = new();
 
     private async Task OnValidSubmit(EditContext context)
     {
         try
         {
-            var result = await ApiClient.Register.PostAsync(new RegisterRequest() { Email = model.Email, Password = model.Password });
+            waiting = true;
+            var result = await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.TenantId });
             Navigation.NavigateTo("/account/signupsuccessful");
         }
         catch (Exception e)
         {
             Logger.LogError(e, e.Message);
             Snackbar.Add(L["An error occurred while creating your account. Please try again later."], Severity.Error);
+        }
+        finally
+        {
+            waiting = false;
         }
     }
     public class SignupModel
@@ -56,5 +67,21 @@
         public string ConfirmPassword { get; set; } = string.Empty;
         [Range(typeof(bool), "true", "true", ErrorMessage = "You must accept the privacy policy.")]
         public bool CheckPrivacy { get; set; }
+        [RegularExpression("^[a-zA-Z0-9_]*$", ErrorMessage = "Nickname can only contain letters, numbers, and underscores.")]
+        [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+        public string? Nickname { get; set; }
+        [MaxLength(50, ErrorMessage = "TimeZoneId cannot exceed 50 characters.")]
+        public string? TimeZoneId { get; set; }
+
+        [MaxLength(10, ErrorMessage = "LanguageCode cannot exceed 10 characters.")]
+        [RegularExpression("^[a-z]{2,3}(-[A-Z]{2})?$", ErrorMessage = "Invalid language code format.")]
+        public string? LanguageCode { get; set; }
+        [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+        public string? SuperiorId { get; init; } = Guid.CreateVersion7().ToString();
+        [MaxLength(50, ErrorMessage = "Tenant id cannot exceed 50 characters.")]
+        public string? TenantId { get; init; } = Guid.CreateVersion7().ToString();
+
+        [MaxLength(20, ErrorMessage = "Provider cannot exceed 20 characters.")]
+        public string? Provider { get; set; } = "Local";
     }
 }

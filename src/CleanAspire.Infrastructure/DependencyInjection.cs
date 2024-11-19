@@ -41,7 +41,8 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services
-            .AddDatabase(configuration);
+            .AddDatabase(configuration)
+            .AddScoped<IUploadService, UploadService>();
  
 
         return services;

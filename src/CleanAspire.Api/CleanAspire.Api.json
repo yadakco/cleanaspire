@@ -414,8 +414,56 @@
           "Authentication",
           "Identity Management"
         ],
-        "summary": "Retrieve the profile information",
-        "description": "This endpoint fetches the profile information of the currently authenticated user based on their claims. If the user is not found in the system, it returns a 404 Not Found status. The endpoint requires authorization and utilizes Identity Management for user retrieval and profile generation.",
+        "summary": "Retrieve the user's profile",
+        "description": "Fetches the profile information of the authenticated user. Returns 404 if the user is not found. Requires authorization.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Authentication",
+          "Identity Management"
+        ],
+        "summary": "Update user profile information.",
+        "description": "Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -593,6 +641,11 @@
           }
         }
       },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary",
+        "nullable": true
+      },
       "InfoRequest": {
         "type": "object",
         "properties": {
@@ -650,6 +703,56 @@
         "example": {
           "email": "administrator",
           "password": "P@ssw0rd!"
+        }
+      },
+      "ProfileRequest": {
+        "required": [
+          "username",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9_]*$",
+            "type": "string",
+            "description": "User's preferred nickname.",
+            "nullable": true
+          },
+          "username": {
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9_]*$",
+            "type": "string",
+            "description": "Unique username for the user."
+          },
+          "email": {
+            "maxLength": 80,
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "type": "string",
+            "description": "User's email address. Must be in a valid email format."
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/IFormFile"
+          },
+          "timeZoneId": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "User's time zone identifier, e.g., 'UTC', 'America/New_York'.",
+            "nullable": true
+          },
+          "languageCode": {
+            "maxLength": 10,
+            "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$",
+            "type": "string",
+            "description": "User's preferred language code, e.g., 'en-US'.",
+            "nullable": true
+          },
+          "superiorId": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+            "nullable": true
+          }
         }
       },
       "ProfileResponse": {
@@ -729,7 +832,7 @@
           }
         },
         "example": {
-          "email": "Eddie.Torp73@hotmail.com",
+          "email": "Coleman.Lang@yahoo.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -816,7 +919,7 @@
           }
         },
         "example": {
-          "Email": "Matteo_Breitenberg46@hotmail.com",
+          "Email": "Lavonne.Erdman@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

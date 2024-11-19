@@ -25,7 +25,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         try
         {
             // the user info endpoint is secured, so if the user isn't logged in this will fail
-            var profileResponse = await apiClient.Profile.GetAsync();
+            var profileResponse = await apiClient.Identity.Profile.GetAsync();
             Console.WriteLine(profileResponse);
             profileStore.Set(profileResponse);
             if (profileResponse != null)
@@ -71,7 +71,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
 
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
-        await apiClient.Logout.PostAsync(cancellationToken: cancellationToken);
+        await apiClient.Identity.Logout.PostAsync(cancellationToken: cancellationToken);
         // need to refresh auth state
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
