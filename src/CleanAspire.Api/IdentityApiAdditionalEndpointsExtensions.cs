@@ -78,6 +78,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             appUser.TimeZoneId = request.TimeZoneId;
             appUser.LanguageCode = request.LanguageCode;
             appUser.SuperiorId = request.SuperiorId;
+            appUser.TenantId = request.TenantId;
             if (request.Avatar != null)
             {
                 var avatarUrl = string.Empty;
@@ -303,6 +304,9 @@ public sealed class ProfileRequest
     [Description("Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.")]
     [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
     public string? SuperiorId { get; init; }
+    [Description("Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.")]
+    [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+    public string? TenantId { get; set; }
 }
 public sealed class ProfileResponse
 {

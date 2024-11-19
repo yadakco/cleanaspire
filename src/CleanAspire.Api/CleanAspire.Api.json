@@ -752,6 +752,12 @@
             "type": "string",
             "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
             "nullable": true
+          },
+          "tenantId": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+            "nullable": true
           }
         }
       },
@@ -832,7 +838,7 @@
           }
         },
         "example": {
-          "email": "Coleman.Lang@yahoo.com",
+          "email": "Jamaal_Christiansen@gmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -919,7 +925,7 @@
           }
         },
         "example": {
-          "Email": "Lavonne.Erdman@hotmail.com",
+          "Email": "Ophelia.Kuvalis@yahoo.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

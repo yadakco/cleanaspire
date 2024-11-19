@@ -1,12 +1,15 @@
-﻿
+﻿@using CleanAspire.ClientApp.Components.Autocompletes
+
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <div class="d-flex flex-row gap-3">
         <div class="d-flex flex-column gap-2">
             <MudText Typo="Typo.h4">@L["Public profile"]</MudText>
-            <MudTextField Label="@L["Name"]" @bind-Value="model.Name" For="@(() => model.Name)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit" HelperText="@L["Your name may appear around application where you contribute or are mentioned. You can remove it at any time."]"></MudTextField>
+            <MudTextField Label="@L["Nickname"]" @bind-Value="model.Nickname" For="@(() => model.Nickname)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit"></MudTextField>
             <MudTextField Label="@L["User name"]" @bind-Value="model.Username" For="@(() => model.Username)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit"></MudTextField>
             <MudTextField Label="@L["Email"]" @bind-Value="model.Email" For="@(() => model.Email)" ShrinkLabel="true" ReadOnly></MudTextField>
+            <TimeZoneAutocomplete T="string" For="@(() => model.TimeZoneId)"  @bind-Value="model.TimeZoneId" Label="@L["Time Zone"]" ></TimeZoneAutocomplete>
+            <LanguageAutocomplete T="string" For="@(() => model.LanguageCode)" @bind-Value="model.LanguageCode" Label="@L["Language"]"></LanguageAutocomplete>
             <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Class="ml-auto">@L["Save Profile"]</MudButton>
         </div>
         <div class="d-flex flex-column  gap-1 px-4">
@@ -24,7 +27,7 @@
                 <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                     <ActivatorContent>
                         <MudIconButton Color="Color.Info"
-                                       Icon="@Icons.Material.Filled.PhotoCamera">
+                        Icon="@Icons.Material.Filled.PhotoCamera">
                         </MudIconButton>
                     </ActivatorContent>
                 </MudFileUpload>
@@ -46,9 +49,13 @@
             {
                 Id = userModel?.UserId ?? string.Empty,
                 Email = userModel?.Email ?? string.Empty,
-                Name = userModel?.Nickname ?? string.Empty,
+                Nickname = userModel?.Nickname ?? string.Empty,
                 Username = userModel?.Username ?? string.Empty,
                 AvatarUrl = userModel?.AvatarUrl,
+                LanguageCode = userModel?.LanguageCode,
+                SuperiorId = userModel?.SuperiorId,
+                TenantId = userModel?.TenantId,
+                TimeZoneId = userModel?.TimeZoneId
             };
     }
 
@@ -88,15 +95,14 @@
     {
         try
         {
-            // var uitem = new User(model.Id, null, DateTime.Now, new System.Net.Mail.MailAddress(model.Email), true, model.Username, true, model.Name, model.Avatar ?? new AvatarFile());
-            // var user = await PocketbaseClient.Data.UsersCollection.GetByIdAsync(model.Id);
-            // if (user != null)
-            // {
-            //     user.UpdateWith(uitem);
-            //     await PocketbaseClient.Data.SaveChangesAsync();
-            //     Snackbar.Add(L["User profile updated successfully."], Severity.Info);
-            //     StateHasChanged();
-            // }
+
+            var profile = await ApiClient.Identity.Profile.PostAsync(new ProfileRequest() { Email= model.Email, LanguageCode= model.LanguageCode, Nickname=model.Nickname, SuperiorId= model.SuperiorId, TimeZoneId=model.TenantId, Username= model.Username });
+            if (profile != null)
+            {
+                UserProfileStore.Set(profile);
+                Snackbar.Add(L["User profile updated successfully."], Severity.Info);
+                StateHasChanged();
+            }
         }
         catch
         {
@@ -110,15 +116,23 @@
         [Required]
         public string Id { get; set; } = string.Empty;
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Name contains special characters which are not allowed.")]
-        [StringLength(30, ErrorMessage = "Password must be at least 3 characters long.", MinimumLength = 3)]
+        [StringLength(50, ErrorMessage = "Password must be at least 3 characters long.", MinimumLength = 3)]
         public string Username { get; set; } = string.Empty;
         [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Name contains special characters which are not allowed.")]
-        public string Name { get; set; } = string.Empty;
+        public string Nickname { get; set; } = string.Empty;
         [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
         public string? Avatar { get; set; }
+        [MaxLength(50, ErrorMessage = "TimeZoneId cannot exceed 50 characters.")]
+        public string? TimeZoneId { get; set; }
+        [MaxLength(10, ErrorMessage = "LanguageCode cannot exceed 10 characters.")]
+        [RegularExpression("^[a-z]{2,3}(-[A-Z]{2})?$", ErrorMessage = "Invalid language code format.")]
+        public string? LanguageCode { get; set; }
+        [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+        public string? SuperiorId { get; init; }
+        [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
+        public string? TenantId { get; set; }
     }
 }
