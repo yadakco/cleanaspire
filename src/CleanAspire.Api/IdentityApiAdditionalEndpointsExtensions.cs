@@ -58,7 +58,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Fetches the profile information of the authenticated user. " +
          "Returns 404 if the user is not found. Requires authorization.");
         identityGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, [FromForm] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
@@ -292,6 +292,7 @@ public sealed class ProfileRequest
     [MaxLength(80, ErrorMessage = "Email cannot exceed 80 characters.")]
     [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
     public required string Email { get; init; }
+    [Description("User uploads an avatar image.")]
     public IFormFile? Avatar { get; init; }
     [Description("User's time zone identifier, e.g., 'UTC', 'America/New_York'.")]
     [MaxLength(50, ErrorMessage = "TimeZoneId cannot exceed 50 characters.")]
