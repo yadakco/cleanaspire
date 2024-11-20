@@ -16,6 +16,7 @@ using Scalar.AspNetCore;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using CleanAspire.Api.Identity;
+using Microsoft.Extensions.FileProviders;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -117,6 +118,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"files")),
+    RequestPath = new PathString("/files")
+});
 await app.RunAsync();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

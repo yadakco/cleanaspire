@@ -1,4 +1,5 @@
-﻿<div class="d-flex flex-column gap-2">
+﻿@using Microsoft.Kiota.Abstractions
+<div class="d-flex flex-column gap-2">
     <MudText Typo="Typo.h4">@L["Change email"]</MudText>
     <MudDivider />
 
@@ -26,7 +27,7 @@
     <DialogContent>
         <MudForm   @bind-IsValid="@success" >
             <MudTextField T="string" Label="@L["New email address"]" Placeholder="Enter your new email address" @bind-Value="@newEmailAddress" Required="true" RequiredError="@L["Email is required!"]"
-                          Validation="@(new EmailAddressAttribute() {ErrorMessage = L["The email address is invalid"]})"></MudTextField>
+            Validation="@(new EmailAddressAttribute() {ErrorMessage = L["The email address is invalid"]})"></MudTextField>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -52,10 +53,10 @@
                 @model?.Username
             </span>
         </div>
-        
+
         <MudForm   @bind-IsValid="@deleteSuccess">
             <MudTextField T="string" Label="@L["User name"]" Placeholder="Enter your user name" @bind-Value="@confirmUsername" Required="true" RequiredError="@L["User name is required!"]"
-                          Validation="@(new Func<string, string?>(userNameMatch))"></MudTextField>
+            Validation="@(new Func<string, string?>(userNameMatch))"></MudTextField>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -74,7 +75,7 @@
     private ProfileResponse? model => UserProfileStore.Profile;
     protected override async Task OnInitializedAsync()
     {
-        
+
     }
     private async Task OnChangeMyEmail()
     {
@@ -82,7 +83,20 @@
         {
             try
             {
-                await ApiClient.Identity.Profile.PostAsync(new ProfileRequest() { Email = newEmailAddress, LanguageCode = model.LanguageCode, Nickname = model.Nickname, SuperiorId = model.SuperiorId, TimeZoneId = model.TenantId, Username = model.Username });
+                var request = new MultipartBody();
+                request.AddOrReplacePart("email", "text/plain", model.Email);
+                request.AddOrReplacePart("languageCode", "text/plain", model.LanguageCode ?? string.Empty);
+                request.AddOrReplacePart("timeZoneId", "text/plain", model.TimeZoneId ?? string.Empty);
+                request.AddOrReplacePart("nickname", "text/plain", model.Nickname ?? string.Empty);
+                request.AddOrReplacePart("tenantId", "text/plain", model.TenantId ?? string.Empty);
+                request.AddOrReplacePart("username", "text/plain", model.Username ?? string.Empty);
+                if (!string.IsNullOrEmpty(model.SuperiorId))
+                {
+                    request.AddOrReplacePart("superiorId", "text/plain", model.SuperiorId);
+                }
+                
+
+                await ApiClient.Identity.Profile.PostAsync(request);
                 showChangeEmailDialog = false;
                 Snackbar.Add(L["Email change request sent successfully. Please check your new email for confirmation."], Severity.Info);
             }

@@ -516,67 +516,6 @@
                   }
                 }
               }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "required": [
-                  "username",
-                  "email"
-                ],
-                "type": "object",
-                "properties": {
-                  "nickname": {
-                    "maxLength": 50,
-                    "pattern": "^[a-zA-Z0-9_]*$",
-                    "type": "string",
-                    "description": "User's preferred nickname.",
-                    "nullable": true
-                  },
-                  "username": {
-                    "maxLength": 50,
-                    "pattern": "^[a-zA-Z0-9_]*$",
-                    "type": "string",
-                    "description": "Unique username for the user."
-                  },
-                  "email": {
-                    "maxLength": 80,
-                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-                    "type": "string",
-                    "description": "User's email address. Must be in a valid email format."
-                  },
-                  "avatar": {
-                    "type": "string",
-                    "description": "User uploads an avatar image.",
-                    "format": "binary",
-                    "nullable": true
-                  },
-                  "timeZoneId": {
-                    "maxLength": 50,
-                    "type": "string",
-                    "description": "User's time zone identifier, e.g., 'UTC', 'America/New_York'.",
-                    "nullable": true
-                  },
-                  "languageCode": {
-                    "maxLength": 10,
-                    "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$",
-                    "type": "string",
-                    "description": "User's preferred language code, e.g., 'en-US'.",
-                    "nullable": true
-                  },
-                  "superiorId": {
-                    "maxLength": 50,
-                    "type": "string",
-                    "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
-                    "nullable": true
-                  },
-                  "tenantId": {
-                    "maxLength": 50,
-                    "type": "string",
-                    "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
-                    "nullable": true
-                  }
-                }
-              }
             }
           },
           "required": true
@@ -894,7 +833,7 @@
           }
         },
         "example": {
-          "email": "Arielle32@hotmail.com",
+          "email": "Alisha67@gmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -981,7 +920,7 @@
           }
         },
         "example": {
-          "Email": "Lavern7@yahoo.com",
+          "Email": "Jacey_Mitchell@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

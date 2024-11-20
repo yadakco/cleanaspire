@@ -365,3 +365,4 @@ src/CleanAspire.Api/CleanAspireDb.db
 src/CleanAspire.Api/CleanAspireDb.db-shm
 src/CleanAspire.Api/CleanAspireDb.db-wal
 src/CleanAspire.Api/appsettings.Development.json
+src/CleanAspire.Api/files/
