@@ -102,7 +102,6 @@
             {
                 request.AddOrReplacePart("superiorId", "text/plain", model.SuperiorId);
             }
-            request.AddOrReplacePart("tenantId", "text/plain", model.TenantId ?? string.Empty);
             if (browserFile != null)
             {
                 var filename = browserFile.Name;

@@ -110,7 +110,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
 
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
-        }).Accepts<ProfileRequest>("application/x-www-form-urlencoded")
+        }).Accepts<ProfileRequest>("multipart/form-data")
         .DisableAntiforgery()
         .WithMetadata(new ConsumesAttribute("multipart/form-data")).WithSummary("Update user profile information.")
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
