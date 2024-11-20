@@ -456,9 +456,126 @@
         "description": "Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/ProfileRequest"
+                "required": [
+                  "username",
+                  "email"
+                ],
+                "type": "object",
+                "properties": {
+                  "nickname": {
+                    "maxLength": 50,
+                    "pattern": "^[a-zA-Z0-9_]*$",
+                    "type": "string",
+                    "description": "User's preferred nickname.",
+                    "nullable": true
+                  },
+                  "username": {
+                    "maxLength": 50,
+                    "pattern": "^[a-zA-Z0-9_]*$",
+                    "type": "string",
+                    "description": "Unique username for the user."
+                  },
+                  "email": {
+                    "maxLength": 80,
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+                    "type": "string",
+                    "description": "User's email address. Must be in a valid email format."
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "description": "User uploads an avatar image.",
+                    "format": "binary",
+                    "nullable": true
+                  },
+                  "timeZoneId": {
+                    "maxLength": 50,
+                    "type": "string",
+                    "description": "User's time zone identifier, e.g., 'UTC', 'America/New_York'.",
+                    "nullable": true
+                  },
+                  "languageCode": {
+                    "maxLength": 10,
+                    "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$",
+                    "type": "string",
+                    "description": "User's preferred language code, e.g., 'en-US'.",
+                    "nullable": true
+                  },
+                  "superiorId": {
+                    "maxLength": 50,
+                    "type": "string",
+                    "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+                    "nullable": true
+                  },
+                  "tenantId": {
+                    "maxLength": 50,
+                    "type": "string",
+                    "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+                    "nullable": true
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "required": [
+                  "username",
+                  "email"
+                ],
+                "type": "object",
+                "properties": {
+                  "nickname": {
+                    "maxLength": 50,
+                    "pattern": "^[a-zA-Z0-9_]*$",
+                    "type": "string",
+                    "description": "User's preferred nickname.",
+                    "nullable": true
+                  },
+                  "username": {
+                    "maxLength": 50,
+                    "pattern": "^[a-zA-Z0-9_]*$",
+                    "type": "string",
+                    "description": "Unique username for the user."
+                  },
+                  "email": {
+                    "maxLength": 80,
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+                    "type": "string",
+                    "description": "User's email address. Must be in a valid email format."
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "description": "User uploads an avatar image.",
+                    "format": "binary",
+                    "nullable": true
+                  },
+                  "timeZoneId": {
+                    "maxLength": 50,
+                    "type": "string",
+                    "description": "User's time zone identifier, e.g., 'UTC', 'America/New_York'.",
+                    "nullable": true
+                  },
+                  "languageCode": {
+                    "maxLength": 10,
+                    "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$",
+                    "type": "string",
+                    "description": "User's preferred language code, e.g., 'en-US'.",
+                    "nullable": true
+                  },
+                  "superiorId": {
+                    "maxLength": 50,
+                    "type": "string",
+                    "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+                    "nullable": true
+                  },
+                  "tenantId": {
+                    "maxLength": 50,
+                    "type": "string",
+                    "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
+                    "nullable": true
+                  }
+                }
               }
             }
           },
@@ -641,11 +758,6 @@
           }
         }
       },
-      "IFormFile": {
-        "type": "string",
-        "format": "binary",
-        "nullable": true
-      },
       "InfoRequest": {
         "type": "object",
         "properties": {
@@ -703,62 +815,6 @@
         "example": {
           "email": "administrator",
           "password": "P@ssw0rd!"
-        }
-      },
-      "ProfileRequest": {
-        "required": [
-          "username",
-          "email"
-        ],
-        "type": "object",
-        "properties": {
-          "nickname": {
-            "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9_]*$",
-            "type": "string",
-            "description": "User's preferred nickname.",
-            "nullable": true
-          },
-          "username": {
-            "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9_]*$",
-            "type": "string",
-            "description": "Unique username for the user."
-          },
-          "email": {
-            "maxLength": 80,
-            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            "type": "string",
-            "description": "User's email address. Must be in a valid email format."
-          },
-          "avatar": {
-            "$ref": "#/components/schemas/IFormFile"
-          },
-          "timeZoneId": {
-            "maxLength": 50,
-            "type": "string",
-            "description": "User's time zone identifier, e.g., 'UTC', 'America/New_York'.",
-            "nullable": true
-          },
-          "languageCode": {
-            "maxLength": 10,
-            "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$",
-            "type": "string",
-            "description": "User's preferred language code, e.g., 'en-US'.",
-            "nullable": true
-          },
-          "superiorId": {
-            "maxLength": 50,
-            "type": "string",
-            "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
-            "nullable": true
-          },
-          "tenantId": {
-            "maxLength": 50,
-            "type": "string",
-            "description": "Tenant identifier for multi-tenant systems. Must be a GUID in version 7 format.",
-            "nullable": true
-          }
         }
       },
       "ProfileResponse": {
@@ -838,7 +894,7 @@
           }
         },
         "example": {
-          "email": "Lou_Bruen@gmail.com",
+          "email": "Martin.Leuschke34@yahoo.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -925,7 +981,7 @@
           }
         },
         "example": {
-          "Email": "Jammie42@gmail.com",
+          "Email": "Shanna.Skiles18@yahoo.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
