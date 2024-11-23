@@ -27,8 +27,5 @@
         <ProjectReference Include="..\Migrators\Migrators.SQLite\Migrators.SQLite.csproj" />
 
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="files\" />
-    </ItemGroup>
 
 </Project>

@@ -118,6 +118,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), @"files")))
+    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), @"files"));
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"files")),
