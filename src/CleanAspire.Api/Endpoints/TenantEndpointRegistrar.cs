@@ -14,15 +14,17 @@ public class TenantEndpointRegistrar : IEndpointRegistrar
 {
     public void RegisterRoutes(IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/tenants").WithTags("tenants").RequireAuthorization();
+        var group = routes.MapGroup("/tenants").WithTags("tenants");
 
         group.MapGet("/", async (IMediator mediator) => await mediator.Send(new GetAllTenantsQuery()))
              .Produces<IEnumerable<TenantDto>>()
+             .AllowAnonymous()
              .WithSummary("Get all tenants")
              .WithDescription("Returns a list of all tenants in the system.");
 
         group.MapGet("/{id}", async (IMediator mediator, [FromRoute] string id) => await mediator.Send(new GetTenantByIdQuery(id)))
             .Produces<TenantDto>()
+            .AllowAnonymous()
             .WithSummary("Get tenant by ID")
             .WithDescription("Returns the details of a specific tenant by their unique ID.");
 
@@ -30,15 +32,17 @@ public class TenantEndpointRegistrar : IEndpointRegistrar
         {
             var id = await mediator.Send(command);
             return TypedResults.Ok(id);
-        })
+        }).RequireAuthorization()
             .WithSummary("Create a new tenant")
             .WithDescription("Creates a new tenant with the provided details.");
 
         group.MapPut("/", async (IMediator mediator, [FromBody] UpdateTenantCommand command) => await mediator.Send(command))
+            .RequireAuthorization()
             .WithSummary("Update an existing tenant")
             .WithDescription("Updates the details of an existing tenant.");
 
         group.MapDelete("/", async (IMediator mediator, [FromQuery]string[] ids) => await mediator.Send(new DeleteTenantCommand(ids)))
+            .RequireAuthorization()
             .WithSummary("Delete tenants by IDs")
             .WithDescription("Deletes one or more tenants by their unique IDs.");
     }

@@ -26,7 +26,7 @@ public class GetAllTenantsQueryHandler : IRequestHandler<GetAllTenantsQuery, Lis
 
     public async Task<List<TenantDto>> Handle(GetAllTenantsQuery request, CancellationToken cancellationToken)
     {
-        var tenants = await _dbContext.Tenants
+        var tenants = await _dbContext.Tenants.OrderBy(x=>x.Name)
             .Select(t => new TenantDto
             {
                 Id = t.Id,

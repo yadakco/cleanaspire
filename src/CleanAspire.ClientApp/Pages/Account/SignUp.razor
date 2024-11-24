@@ -16,12 +16,20 @@
         <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
             <DataAnnotationsValidator />
             <div class="d-flex flex-column gap-2">
-                <MudTextField @bind-Value="model.Email" For="@(() => model.Email)" Label="@L["Email"]" Placeholder="Email" Required="true" RequiredError="@L["Email is required"]"></MudTextField>
+                <MultiTenantAutocomplete T="TenantDto" For="(()=>model.Tenant)"
+                                         Placeholder="@L["Organization"]"
+                                         Label="@L["Select Organization"]"
+                                         Required="true"
+                                         RequiredError="@L["Organization selection is required"]"
+                                         @bind-Value="@model.Tenant">
+
+                </MultiTenantAutocomplete>
+                <MudTextField @bind-Value="model.Email" For="@(() => model.Email)" Label="@L["Email"]" Placeholder="@L["Email"]" Required="true" RequiredError="@L["Email is required"]"></MudTextField>
                 <MudTextField @bind-Value="model.Nickname" For="@(() => model.Nickname)" Label="@L["Nickname"]" Placeholder="Nickname"></MudTextField>
-                <MudTextField @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" Label="@L["Password"]" Placeholder="Password" Required="true" RequiredError="@L["Password is required"]"></MudTextField>
+                <MudTextField @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]"></MudTextField>
                 <MudTextField @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" T="string" Label="@L["Confirm password"]" Placeholder="@L["Confirm password"]" Required="true" RequiredError="@L["Confirm password is required"]"></MudTextField>
-                <TimeZoneAutocomplete T="string" For="@(() => model.TimeZoneId)"  @bind-Value="model.TimeZoneId" Label="@L["Time Zone"]" ></TimeZoneAutocomplete>
-                <LanguageAutocomplete T="string" For="@(() => model.LanguageCode)" @bind-Value="model.LanguageCode" Label="@L["Language"]"></LanguageAutocomplete>
+                <TimeZoneAutocomplete T="string" For="@(() => model.TimeZoneId)" @bind-Value="model.TimeZoneId" Label="@L["Time Zone"]" Placeholder="@L["Time Zone"]"></TimeZoneAutocomplete>
+                <LanguageAutocomplete T="string" For="@(() => model.LanguageCode)" @bind-Value="model.LanguageCode" Label="@L["Language"]" Placeholder="@L["Language"]"></LanguageAutocomplete>
                 <div class="d-flex flex-row align-center justify-space-between">
                     <MudCheckBox @bind-Value="model.CheckPrivacy" For="@(() => model.CheckPrivacy)">@L["I agree to the terms and privacy"]</MudCheckBox>
                 </div>
@@ -34,13 +42,13 @@
 @code {
     private bool waiting = false;
     private SignupModel model = new();
-
+    private TenantDto tenantDto = new();
     private async Task OnValidSubmit(EditContext context)
     {
         try
         {
             waiting = true;
-            var result = await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.TenantId });
+            var result = await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id });
             Navigation.NavigateTo("/account/signupsuccessful");
         }
         catch (Exception e)
@@ -77,9 +85,9 @@
         [RegularExpression("^[a-z]{2,3}(-[A-Z]{2})?$", ErrorMessage = "Invalid language code format.")]
         public string? LanguageCode { get; set; }
         [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
-        public string? SuperiorId { get; init; } = Guid.CreateVersion7().ToString();
-        [MaxLength(50, ErrorMessage = "Tenant id cannot exceed 50 characters.")]
-        public string? TenantId { get; init; } = Guid.CreateVersion7().ToString();
+        public string? SuperiorId { get; init; }
+        [Required]
+        public TenantDto? Tenant { get; set; } 
 
         [MaxLength(20, ErrorMessage = "Provider cannot exceed 20 characters.")]
         public string? Provider { get; set; } = "Local";
