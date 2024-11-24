@@ -26,12 +26,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "Identity.Application": [ ]
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -153,12 +148,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "Identity.Application": [ ]
-          }
-        ]
+        }
       }
     },
     "/weatherforecast": {
@@ -1004,7 +994,7 @@
           }
         },
         "example": {
-          "email": "Jalen_Tillman9@hotmail.com",
+          "email": "Elta98@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1091,7 +1081,7 @@
           }
         },
         "example": {
-          "Email": "Lilla.Jakubowski16@yahoo.com",
+          "Email": "Eda_Kuphal@gmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

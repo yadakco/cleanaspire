@@ -10,6 +10,7 @@ using CleanAspire.Api.Client.Refresh;
 using CleanAspire.Api.Client.Register;
 using CleanAspire.Api.Client.ResendConfirmationEmail;
 using CleanAspire.Api.Client.ResetPassword;
+using CleanAspire.Api.Client.Tenants;
 using CleanAspire.Api.Client.Weatherforecast;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
@@ -74,6 +75,11 @@ namespace CleanAspire.Api.Client
         public global::CleanAspire.Api.Client.ResetPassword.ResetPasswordRequestBuilder ResetPassword
         {
             get => new global::CleanAspire.Api.Client.ResetPassword.ResetPasswordRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The tenants property</summary>
+        public global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder Tenants
+        {
+            get => new global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The weatherforecast property</summary>
         public global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder Weatherforecast
