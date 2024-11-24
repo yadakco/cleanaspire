@@ -7,14 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CleanAspire.Application.Common.Interfaces;
-using CleanAspire.Domain.Entities;
-using MediatR;
-using Microsoft.Extensions.Logging;
+using CleanAspire.Application.Common.Interfaces.FusionCache;
+
 
 namespace CleanAspire.Application.Features.Tenants.Commands;
 
-public record CreateTenantCommand(string Name, string Description) : IRequest<string>;
+public record CreateTenantCommand(string Name, string Description) : IFusionCacheRefreshRequest<string>
+{
+    public IEnumerable<string>? Tags => new[] { "tenants" };
+}
 
 public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, string>
 {
@@ -27,7 +28,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, s
         _dbContext = dbContext;
     }
 
-    public async Task<string> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
+    public async ValueTask<string> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         // Creating a new tenant instance with a unique Id
         var tenant = new Tenant

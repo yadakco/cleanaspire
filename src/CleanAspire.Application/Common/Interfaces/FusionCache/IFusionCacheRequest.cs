@@ -7,16 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CleanAspire.Domain.Common;
 
-namespace CleanAspire.Domain.Events;
+namespace CleanAspire.Application.Common.Interfaces.FusionCache;
 
-public class UpdatedEvent<T> : DomainEvent where T : IEntity
+public interface IFusionCacheRequest<TResponse> : IRequest<TResponse>
 {
-    public UpdatedEvent(T entity)
-    {
-        Entity = entity;
-    }
-
-    public T Entity { get; }
+    string CacheKey => string.Empty;
+    IEnumerable<string>? Tags { get; }
 }

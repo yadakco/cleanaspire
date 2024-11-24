@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 using CleanAspire.Infrastructure.Services;
 using Microsoft.Extensions.Hosting;
 using CleanAspire.Application.Common.Services;
+using ZiggyCreatures.Caching.Fusion;
 
 
 namespace CleanAspire.Infrastructure;
@@ -42,6 +43,7 @@ public static class DependencyInjection
     {
         services
             .AddDatabase(configuration)
+            .AddFusionCacheService()
             .AddScoped<IUploadService, UploadService>();
  
 
@@ -141,7 +143,24 @@ public static class DependencyInjection
     }
 
 
-
+    private static IServiceCollection AddFusionCacheService(this IServiceCollection services)
+    {
+        services.AddMemoryCache();
+        services.AddFusionCache().WithDefaultEntryOptions(new FusionCacheEntryOptions
+        {
+            // CACHE DURATION
+            Duration = TimeSpan.FromMinutes(120),
+            // FAIL-SAFE OPTIONS
+            IsFailSafeEnabled = true,
+            FailSafeMaxDuration = TimeSpan.FromHours(8),
+            FailSafeThrottleDuration = TimeSpan.FromSeconds(30),
+            // FACTORY TIMEOUTS
+            FactorySoftTimeout = TimeSpan.FromSeconds(10),
+            FactoryHardTimeout = TimeSpan.FromSeconds(30),
+            AllowTimedOutFactoryBackgroundCompletion = true,
+        });
+        return services;
+    }
     public static async Task InitializeDatabaseAsync(this IHost host)
     {
         using (var scope = host.Services.CreateScope())

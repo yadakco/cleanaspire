@@ -2,23 +2,17 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CleanAspire.Application.Common.Interfaces;
-using CleanAspire.Domain.Entities;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using CleanAspire.Application.Common.Interfaces.FusionCache;
 
 namespace CleanAspire.Application.Features.Tenants.Commands;
 
-public record DeleteTenantCommand(params IEnumerable<string> Ids) : IRequest;
+public record DeleteTenantCommand(params IEnumerable<string> Ids) : IFusionCacheRefreshRequest<int>
+{
+   public IEnumerable<string>? Tags => new[] { "tenants" };
+}
 
 
-public class DeleteTenantCommandHandler : IRequestHandler<DeleteTenantCommand>
+public class DeleteTenantCommandHandler : IRequestHandler<DeleteTenantCommand, int>
 {
     private readonly ILogger<DeleteTenantCommandHandler> _logger;
     private readonly IApplicationDbContext _dbContext;
@@ -29,11 +23,12 @@ public class DeleteTenantCommandHandler : IRequestHandler<DeleteTenantCommand>
         _dbContext = dbContext;
     }
 
-    public async Task Handle(DeleteTenantCommand request, CancellationToken cancellationToken)
+    public async ValueTask<int> Handle(DeleteTenantCommand request, CancellationToken cancellationToken)
     {
         // Logic to delete tenants from the database
         _dbContext.Tenants.RemoveRange(_dbContext.Tenants.Where(t => request.Ids.Contains(t.Id)));
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        var result= await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Tenants with Ids {TenantIds} are deleted", string.Join(", ", request.Ids));
+        return result;
     }
 }

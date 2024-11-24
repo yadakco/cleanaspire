@@ -80,7 +80,15 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -110,7 +118,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -809,6 +825,13 @@
           },
           "description": {
             "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         }
       },
@@ -994,7 +1017,7 @@
           }
         },
         "example": {
-          "email": "Elta98@hotmail.com",
+          "email": "Tyrell.Crist7@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1081,7 +1104,7 @@
           }
         },
         "example": {
-          "Email": "Eda_Kuphal@gmail.com",
+          "Email": "Kariane57@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
@@ -1175,6 +1198,13 @@
           },
           "description": {
             "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         }
       },
