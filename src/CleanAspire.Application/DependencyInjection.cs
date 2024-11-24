@@ -8,7 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using MediatR.Pipeline;
+using CleanAspire.Application.Pipeline;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanAspire.Application;
@@ -17,9 +18,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddMediatR(config =>
+        services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(FusionCacheBehaviour<,>));
+        services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(FusionCacheRefreshBehaviour<,>));
+        services.AddMediator(options=>
         {
-            config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            options.ServiceLifetime = ServiceLifetime.Scoped;
         });
         return services;
     }

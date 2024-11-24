@@ -3,18 +3,16 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CleanAspire.Application.Common.Interfaces;
+using CleanAspire.Application.Common.Interfaces.FusionCache;
 using CleanAspire.Application.Features.Tenants.DTOs;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-
 namespace CleanAspire.Application.Features.Tenants.Queries;
 
-public record GetAllTenantsQuery() : IRequest<List<TenantDto>>;
+public record GetAllTenantsQuery() : IFusionCacheRequest<List<TenantDto>>
+{
+    public string CacheKey => "GetAllTenants";
+    public IEnumerable<string>? Tags => new[] { "tenants" };
+}
+
 public class GetAllTenantsQueryHandler : IRequestHandler<GetAllTenantsQuery, List<TenantDto>>
 {
     private readonly IApplicationDbContext _dbContext;
@@ -24,7 +22,7 @@ public class GetAllTenantsQueryHandler : IRequestHandler<GetAllTenantsQuery, Lis
         _dbContext = dbContext;
     }
 
-    public async Task<List<TenantDto>> Handle(GetAllTenantsQuery request, CancellationToken cancellationToken)
+    public async ValueTask<List<TenantDto>> Handle(GetAllTenantsQuery request, CancellationToken cancellationToken)
     {
         var tenants = await _dbContext.Tenants.OrderBy(x=>x.Name)
             .Select(t => new TenantDto

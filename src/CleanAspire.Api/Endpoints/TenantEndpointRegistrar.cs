@@ -5,7 +5,7 @@
 using CleanAspire.Application.Features.Tenants.Commands;
 using CleanAspire.Application.Features.Tenants.DTOs;
 using CleanAspire.Application.Features.Tenants.Queries;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanAspire.Api.Endpoints;
