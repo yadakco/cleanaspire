@@ -53,8 +53,29 @@ public class ApplicationDbContextInitializer
     }
     private async Task SeedUsersAsync()
     {
+        if (!(await _context.Tenants.AnyAsync()))
+        {
+            var tenants = new List<Tenant>()
+            {
+                new()
+                {
+                    Name = "Org - 1",
+                    Description = "Organization 1",
+                    Id = Guid.CreateVersion7().ToString()
+                },
+                new()
+                {
+                    Name = "Org - 2",
+                    Description = "Organization 2",
+                    Id = Guid.CreateVersion7().ToString()
+                }
+            };
+            _context.Tenants.AddRange(tenants);
+            await _context.SaveChangesAsync();
+        }
+
         if (await _userManager.Users.AnyAsync()) return;
-        var tenantId = Guid.CreateVersion7().ToString();
+        var tenantId = _context.Tenants.First().Id;
         var defaultPassword = "P@ssw0rd!";
         _logger.LogInformation("Seeding users...");
         var adminUser = new ApplicationUser

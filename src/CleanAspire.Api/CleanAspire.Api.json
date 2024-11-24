@@ -5,6 +5,162 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/tenants": {
+      "get": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Get all tenants",
+        "description": "Returns a list of all tenants in the system.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TenantDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Create a new tenant",
+        "description": "Creates a new tenant with the provided details.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTenantCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Update an existing tenant",
+        "description": "Updates the details of an existing tenant.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Delete tenants by IDs",
+        "description": "Deletes one or more tenants by their unique IDs.",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      }
+    },
+    "/tenants/{id}": {
+      "get": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Get tenant by ID",
+        "description": "Returns the details of a specific tenant by their unique ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      }
+    },
     "/weatherforecast": {
       "get": {
         "tags": [
@@ -651,6 +807,21 @@
           }
         }
       },
+      "CreateTenantCommand": {
+        "required": [
+          "name",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "ForgotPasswordRequest": {
         "required": [
           "email"
@@ -833,7 +1004,7 @@
           }
         },
         "example": {
-          "email": "Elias69@hotmail.com",
+          "email": "Jalen_Tillman9@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -920,13 +1091,29 @@
           }
         },
         "example": {
-          "Email": "Nathen_Konopelski60@hotmail.com",
+          "Email": "Lilla.Jakubowski16@yahoo.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
           "TenantId": "123e4567-e89b-47d3-a456-426614174000",
           "TimeZoneId": "America/New_York",
           "LanguageCode": "en-US"
+        }
+      },
+      "TenantDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
         }
       },
       "TwoFactorRequest": {
@@ -982,6 +1169,25 @@
           }
         }
       },
+      "UpdateTenantCommand": {
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "WeatherForecast": {
         "required": [
           "date",
@@ -1019,6 +1225,9 @@
     }
   },
   "tags": [
+    {
+      "name": "tenants"
+    },
     {
       "name": "Weather"
     },

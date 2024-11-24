@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using CleanAspire.Api.Identity;
 using Microsoft.Extensions.FileProviders;
+using CleanAspire.Api.Endpoints;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +51,13 @@ builder.Services.AddCors(
             .AllowAnyHeader()
             .AllowCredentials()));
 
+
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<Program>()
+    .AddClasses(classes => classes.AssignableTo<IEndpointRegistrar>())
+    .As<IEndpointRegistrar>()
+    .WithScopedLifetime());
+
 builder.Services.AddOpenApi(options =>
 {
     options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
@@ -74,7 +82,7 @@ var app = builder.Build();
 await app.InitializeDatabaseAsync();
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
-
+app.MapEndpointDefinitions();
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"

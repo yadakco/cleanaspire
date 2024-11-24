@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
        : base(options)
     {
     }
+    public  DbSet<Tenant> Tenants { get; set; }
     public DbSet<AuditTrail> AuditTrails { get; set; }
     public DbSet<Product> Products { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)

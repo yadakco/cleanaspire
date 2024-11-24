@@ -17,6 +17,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.0" />
         <PackageReference Include="Scalar.AspNetCore" Version="1.2.43" />
+        <PackageReference Include="Scrutor" Version="5.0.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
         <PackageReference Include="StrongGrid" Version="0.110.0" />
     </ItemGroup>
