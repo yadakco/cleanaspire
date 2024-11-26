@@ -43,7 +43,7 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 EXPOSE 80 443
 
 # Set the environment variable for ASP.NET Core to use Production settings
-ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_ENVIRONMENT=Development
 
 # Start the application
 ENTRYPOINT ["dotnet", "CleanAspire.Api.dll"]
