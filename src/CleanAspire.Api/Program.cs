@@ -42,7 +42,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 // add a CORS policy for the client
 var allowedCorsOrigins = builder.Configuration.GetValue<string>("AllowedCorsOrigins")?
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-    ?? new[] { "https://localhost:7341", "https://localhost:7123" };
+    ?? new[] { "https://localhost:7341", "https://localhost:7123", "https://cleanaspire.blazorserver.com" };
 builder.Services.AddCors(
     options => options.AddPolicy(
         "wasm",

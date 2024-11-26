@@ -55,7 +55,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -79,8 +84,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int32"
+                  "$ref": "#/components/schemas/Unit"
                 }
               }
             }
@@ -1011,7 +1015,7 @@
           }
         },
         "example": {
-          "email": "Ruthie81@hotmail.com",
+          "email": "Francis.Becker@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1098,7 +1102,7 @@
           }
         },
         "example": {
-          "Email": "Donny_Heathcote88@hotmail.com",
+          "Email": "Destin.Russel35@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
