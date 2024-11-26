@@ -36,8 +36,9 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout /https/aspnetapp.key \
   -subj "/CN=localhost"
 
-# Optionally, convert to PFX format (uncomment if you choose Option B)
-# RUN openssl pkcs12 -export -out /https/aspnetapp.pfx -inkey /https/aspnetapp.key -in /https/aspnetapp.crt -passout pass:
+# Convert to PFX format
+RUN openssl pkcs12 -export -out /https/aspnetapp.pfx -inkey /https/aspnetapp.key -in /https/aspnetapp.crt -passout pass:
+
 
 # Expose ports
 EXPOSE 80 443
