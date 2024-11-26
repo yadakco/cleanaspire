@@ -50,17 +50,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/Unit"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "Identity.Application": [ ]
-          }
-        ]
+        }
       },
       "put": {
         "tags": [
@@ -122,8 +117,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int32"
+                  "$ref": "#/components/schemas/Unit"
                 }
               }
             }
@@ -1017,7 +1011,7 @@
           }
         },
         "example": {
-          "email": "Tyrell.Crist7@hotmail.com",
+          "email": "Ruthie81@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1104,7 +1098,7 @@
           }
         },
         "example": {
-          "Email": "Kariane57@hotmail.com",
+          "Email": "Donny_Heathcote88@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
@@ -1181,6 +1175,9 @@
             "type": "boolean"
           }
         }
+      },
+      "Unit": {
+        "type": "object"
       },
       "UpdateTenantCommand": {
         "required": [

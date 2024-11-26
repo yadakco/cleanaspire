@@ -1,15 +1,24 @@
-﻿
-
-using CleanAspire.Application.Common.Interfaces.FusionCache;
+﻿using CleanAspire.Application.Common.Interfaces.FusionCache;
 
 namespace CleanAspire.Application.Pipeline;
 
+
+/// <summary>
+/// Pipeline behavior for handling FusionCache refresh requests.
+/// </summary>
+/// <typeparam name="TRequest">The type of the request.</typeparam>
+/// <typeparam name="TResponse">The type of the response.</typeparam>
 public class FusionCacheRefreshBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IFusionCacheRefreshRequest<TResponse>
 {
     private readonly IFusionCache _cache;
     private readonly ILogger<FusionCacheRefreshBehaviour<TRequest, TResponse>> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FusionCacheRefreshBehaviour{TRequest, TResponse}"/> class.
+    /// </summary>
+    /// <param name="cache">The FusionCache instance.</param>
+    /// <param name="logger">The logger instance.</param>
     public FusionCacheRefreshBehaviour(
         IFusionCache cache,
         ILogger<FusionCacheRefreshBehaviour<TRequest, TResponse>> logger
@@ -19,6 +28,13 @@ public class FusionCacheRefreshBehaviour<TRequest, TResponse> : IPipelineBehavio
         _logger = logger;
     }
 
+    /// <summary>
+    /// Handles the request and refreshes the cache if necessary.
+    /// </summary>
+    /// <param name="request">The request instance.</param>
+    /// <param name="next">The next delegate in the pipeline.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The response from the next delegate in the pipeline.</returns>
     public async ValueTask<TResponse> Handle(TRequest request, MessageHandlerDelegate<TRequest, TResponse> next,
         CancellationToken cancellationToken)
     {

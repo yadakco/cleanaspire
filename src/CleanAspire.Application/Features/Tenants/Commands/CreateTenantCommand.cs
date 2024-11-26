@@ -12,12 +12,12 @@ using CleanAspire.Application.Common.Interfaces.FusionCache;
 
 namespace CleanAspire.Application.Features.Tenants.Commands;
 
-public record CreateTenantCommand(string Name, string Description) : IFusionCacheRefreshRequest<string>
+public record CreateTenantCommand(string Name, string Description) : IFusionCacheRefreshRequest<Unit>
 {
     public IEnumerable<string>? Tags => new[] { "tenants" };
 }
 
-public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, string>
+public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand>
 {
     private readonly ILogger<CreateTenantCommandHandler> _logger;
     private readonly IApplicationDbContext _dbContext;
@@ -28,7 +28,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, s
         _dbContext = dbContext;
     }
 
-    public async ValueTask<string> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Unit> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         // Creating a new tenant instance with a unique Id
         var tenant = new Tenant
@@ -40,6 +40,6 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, s
         _dbContext.Tenants.Add(tenant);
         await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Tenant {TenantId} is created", tenant.Id);
-        return tenant.Id;
+        return Unit.Value;
     }
 }

@@ -7,12 +7,12 @@ using CleanAspire.Application.Common.Interfaces.FusionCache;
 
 namespace CleanAspire.Application.Features.Tenants.Commands;
 
-public record UpdateTenantCommand(string Id, string Name, string Description) : IFusionCacheRefreshRequest<int>
+public record UpdateTenantCommand(string Id, string Name, string Description) : IFusionCacheRefreshRequest<Unit>
 {
     public IEnumerable<string>? Tags => new[] { "tenants" };
 }
 
-public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand,int>
+public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand,Unit>
 {
     private readonly ILogger<UpdateTenantCommandHandler> _logger;
     private readonly IApplicationDbContext _dbContext;
@@ -23,7 +23,7 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand,in
         _dbContext = dbContext;
     }
 
-    public async ValueTask<int> Handle(UpdateTenantCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Unit> Handle(UpdateTenantCommand request, CancellationToken cancellationToken)
     {
         // Logic to update tenant in the database
         var tenant = await _dbContext.Tenants.FindAsync(new object[] { request.Id }, cancellationToken);
@@ -35,8 +35,8 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand,in
 
         tenant.Name = request.Name;
         tenant.Description = request.Description;
-        var result= await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation($"Updated Tenant: {request.Id}, Name: {request.Name}");
-        return result;
+        return Unit.Value;
     }
 }
