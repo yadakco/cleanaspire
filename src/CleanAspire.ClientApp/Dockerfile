@@ -3,12 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy the project files and restore dependencies
-COPY ["src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj", "src/CleanAspire.ClientApp/"]
-RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
+COPY ["CleanAspire.ClientApp.csproj", "."]
+RUN dotnet restore "CleanAspire.ClientApp.csproj"
 
 # Copy the entire source code and build the application in Release mode
 COPY . .
-WORKDIR /src/src/CleanAspire.ClientApp
 RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Serve the Blazor Client Application using Nginx
