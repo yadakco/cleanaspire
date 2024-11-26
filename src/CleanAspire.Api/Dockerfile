@@ -2,20 +2,19 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy the project files and restore dependencies
-COPY ["CleanAspire.Api.csproj", "./"]
-COPY ["../CleanAspire.Application/CleanAspire.Application.csproj", "../CleanAspire.Application/"]
-COPY ["../CleanAspire.Domain/CleanAspire.Domain.csproj", "../CleanAspire.Domain/"]
-COPY ["../CleanAspire.Infrastructure/CleanAspire.Infrastructure.csproj", "../CleanAspire.Infrastructure/"]
-COPY ["../CleanAspire.ServiceDefaults/CleanAspire.ServiceDefaults.csproj", "../CleanAspire.ServiceDefaults/"]
-COPY ["../Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj", "../Migrators/Migrators.MSSQL/"]
-COPY ["../Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj", "../Migrators/Migrators.PostgreSQL/"]
-COPY ["../Migrators/Migrators.SQLite/Migrators.SQLite.csproj", "../Migrators/Migrators.SQLite/"]
-RUN dotnet restore "CleanAspire.Api.csproj"
+COPY ["src/CleanAspire.Api/CleanAspire.Api.csproj", "src/CleanAspire.Api/"]
+COPY ["src/CleanAspire.Application/CleanAspire.Application.csproj", "src/CleanAspire.Application/"]
+COPY ["src/CleanAspire.Domain/CleanAspire.Domain.csproj", "src/CleanAspire.Domain/"]
+COPY ["src/CleanAspire.Infrastructure/CleanAspire.Infrastructure.csproj", "src/CleanAspire.Infrastructure/"]
+COPY ["src/CleanAspire.ServiceDefaults/CleanAspire.ServiceDefaults.csproj", "src/CleanAspire.ServiceDefaults/"]
+COPY ["src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj", "src/Migrators/Migrators.MSSQL/"]
+COPY ["src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj", "src/Migrators/Migrators.PostgreSQL/"]
+COPY ["src/Migrators/Migrators.SQLite/Migrators.SQLite.csproj", "src/Migrators/Migrators.SQLite/"]
 
-# Copy the entire source code and build the application in Release mode
-COPY .. .
-WORKDIR /src
+RUN dotnet restore "src/CleanAspire.Api/CleanAspire.Api.csproj"
+
+COPY . .
+WORKDIR /src/src/CleanAspire.Api
 RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Create the runtime image
