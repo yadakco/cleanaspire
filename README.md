@@ -26,6 +26,8 @@
 - **Modular and Testable**: Clean Architecture makes maintaining and testing your project a breeze.
 - **Community-driven**: CleanAspire is open-source, encouraging contributions and collaboration from developers worldwide.
 
+### Build Docker Image
+
 ### Quick Start
 
 1. **Clone the Repo**:
