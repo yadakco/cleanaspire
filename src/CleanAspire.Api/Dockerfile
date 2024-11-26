@@ -24,12 +24,26 @@ WORKDIR /app
 # Copy the build output from the previous stage
 COPY --from=build /app/publish .
 
-# Expose ports 80 and 443 for HTTP and HTTPS traffic
+# Install OpenSSL
+RUN apt-get update && apt-get install -y openssl
+
+# Create the /https directory
+RUN mkdir /https
+
+# Generate the self-signed certificate using OpenSSL
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -out /https/aspnetapp.crt \
+  -keyout /https/aspnetapp.key \
+  -subj "/CN=localhost"
+
+# Optionally, convert to PFX format (uncomment if you choose Option B)
+# RUN openssl pkcs12 -export -out /https/aspnetapp.pfx -inkey /https/aspnetapp.key -in /https/aspnetapp.crt -passout pass:
+
+# Expose ports
 EXPOSE 80 443
 
-# Create a self-signed certificate
-RUN dotnet dev-certs https -ep /https/aspnetapp.pfx -p password
+# Set the environment variable for ASP.NET Core to use Production settings
+ENV ASPNETCORE_ENVIRONMENT=Production
 
-# Set the environment variable and start the application with HTTP and HTTPS support
-ENV ASPNETCORE_ENVIRONMENT=Development
-ENTRYPOINT ["dotnet", "CleanAspire.Api.dll", "--urls", "http://0.0.0.0:80;https://0.0.0.0:443"]
+# Start the application
+ENTRYPOINT ["dotnet", "CleanAspire.Api.dll"]
