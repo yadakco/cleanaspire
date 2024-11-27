@@ -28,7 +28,7 @@ builder.Services.AddSingleton(clientAppSettings);
 
 builder.Services.TryAddMudBlazor(builder.Configuration);
 builder.Services.AddHttpClient("apiservice", (sp,options) => {
-    var settings = sp.GetRequiredService<IOptions<ClientAppSettings>>().Value;
+    var settings = sp.GetRequiredService<ClientAppSettings>();
     options.BaseAddress = new Uri(settings.ServiceBaseUrl);
 
 }).AddHttpMessageHandler<CookieHandler>();
@@ -41,7 +41,7 @@ builder.Services.AddSingleton<ApiClient>(sp =>
     ApiClientBuilder.RegisterDefaultDeserializer<JsonParseNodeFactory>();
     ApiClientBuilder.RegisterDefaultDeserializer<TextParseNodeFactory>();
     ApiClientBuilder.RegisterDefaultDeserializer<FormParseNodeFactory>();
-    var settings = sp.GetRequiredService<IOptions<ClientAppSettings>>().Value;
+    var settings = sp.GetRequiredService<ClientAppSettings>();
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient("apiservice");
     var authProvider = new AnonymousAuthenticationProvider();
