@@ -26,7 +26,9 @@
 - **Modular and Testable**: Clean Architecture makes maintaining and testing your project a breeze.
 - **Community-driven**: CleanAspire is open-source, encouraging contributions and collaboration from developers worldwide.
 
-### Build Docker Image
+### OpenAPI documentation
+- https://apiservice.blazorserver.com/scalar/v1
+### Here is an example of a docker-compose.yml file for a local Docker deployment:
 
 ```yml
 version: '3.8'
