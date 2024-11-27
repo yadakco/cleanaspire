@@ -28,6 +28,37 @@
 
 ### Build Docker Image
 
+```yml
+version: '3.8'
+services:
+  apiservice:
+    image: blazordevlab/cleanaspire-api:0.0.31
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AllowedHosts=*
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
+      - DatabaseSettings__DBProvider=sqlite
+      - DatabaseSettings__ConnectionString=Data Source=CleanAspireDb.db
+      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7123
+      - SendGrid__ApiKey=<your API key>
+      - SendGrid__DefaultFromEmail=<your email>
+    ports:
+      - "8019:80"
+      - "8018:443"
+
+
+  webfrontend:
+    image: blazordevlab/cleanaspire-clientapp:0.0.31
+    ports:
+      - "8016:80"
+      - "8017:443"
+
+
+
+```
+
 ### Quick Start
 
 1. **Clone the Repo**:
