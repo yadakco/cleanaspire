@@ -5,6 +5,143 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/upload": {
+      "post": {
+        "tags": [
+          "File Upload"
+        ],
+        "summary": "Upload files to the server",
+        "description": "Allows uploading multiple files to a specific folder on the server.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "folder",
+                  "files"
+                ],
+                "type": "object",
+                "properties": {
+                  "folder": {
+                    "maxLength": 255,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "The folder path where the files should be uploaded."
+                  },
+                  "overwrite": {
+                    "type": "boolean",
+                    "description": "Indicates whether to overwrite existing files."
+                  },
+                  "files": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/IFormFile"
+                    },
+                    "description": "The list of files to be uploaded."
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileUploadResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload/image": {
+      "post": {
+        "tags": [
+          "File Upload"
+        ],
+        "summary": "Upload images to the server with cropping options",
+        "description": "Allows uploading multiple image files with optional cropping options to a specific folder on the server.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "folder",
+                  "files"
+                ],
+                "type": "object",
+                "properties": {
+                  "folder": {
+                    "maxLength": 255,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "The folder path where the files should be uploaded."
+                  },
+                  "overwrite": {
+                    "type": "boolean",
+                    "description": "Indicates whether to overwrite existing files."
+                  },
+                  "files": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/IFormFile"
+                    },
+                    "description": "The list of files to be uploaded."
+                  },
+                  "cropSize": {
+                    "type": "object",
+                    "properties": {
+                      "width": {
+                        "maximum": 2147483647,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "The width of the cropped image.",
+                        "format": "int32"
+                      },
+                      "height": {
+                        "maximum": 2147483647,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "The height of the cropped image.",
+                        "format": "int32"
+                      }
+                    },
+                    "description": "The desired crop size for the uploaded image.",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileUploadResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tenants": {
       "get": {
         "tags": [
@@ -833,6 +970,20 @@
           }
         }
       },
+      "FileUploadResponse": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The path where the uploaded file is saved."
+          },
+          "size": {
+            "type": "integer",
+            "description": "The size of the uploaded file in bytes.",
+            "format": "int64"
+          }
+        }
+      },
       "ForgotPasswordRequest": {
         "required": [
           "email"
@@ -878,6 +1029,10 @@
             }
           }
         }
+      },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary"
       },
       "InfoRequest": {
         "type": "object",
@@ -1015,7 +1170,7 @@
           }
         },
         "example": {
-          "email": "Kraig_Reichel58@hotmail.com",
+          "email": "Harley.Mohr@gmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1102,7 +1257,7 @@
           }
         },
         "example": {
-          "Email": "Reese46@yahoo.com",
+          "Email": "Verner.Stokes22@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
@@ -1246,6 +1401,9 @@
     }
   },
   "tags": [
+    {
+      "name": "File Upload"
+    },
     {
       "name": "tenants"
     },

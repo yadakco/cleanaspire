@@ -21,6 +21,7 @@ public record UploadRequest(
 public enum UploadType : byte
 {
     [Description(@"Products")] Product,
+    [Description(@"Images")] Images,
     [Description(@"ProfilePictures")] ProfilePicture,
     [Description(@"Documents")] Document
 }
