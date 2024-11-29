@@ -5,12 +5,14 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
 using CleanAspire.Application.Common.Interfaces;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Security.Claims;
 
 namespace CleanAspire.Api.Endpoints;
 
@@ -18,12 +20,16 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
 {
     public void RegisterRoutes(IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/upload").WithTags("File Upload");
-        var linkGenerator = routes.ServiceProvider.GetRequiredService<LinkGenerator>();
+        var group = routes.MapGroup("/upload").WithTags("File Upload").RequireAuthorization();
+ 
         group.MapPost("/", async ([FromForm] FileUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var response = new List<FileUploadResponse>();
             var uploadService = sp.GetRequiredService<IUploadService>();
+            // Construct the URL to access the file
+            var requestScheme = context.Request.Scheme; // 'http' or 'https'
+            var requestHost = context.Request.Host.Value; // 'host:port'
+           
             foreach (var file in request.Files)
             {
                 var filestream = file.OpenReadStream();
@@ -40,7 +46,8 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                     request.Folder
                 );
                 var result = await uploadService.UploadAsync(uploadRequest);
-                response.Add(new FileUploadResponse { Path = result, Size = size });
+                var fileUrl = $"{requestScheme}://{requestHost}{result}";
+                response.Add(new FileUploadResponse { Path = result, Url= fileUrl, Size = size });
             }
             return TypedResults.Ok(response);
         }).Accepts<FileUploadRequest>("multipart/form-data")
@@ -53,6 +60,9 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         {
             var response = new List<FileUploadResponse>();
             var uploadService = sp.GetRequiredService<IUploadService>();
+            // Construct the URL to access the file
+            var requestScheme = context.Request.Scheme; // 'http' or 'https'
+            var requestHost = context.Request.Host.Value; // 'host:port'
             foreach (var file in request.Files)
             {
                 var filestream = file.OpenReadStream();
@@ -75,7 +85,8 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                                 Path.GetExtension(file.FileName),
                                 request.Folder
                             ));
-                            response.Add(new FileUploadResponse { Path = result, Size = (int)outStream.Length });
+                            var fileUrl = $"{requestScheme}://{requestHost}{result}";
+                            response.Add(new FileUploadResponse { Url= fileUrl, Path = result, Size = outStream.Length });
                         }
                     }
                 }
@@ -90,7 +101,8 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                         request.Folder
                     );
                     var result = await uploadService.UploadAsync(uploadRequest);
-                    response.Add(new FileUploadResponse { Path = result, Size = (int)imgstream.Length });
+                    var fileUrl = $"{requestScheme}://{requestHost}{result}";
+                    response.Add(new FileUploadResponse { Url = fileUrl, Path = result, Size = imgstream.Length });
                 }
 
             }
@@ -102,50 +114,90 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         .WithSummary("Upload images to the server with cropping options")
         .WithDescription("Allows uploading multiple image files with optional cropping options to a specific folder on the server.");
 
-        group.MapGet("/{path}", ([FromRoute] string path) =>
+        group.MapGet("/{**path}", async Task<Results<FileStreamHttpResult, ValidationProblem, NotFound<string>>> (
+            [FromRoute] string path,
+            HttpContext context,
+            [FromServices] IServiceProvider sp) =>
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), path);
-            if (File.Exists(filePath))
+            var baseDirectory = Path.GetFullPath(Directory.GetCurrentDirectory());
+            var filePath = Path.GetFullPath(Path.Combine(baseDirectory, path));
+            if (!filePath.StartsWith(baseDirectory))
             {
-                return TypedResults.NotFound($"The file '{path}' does not exist.");
+                var validationProblem = TypedResults.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "path", new[] { "Invalid file path." } }
+                });
+                return validationProblem;
             }
+            if (!File.Exists(filePath))
+            {
+                return TypedResults.NotFound($"File '{path}' does not exist.");
+            }
+            FileStream fileStream;
+            try
+            {
+                fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
+            }
+            catch (Exception ex)
+            {
+                var validationProblem = TypedResults.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "file", new[] { "An error occurred while accessing the file.", ex.Message } }
+                });
+                return validationProblem;
+            }
+            var contentType = GetContentType(filePath);
             var fileName = Path.GetFileName(filePath);
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            var contentType = GetContentType(filePath); 
             return TypedResults.File(fileStream, contentType, fileName);
         })
         .WithSummary("Download or preview a file from the server")
         .WithDescription("Allows clients to download or preview a file by specifying the folder and file name.");
 
-        group.MapDelete("/{path}", ([FromRoute] string path, [FromServices] IServiceProvider sp) =>
+        group.MapDelete("/{**path}", async Task<Results<NoContent, ValidationProblem, NotFound<string>>> (
+            [FromRoute] string path,
+            HttpContext context,
+            [FromServices] IServiceProvider sp) =>
         {
-            var uploadService = sp.GetRequiredService<IUploadService>();
-            uploadService.Remove(path);
-            return TypedResults.Ok();
+            var baseDirectory = Path.GetFullPath(Directory.GetCurrentDirectory());
+            var filePath = Path.GetFullPath(Path.Combine(baseDirectory, path));
+            if (!filePath.StartsWith(baseDirectory))
+            {
+                var validationProblem = TypedResults.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "path", new[] { "Invalid file path." } }
+                });
+                return validationProblem;
+            }
+            if (!File.Exists(filePath))
+            {
+                return TypedResults.NotFound($"File '{path}' does not exist.");
+            }
+            try
+            {
+                File.Delete(filePath);
+                return TypedResults.NoContent();
+            }
+            catch (Exception ex)
+            {
+                var validationProblem = TypedResults.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "file", new[] { "An error occurred while deleting the file.", ex.Message } }
+                });
+                return validationProblem;
+            }
         })
         .WithSummary("Delete a file from the server")
         .WithDescription("Allows clients to delete a file by specifying the folder and file name.");
     }
 
-    private string GetContentType(string path)
+    private static string GetContentType(string path)
     {
-        var types = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
-    {
-        { ".png", "image/png" },
-        { ".jpg", "image/jpeg" },
-        { ".jpeg", "image/jpeg" },
-        { ".gif", "image/gif" },
-        { ".pdf", "application/pdf" },
-        { ".doc", "application/msword" },
-        { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-        { ".xls", "application/vnd.ms-excel" },
-        { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-        { ".txt", "text/plain" },
-        { ".zip", "application/zip" }
-    };
-
-        var ext = Path.GetExtension(path).ToLowerInvariant();
-        return types.TryGetValue(ext, out var contentType) ? contentType : "application/octet-stream";
+        var provider = new FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(path, out var contentType))
+        {
+            contentType = "application/octet-stream";
+        }
+        return contentType;
     }
     public class FileUploadRequest
     {
@@ -167,6 +219,11 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
     }
     public class FileUploadResponse
     {
+        /// <summary>
+        /// The full URL to access the uploaded file.
+        /// </summary>
+        [Description("The full URL to access the uploaded file.")]
+        public string Url { get; set; } = string.Empty;
         /// <summary>
         /// The path where the uploaded file is saved.
         /// </summary>  

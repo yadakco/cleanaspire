@@ -60,7 +60,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
       }
     },
     "/upload/image": {
@@ -139,7 +144,105 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      }
+    },
+    "/upload/{path}": {
+      "get": {
+        "tags": [
+          "File Upload"
+        ],
+        "summary": "Download or preview a file from the server",
+        "description": "Allows clients to download or preview a file by specifying the folder and file name.",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "File Upload"
+        ],
+        "summary": "Delete a file from the server",
+        "description": "Allows clients to delete a file by specifying the folder and file name.",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Application": [ ]
+          }
+        ]
       }
     },
     "/tenants": {
@@ -973,6 +1076,10 @@
       "FileUploadResponse": {
         "type": "object",
         "properties": {
+          "url": {
+            "type": "string",
+            "description": "The full URL to access the uploaded file."
+          },
           "path": {
             "type": "string",
             "description": "The path where the uploaded file is saved."
@@ -1170,7 +1277,7 @@
           }
         },
         "example": {
-          "email": "Susanna_Batz@hotmail.com",
+          "email": "Edd.Howell3@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1257,7 +1364,7 @@
           }
         },
         "example": {
-          "Email": "Jesus21@gmail.com",
+          "Email": "Thad10@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",
