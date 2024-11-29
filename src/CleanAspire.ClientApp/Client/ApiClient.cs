@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using CleanAspire.Api.Client.Account;
 using CleanAspire.Api.Client.ConfirmEmail;
+using CleanAspire.Api.Client.FileNamespace;
 using CleanAspire.Api.Client.ForgotPassword;
 using CleanAspire.Api.Client.Identity;
 using CleanAspire.Api.Client.Login;
@@ -35,6 +36,11 @@ namespace CleanAspire.Api.Client
         public global::CleanAspire.Api.Client.ConfirmEmail.ConfirmEmailRequestBuilder ConfirmEmail
         {
             get => new global::CleanAspire.Api.Client.ConfirmEmail.ConfirmEmailRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The file property</summary>
+        public global::CleanAspire.Api.Client.FileNamespace.FileRequestBuilder File
+        {
+            get => new global::CleanAspire.Api.Client.FileNamespace.FileRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The forgotPassword property</summary>
         public global::CleanAspire.Api.Client.ForgotPassword.ForgotPasswordRequestBuilder ForgotPassword

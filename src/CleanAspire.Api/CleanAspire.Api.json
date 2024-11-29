@@ -5,7 +5,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/upload": {
+    "/file/upload": {
       "post": {
         "tags": [
           "File Upload"
@@ -33,12 +33,7 @@
                     "description": "Indicates whether to overwrite existing files."
                   },
                   "files": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/IFormFile"
-                    },
-                    "description": "The list of files to be uploaded."
+                    "$ref": "#/components/schemas/IFormFileCollection"
                   }
                 }
               }
@@ -68,7 +63,7 @@
         ]
       }
     },
-    "/upload/image": {
+    "/file/image": {
       "post": {
         "tags": [
           "File Upload"
@@ -96,12 +91,7 @@
                     "description": "Indicates whether to overwrite existing files."
                   },
                   "files": {
-                    "minItems": 1,
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/IFormFile"
-                    },
-                    "description": "The list of files to be uploaded."
+                    "$ref": "#/components/schemas/IFormFileCollection"
                   },
                   "cropSize": {
                     "type": "object",
@@ -152,7 +142,7 @@
         ]
       }
     },
-    "/upload/{path}": {
+    "/file": {
       "get": {
         "tags": [
           "File Upload"
@@ -162,7 +152,7 @@
         "parameters": [
           {
             "name": "path",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string"
@@ -206,7 +196,7 @@
         "parameters": [
           {
             "name": "path",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string"
@@ -1141,6 +1131,14 @@
         "type": "string",
         "format": "binary"
       },
+      "IFormFileCollection": {
+        "minItems": 1,
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/IFormFile"
+        },
+        "description": "The list of files to be uploaded."
+      },
       "InfoRequest": {
         "type": "object",
         "properties": {
@@ -1277,7 +1275,7 @@
           }
         },
         "example": {
-          "email": "Trisha23@hotmail.com",
+          "email": "Sim.Yost@gmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1364,7 +1362,7 @@
           }
         },
         "example": {
-          "Email": "Nona.Denesik81@yahoo.com",
+          "Email": "Dell16@gmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

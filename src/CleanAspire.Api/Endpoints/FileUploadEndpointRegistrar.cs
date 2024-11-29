@@ -20,16 +20,15 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
 {
     public void RegisterRoutes(IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/upload").WithTags("File Upload").RequireAuthorization();
- 
-        group.MapPost("/", async ([FromForm] FileUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+        var group = routes.MapGroup("/file").WithTags("File Upload").RequireAuthorization();
+
+        group.MapPost("/upload", async ([FromForm] FileUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var response = new List<FileUploadResponse>();
             var uploadService = sp.GetRequiredService<IUploadService>();
             // Construct the URL to access the file
             var requestScheme = context.Request.Scheme; // 'http' or 'https'
             var requestHost = context.Request.Host.Value; // 'host:port'
-           
             foreach (var file in request.Files)
             {
                 var filestream = file.OpenReadStream();
@@ -46,12 +45,13 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                     request.Folder
                 );
                 var result = await uploadService.UploadAsync(uploadRequest);
-                var fileUrl = $"{requestScheme}://{requestHost}{result}";
-                response.Add(new FileUploadResponse { Path = result, Url= fileUrl, Size = size });
+                var fileUrl = $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
+                response.Add(new FileUploadResponse { Path = result, Url = fileUrl, Size = size });
             }
             return TypedResults.Ok(response);
         }).Accepts<FileUploadRequest>("multipart/form-data")
         .DisableAntiforgery()
+        .Produces<IEnumerable<FileUploadResponse>>()
         .WithMetadata(new ConsumesAttribute("multipart/form-data"))
         .WithSummary("Upload files to the server")
         .WithDescription("Allows uploading multiple files to a specific folder on the server.");
@@ -85,8 +85,8 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                                 Path.GetExtension(file.FileName),
                                 request.Folder
                             ));
-                            var fileUrl = $"{requestScheme}://{requestHost}{result}";
-                            response.Add(new FileUploadResponse { Url= fileUrl, Path = result, Size = outStream.Length });
+                            var fileUrl = $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
+                            response.Add(new FileUploadResponse { Url = fileUrl, Path = result, Size = outStream.Length });
                         }
                     }
                 }
@@ -101,7 +101,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                         request.Folder
                     );
                     var result = await uploadService.UploadAsync(uploadRequest);
-                    var fileUrl = $"{requestScheme}://{requestHost}{result}";
+                    var fileUrl = $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
                     response.Add(new FileUploadResponse { Url = fileUrl, Path = result, Size = imgstream.Length });
                 }
 
@@ -110,12 +110,13 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
             return TypedResults.Ok(response);
         }).Accepts<ImageUploadRequest>("multipart/form-data")
         .DisableAntiforgery()
+        .Produces<IEnumerable<FileUploadResponse>>()
         .WithMetadata(new ConsumesAttribute("multipart/form-data"))
         .WithSummary("Upload images to the server with cropping options")
         .WithDescription("Allows uploading multiple image files with optional cropping options to a specific folder on the server.");
 
-        group.MapGet("/{**path}", async Task<Results<FileStreamHttpResult, ValidationProblem, NotFound<string>>> (
-            [FromRoute] string path,
+        group.MapGet("/", async Task<Results<FileStreamHttpResult, ValidationProblem, NotFound<string>>> (
+            [FromQuery] string path,
             HttpContext context,
             [FromServices] IServiceProvider sp) =>
         {
@@ -153,8 +154,8 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         .WithSummary("Download or preview a file from the server")
         .WithDescription("Allows clients to download or preview a file by specifying the folder and file name.");
 
-        group.MapDelete("/{**path}", async Task<Results<NoContent, ValidationProblem, NotFound<string>>> (
-            [FromRoute] string path,
+        group.MapDelete("/", async Task<Results<NoContent, ValidationProblem, NotFound<string>>> (
+            [FromQuery] string path,
             HttpContext context,
             [FromServices] IServiceProvider sp) =>
         {
@@ -215,7 +216,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         [Required]
         [MinLength(1, ErrorMessage = "At least one file must be uploaded.")]
         [Description("The list of files to be uploaded.")]
-        public List<IFormFile> Files { get; set; } = new();
+        public IFormFileCollection Files { get; set; } = new FormFileCollection();
     }
     public class FileUploadResponse
     {
@@ -254,7 +255,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         [Required]
         [MinLength(1, ErrorMessage = "At least one file must be uploaded.")]
         [Description("The list of files to be uploaded.")]
-        public List<IFormFile> Files { get; set; } = new();
+        public IFormFileCollection Files { get; set; } = new FormFileCollection();
 
         [Description("The desired crop size for the uploaded image.")]
         public CropSize? CropSize { get; set; }
