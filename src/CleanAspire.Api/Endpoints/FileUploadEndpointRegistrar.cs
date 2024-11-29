@@ -120,6 +120,15 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
             HttpContext context,
             [FromServices] IServiceProvider sp) =>
         {
+            if (path.Contains("..") || path.StartsWith("/") || path.StartsWith("\\"))
+            {
+                var validationProblem = TypedResults.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "path", new[] { "Invalid file path." } }
+                });
+                return validationProblem;
+            }
+
             var baseDirectory = Path.GetFullPath(Directory.GetCurrentDirectory());
             var filePath = Path.GetFullPath(Path.Combine(baseDirectory, path));
             if (!filePath.StartsWith(baseDirectory))
@@ -159,6 +168,14 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
             HttpContext context,
             [FromServices] IServiceProvider sp) =>
         {
+            if (path.Contains("..") || path.StartsWith("/") || path.StartsWith("\\"))
+            {
+                var validationProblem = TypedResults.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "path", new[] { "Invalid file path." } }
+                });
+                return validationProblem;
+            }
             var baseDirectory = Path.GetFullPath(Directory.GetCurrentDirectory());
             var filePath = Path.GetFullPath(Path.Combine(baseDirectory, path));
             if (!filePath.StartsWith(baseDirectory))
