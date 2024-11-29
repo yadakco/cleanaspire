@@ -69,13 +69,13 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                 var imgstream = new MemoryStream();
                 await filestream.CopyToAsync(imgstream);
                 imgstream.Position = 0;
-                if (request.CropSize != null)
+                if (request.CropSize_Width != null && request.CropSize_Height!=null)
                 {
                     using (var outStream = new MemoryStream())
                     {
                         using (var image = SixLabors.ImageSharp.Image.Load(imgstream))
                         {
-                            image.Mutate(i => i.Resize(new ResizeOptions { Mode = ResizeMode.Crop, Size = new Size(request.CropSize.Width, request.CropSize.Height) }));
+                            image.Mutate(i => i.Resize(new ResizeOptions { Mode = ResizeMode.Crop, Size = new Size((int)request.CropSize_Width, (int)request.CropSize_Height) }));
                             image.Save(outStream, PngFormat.Instance);
                             var result = await uploadService.UploadAsync(new UploadRequest(
                                 file.FileName,
@@ -257,8 +257,10 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         [Description("The list of files to be uploaded.")]
         public IFormFileCollection Files { get; set; } = new FormFileCollection();
 
-        [Description("The desired crop size for the uploaded image.")]
-        public CropSize? CropSize { get; set; }
+        [Description("The desired crop size for width the uploaded image.")]
+        public int? CropSize_Width { get; set; }
+        [Description("The desired crop size for height the uploaded image.")]
+        public int? CropSize_Height { get; set; }
     }
 
     public class CropSize

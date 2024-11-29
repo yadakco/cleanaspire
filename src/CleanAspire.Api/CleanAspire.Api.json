@@ -93,25 +93,16 @@
                   "files": {
                     "$ref": "#/components/schemas/IFormFileCollection"
                   },
-                  "cropSize": {
-                    "type": "object",
-                    "properties": {
-                      "width": {
-                        "maximum": 2147483647,
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "The width of the cropped image.",
-                        "format": "int32"
-                      },
-                      "height": {
-                        "maximum": 2147483647,
-                        "minimum": 1,
-                        "type": "integer",
-                        "description": "The height of the cropped image.",
-                        "format": "int32"
-                      }
-                    },
-                    "description": "The desired crop size for the uploaded image.",
+                  "cropSize_Width": {
+                    "type": "integer",
+                    "description": "The desired crop size for width the uploaded image.",
+                    "format": "int32",
+                    "nullable": true
+                  },
+                  "cropSize_Height": {
+                    "type": "integer",
+                    "description": "The desired crop size for height the uploaded image.",
+                    "format": "int32",
                     "nullable": true
                   }
                 }
@@ -1281,7 +1272,7 @@
           }
         },
         "example": {
-          "email": "Erik_Kovacek@hotmail.com",
+          "email": "Nickolas21@yahoo.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1368,7 +1359,7 @@
           }
         },
         "example": {
-          "Email": "Jamison_Rodriguez@gmail.com",
+          "Email": "Anna_Kub@hotmail.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

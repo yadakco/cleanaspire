@@ -66,8 +66,12 @@
         {
 
             var request = new MultipartBody();
-            request.AddOrReplacePart("Overwrite", "text/plain", "false");
-            request.AddOrReplacePart("Folder", "text/plain", $"{model.Id}");
+            request.AddOrReplacePart("overwrite", "text/plain", "false");
+            request.AddOrReplacePart("folder", "text/plain", $"{model.Id}");
+            // request.AddOrReplacePart("cropSize[width]", "text/plain", "150");
+            // request.AddOrReplacePart("cropSize[height]", "text/plain", "150");
+            request.AddOrReplacePart("cropSize_width", "text/plain", $"{150}");
+            request.AddOrReplacePart("cropSize_height", "text/plain", $"{150}");
             var i = 0;
 
             var filename = file.Name;
