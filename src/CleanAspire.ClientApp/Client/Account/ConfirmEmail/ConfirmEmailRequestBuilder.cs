@@ -32,6 +32,9 @@ namespace CleanAspire.Api.Client.Account.ConfirmEmail
         public ConfirmEmailRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/confirmEmail?code={code}&userId={userId}{&changedEmail*}", rawUrl)
         {
         }
+        /// <summary>
+        /// Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.
+        /// </summary>
         /// <returns>A <see cref="Stream"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -47,6 +50,9 @@ namespace CleanAspire.Api.Client.Account.ConfirmEmail
             var requestInfo = ToGetRequestInformation(requestConfiguration);
             return await RequestAdapter.SendPrimitiveAsync<Stream>(requestInfo, default, cancellationToken).ConfigureAwait(false);
         }
+        /// <summary>
+        /// Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.
+        /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -71,10 +77,11 @@ namespace CleanAspire.Api.Client.Account.ConfirmEmail
         {
             return new global::CleanAspire.Api.Client.Account.ConfirmEmail.ConfirmEmailRequestBuilder(rawUrl, RequestAdapter);
         }
+        /// <summary>
+        /// Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.
+        /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        #pragma warning disable CS1591
         public partial class ConfirmEmailRequestBuilderGetQueryParameters 
-        #pragma warning restore CS1591
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable

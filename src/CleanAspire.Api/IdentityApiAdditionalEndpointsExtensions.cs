@@ -10,14 +10,10 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using CleanAspire.Api.Identity;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
 using CleanAspire.Application.Common.Interfaces;
-using CleanAspire.Infrastructure.Services;
-using static System.Net.Mime.MediaTypeNames;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -58,7 +54,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Fetches the profile information of the authenticated user. " +
          "Returns 404 if the user is not found. Requires authorization.");
         identityGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, [FromForm] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
@@ -79,25 +75,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             appUser.LanguageCode = request.LanguageCode;
             appUser.SuperiorId = request.SuperiorId;
             appUser.TenantId = request.TenantId;
-            if (request.Avatar != null)
-            {
-                var avatarUrl = string.Empty;
-                var uploadService = sp.GetRequiredService<IUploadService>();
-                var filestream = request.Avatar.OpenReadStream();
-                var imgstream = new MemoryStream();
-                await filestream.CopyToAsync(imgstream);
-                imgstream.Position = 0;
-                using (var outStream = new MemoryStream())
-                {
-                    using (var image = SixLabors.ImageSharp.Image.Load(imgstream))
-                    {
-                        image.Mutate(i => i.Resize(new ResizeOptions { Mode = ResizeMode.Crop, Size = new Size(128, 128) }));
-                        image.Save(outStream, PngFormat.Instance);
-                        avatarUrl = await uploadService.UploadAsync(new UploadRequest($"{appUser.Id}_{DateTime.UtcNow.Ticks}.png", UploadType.ProfilePicture, outStream.ToArray(), true));
-                    }
-                }
-                appUser.AvatarUrl = avatarUrl;
-            }
+            appUser.AvatarUrl = request.AvatarUrl;
             await userManager.UpdateAsync(user).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(request.Email))
             {
@@ -110,9 +88,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
 
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
-        }).Accepts<ProfileRequest>("multipart/form-data")
-        .DisableAntiforgery()
-        .WithMetadata(new ConsumesAttribute("multipart/form-data")).WithSummary("Update user profile information.")
+        })
+        .WithSummary("Update user profile information.")
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
 
@@ -121,8 +98,6 @@ public static class IdentityApiAdditionalEndpointsExtensions
         routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
-            var fullPath = linkGenerator.GetUriByName(context, $"/abc");
-
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
             var user = new TUser();
             if (!userManager.SupportsUserEmail)
@@ -145,7 +120,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
             await SendConfirmationEmailAsync(user, userManager, context, request.Email);
             return TypedResults.Ok();
-        });
+        }).WithSummary("User Signup")
+          .WithDescription("Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.");
 
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
             ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
@@ -153,10 +129,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
             if (await userManager.FindByIdAsync(userId) is not { } user)
             {
-                // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
                 return TypedResults.Unauthorized();
             }
-
             try
             {
                 code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
@@ -165,32 +139,26 @@ public static class IdentityApiAdditionalEndpointsExtensions
             {
                 return TypedResults.Unauthorized();
             }
-
             IdentityResult result;
-
             if (string.IsNullOrEmpty(changedEmail))
             {
                 result = await userManager.ConfirmEmailAsync(user, code);
             }
             else
             {
-                // As with Identity UI, email and user name are one and the same. So when we update the email,
-                // we need to update the user name.
                 result = await userManager.ChangeEmailAsync(user, changedEmail, code);
-
                 if (result.Succeeded)
                 {
                     result = await userManager.SetUserNameAsync(user, changedEmail);
                 }
             }
-
             if (!result.Succeeded)
             {
                 return TypedResults.Unauthorized();
             }
-
             return TypedResults.Text("Thank you for confirming your email.");
-        })
+        }).WithSummary("Confirm Email or Update Email Address")
+        .WithDescription("Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.")
         .Add(endpointBuilder =>
         {
             var finalPattern = ((RouteEndpointBuilder)endpointBuilder).RoutePattern.RawText;
@@ -297,7 +265,7 @@ public sealed class ProfileRequest
     [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
     public required string Email { get; init; }
     [Description("User uploads an avatar image.")]
-    public IFormFile? Avatar { get; init; }
+    public string? AvatarUrl { get; init; }
     [Description("User's time zone identifier, e.g., 'UTC', 'America/New_York'.")]
     [MaxLength(50, ErrorMessage = "TimeZoneId cannot exceed 50 characters.")]
     public string? TimeZoneId { get; set; }

@@ -13,7 +13,7 @@
             else
             {
                 <MudAvatar Size="Size.Medium" Square="true">
-                    <MudImage Src="@GetAvatar(userModel.AvatarUrl)"></MudImage>
+                    <MudImage Src="@userModel.AvatarUrl"></MudImage>
                 </MudAvatar>
             }
             <MudStack Justify="Justify.Center" Spacing="0">
@@ -59,8 +59,5 @@
         await IdentityManagement.LogoutAsync();
         StateHasChanged();
     }
-    private string GetAvatar(string avatarUrl)
-    {
-        return $"{AppSettings.ServiceBaseUrl}{avatarUrl}";
-    }
+
 }

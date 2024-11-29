@@ -22,8 +22,8 @@ public class Theme
                 Secondary = "#9E9E9E", // Dark gray, secondary color
 
                 // **Background and Surface**
-                Background = "#FFFFFF", // Standard light background color
-                Surface = "#F5F5F5", // Light gray, used for surfaces like cards
+                Background = "#F5F5F5", // Standard light background color
+                Surface = "#FFFFFF", // Light gray, used for surfaces like cards
 
                 // **Text Colors**
                 TextPrimary = "#424242", // Dark gray, primary text color
@@ -53,7 +53,7 @@ public class Theme
                 OverlayLight = "rgba(255,255,255,0.5)", // Semi-transparent white, used for overlays
 
                 // **App Bar and Navigation**
-                AppbarBackground = "#F5F5F5", // Light surface
+                AppbarBackground = "#FFFFFF", // Light surface
                 AppbarText = "#424242", // Dark gray, app bar text color
                 DrawerBackground = "#F5F5F5", // Light surface
                 DrawerText = "#424242", // Dark gray, drawer text color
@@ -195,8 +195,8 @@ public class Theme
                 H6 = new H6Typography
                 {
                     FontSize = "1rem",
-                    FontWeight = "400",
-                    LineHeight = "1.6",
+                    FontWeight = "500",
+                    LineHeight = "1.5",
                     LetterSpacing = ".0075em"
                 },
                 Button = new ButtonTypography
