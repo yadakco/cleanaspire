@@ -121,6 +121,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
         routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
+            var fullPath = linkGenerator.GetUriByName(context, $"/abc");
+
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
             var user = new TUser();
             if (!userManager.SupportsUserEmail)

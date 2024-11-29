@@ -5,14 +5,12 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using CleanAspire.Application.Common.Interfaces;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp;
-using System.IO;
+using Microsoft.AspNetCore.Routing;
 
 namespace CleanAspire.Api.Endpoints;
 
@@ -21,8 +19,8 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
     public void RegisterRoutes(IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/upload").WithTags("File Upload");
-
-        group.MapPost("/", async ([FromForm] FileUploadRequest request, [FromServices] IServiceProvider sp) =>
+        var linkGenerator = routes.ServiceProvider.GetRequiredService<LinkGenerator>();
+        group.MapPost("/", async ([FromForm] FileUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var response = new List<FileUploadResponse>();
             var uploadService = sp.GetRequiredService<IUploadService>();
@@ -51,7 +49,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         .WithSummary("Upload files to the server")
         .WithDescription("Allows uploading multiple files to a specific folder on the server.");
 
-        group.MapPost("/image", async ([FromForm] ImageUploadRequest request, [FromServices] IServiceProvider sp) =>
+        group.MapPost("/image", async ([FromForm] ImageUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var response = new List<FileUploadResponse>();
             var uploadService = sp.GetRequiredService<IUploadService>();
@@ -103,9 +101,52 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         .WithMetadata(new ConsumesAttribute("multipart/form-data"))
         .WithSummary("Upload images to the server with cropping options")
         .WithDescription("Allows uploading multiple image files with optional cropping options to a specific folder on the server.");
+
+        group.MapGet("/{path}", ([FromRoute] string path) =>
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), path);
+            if (File.Exists(filePath))
+            {
+                return TypedResults.NotFound($"The file '{path}' does not exist.");
+            }
+            var fileName = Path.GetFileName(filePath);
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            var contentType = GetContentType(filePath); 
+            return TypedResults.File(fileStream, contentType, fileName);
+        })
+        .WithSummary("Download or preview a file from the server")
+        .WithDescription("Allows clients to download or preview a file by specifying the folder and file name.");
+
+        group.MapDelete("/{path}", ([FromRoute] string path, [FromServices] IServiceProvider sp) =>
+        {
+            var uploadService = sp.GetRequiredService<IUploadService>();
+            uploadService.Remove(path);
+            return TypedResults.Ok();
+        })
+        .WithSummary("Delete a file from the server")
+        .WithDescription("Allows clients to delete a file by specifying the folder and file name.");
     }
 
+    private string GetContentType(string path)
+    {
+        var types = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+    {
+        { ".png", "image/png" },
+        { ".jpg", "image/jpeg" },
+        { ".jpeg", "image/jpeg" },
+        { ".gif", "image/gif" },
+        { ".pdf", "application/pdf" },
+        { ".doc", "application/msword" },
+        { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+        { ".xls", "application/vnd.ms-excel" },
+        { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+        { ".txt", "text/plain" },
+        { ".zip", "application/zip" }
+    };
 
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return types.TryGetValue(ext, out var contentType) ? contentType : "application/octet-stream";
+    }
     public class FileUploadRequest
     {
         /// <summary>
