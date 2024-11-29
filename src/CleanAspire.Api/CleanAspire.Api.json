@@ -290,7 +290,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Unit"
+                  "type": "string"
                 }
               }
             }
@@ -1277,7 +1277,7 @@
           }
         },
         "example": {
-          "email": "Edd.Howell3@hotmail.com",
+          "email": "Trisha23@hotmail.com",
           "password": "P@ssw0rd!"
         }
       },
@@ -1364,7 +1364,7 @@
           }
         },
         "example": {
-          "Email": "Thad10@hotmail.com",
+          "Email": "Nona.Denesik81@yahoo.com",
           "Password": "P@ssw0rd!",
           "Nickname": "exampleNickname",
           "Provider": "Local",

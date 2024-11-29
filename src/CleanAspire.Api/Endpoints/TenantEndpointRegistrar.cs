@@ -16,7 +16,7 @@ public class TenantEndpointRegistrar : IEndpointRegistrar
     {
         var group = routes.MapGroup("/tenants").WithTags("tenants");
 
-        group.MapGet("/", async (IMediator mediator) => await mediator.Send(new GetAllTenantsQuery()))
+        group.MapGet("/", async ([FromServices] IMediator mediator) => await mediator.Send(new GetAllTenantsQuery()))
              .Produces<IEnumerable<TenantDto>>()
              .AllowAnonymous()
              .WithSummary("Get all tenants")
@@ -28,7 +28,7 @@ public class TenantEndpointRegistrar : IEndpointRegistrar
             .WithSummary("Get tenant by ID")
             .WithDescription("Returns the details of a specific tenant by their unique ID.");
 
-        group.MapPost("/", async (IMediator mediator, [FromBody] CreateTenantCommand command) =>
+        group.MapPost("/", async ([FromServices] IMediator mediator, [FromBody] CreateTenantCommand command) =>
         {
             var id = await mediator.Send(command);
             return TypedResults.Ok(id);
@@ -36,12 +36,12 @@ public class TenantEndpointRegistrar : IEndpointRegistrar
             .WithSummary("Create a new tenant")
             .WithDescription("Creates a new tenant with the provided details.");
 
-        group.MapPut("/", async (IMediator mediator, [FromBody] UpdateTenantCommand command) => await mediator.Send(command))
+        group.MapPut("/", async ([FromServices] IMediator mediator, [FromBody] UpdateTenantCommand command) => await mediator.Send(command))
             .RequireAuthorization()
             .WithSummary("Update an existing tenant")
             .WithDescription("Updates the details of an existing tenant.");
 
-        group.MapDelete("/", async (IMediator mediator, [FromQuery]string[] ids) => await mediator.Send(new DeleteTenantCommand(ids)))
+        group.MapDelete("/", async (IMediator mediator, [FromQuery] string[] ids) => await mediator.Send(new DeleteTenantCommand(ids)))
             .RequireAuthorization()
             .WithSummary("Delete tenants by IDs")
             .WithDescription("Deletes one or more tenants by their unique IDs.");
