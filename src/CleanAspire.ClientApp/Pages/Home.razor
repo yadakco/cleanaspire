@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Microsoft.Kiota.Abstractions
 
 <PageTitle>Home</PageTitle>
 
@@ -6,85 +7,85 @@
     <style>
 
         .circle {
-            width: 0.5rem;
-            height: 0.5rem;
-            display: inline-block;
+        width: 0.5rem;
+        height: 0.5rem;
+        display: inline-block;
         }
 
         .rounded-circle {
-            border-radius: 50%;
+        border-radius: 50%;
         }
 
         .bg-success {
-            background-color: #28a745 !important;
+        background-color: #28a745 !important;
         }
 
         .bg-warning {
-            background-color: #ffc107 !important;
+        background-color: #ffc107 !important;
         }
 
         .bg-primary {
-            background-color: #0d6efd !important;
+        background-color: #0d6efd !important;
         }
 
         .bg-danger {
-            background-color: #dc3545 !important;
+        background-color: #dc3545 !important;
         }
 
         .bg-secondary {
-            background-color: #6c757d !important;
+        background-color: #6c757d !important;
         }
 
         .bg-dark {
-            background-color: #343a40 !important;
+        background-color: #343a40 !important;
         }
 
         .bar-label {
-            font-size: .625rem;
-            color: #6c757d;
+        font-size: .625rem;
+        color: #6c757d;
         }
 
         .text-nowrap {
-            white-space: nowrap;
+        white-space: nowrap;
         }
 
         .fw-semibold {
-            font-weight: 600;
+        font-weight: 600;
         }
 
         .small, small {
-            font-size: .875em;
+        font-size: .875em;
         }
 
         .progress {
-            background-color: #e9ecef;
-            border-radius: 0.25rem;
-            overflow: hidden;
-            height: 8px;
-            display: flex;
+        background-color: #e9ecef;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        height: 8px;
+        display: flex;
         }
 
         .progress-bar {
-            height: 100%;
-            transition: width 0.6s ease;
+        height: 100%;
+        transition: width 0.6s ease;
         }
 
         @@media (max-width: 850px) {
-            .flex-row {
-                flex-wrap: wrap;
-            }
+        .flex-row {
+        flex-wrap: wrap;
+        }
         }
 
         .fw-bold {
-            font-weight: 700 !important;
+        font-weight: 700 !important;
         }
 
         .fs-5 {
-            font-size: 1.25rem !important;
+        font-size: 1.25rem !important;
         }
 
         .text-muted {
-            color: var(--mud-palette-text-secondary);
+        color: var(--mud-palette-text-secondary);
         }
     </style>
     <div class="d-flex flex-row gap-3">
@@ -171,7 +172,7 @@
             <PropertyColumn Title="Status" Property="x => x.Status" />
             <PropertyColumn Title="Customer Name" Property="x => x.CustomerName" />
             <PropertyColumn Title="Order Date" Property="x => x.OrderDate" Format="yyyy-MM-dd" />
-            
+
         </Columns>
         <PagerContent>
             <MudDataGridPager T="Order" />
@@ -189,6 +190,34 @@
     <MudPaper Class="mud-theme-error" Width="64px" Height="64px" />
     <MudPaper Class="mud-theme-dark" Width="64px" Height="64px" />
     <MudPaper Class="mud-theme-surface" Width="64px" Height="64px" />
+</MudPaper>
+<MudPaper Class="d-flex flex-column flex-grow-1 gap-4 pa-2" Elevation="0">
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
+        <ActivatorContent>
+            <MudButton Variant="Variant.Filled"
+            Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.CloudUpload">
+                Multiple Files
+            </MudButton>
+        </ActivatorContent>
+    </MudFileUpload>
+
+    @if (fileUploadResponses.Any())
+    {
+        <MudSimpleTable Hover Dense Elevation="0">
+            <tbody>
+                @foreach (var item in fileUploadResponses)
+                {
+                    <tr @onclick="()=>OnDownloadFile(item.Url)" style="cursor:pointer">
+                        <td><Thumbnail Path="@item.Path" FileUrl="@item.Url"> </Thumbnail></td>
+                        <td><FileSizeFormatter  FileSizeInBytes="@((int)item.Size)"></FileSizeFormatter></td>
+                        <td style="width:50px"><MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" title="@L["Delete"]" OnClick="@(()=>DeleteFile(item))"></MudIconButton></td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+    }
+
 </MudPaper>
 <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 pa-2" Elevation="0">
     <MudButton Variant="Variant.Filled">Default</MudButton>
@@ -223,6 +252,16 @@
     <MudText Typo="Typo.body1" Class="mud-dark-text"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
     <MudText Typo="Typo.body1" Class="mud-tertiary-text"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
 </MudPaper>
+<style>
+    @@import url("https://cdn.jsdelivr.net/npm/@@fancyapps/ui@@5.0.36/dist/fancybox/fancybox.css");
+
+    .fancybox__container {
+        --fancybox-bg: rgba(24, 24, 27, 0.85);
+        z-index: 9999;
+    }
+
+
+</style>
 @code {
     public List<Order> Orders = new List<Order>
         {
@@ -268,5 +307,39 @@
         public string CustomerName { get; set; }
         public string ShippingAddress { get; set; }
         public string Product { get; set; }
+    }
+
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    public List<FileUploadResponse> fileUploadResponses = new List<FileUploadResponse>();
+    private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
+    {
+        var request = new MultipartBody();
+        request.AddOrReplacePart("overwrite", "text/plain", "false");
+        request.AddOrReplacePart("folder", "text/plain", $"{DateTime.UtcNow.ToString("yyyyMMdd")}");
+        var i = 0;
+        foreach (var file in files)
+        {
+            var filename = file.Name;
+            var stream = new MemoryStream();
+            await file.OpenReadStream(int.MaxValue).CopyToAsync(stream);
+            request.AddOrReplacePart($"files[{i++}]", "application/octet-stream", stream, filename);
+        }
+        var response = await ApiClient.File.Upload.PostAsync(request);
+        if(response is not null && response.Any())
+        {
+            fileUploadResponses.AddRange(response);
+        }
+
+    }
+    private async Task OnDownloadFile(string? str)
+    {
+        // var fileURL = str;
+        await new Fancybox(JS).Preview(str ?? string.Empty, []);
+    }
+    private async Task DeleteFile(FileUploadResponse item)
+    {
+        await ApiClient.File.DeleteAsync(request => request.QueryParameters.Path = item.Path);
+        fileUploadResponses.Remove(item);
     }
 }

@@ -49,20 +49,20 @@ namespace CleanAspire.Api.Client.Tenants
         /// <summary>
         /// Deletes one or more tenants by their unique IDs.
         /// </summary>
-        /// <returns>A <see cref="Stream"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.Models.Unit"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<Stream?> DeleteAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder.TenantsRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::CleanAspire.Api.Client.Models.Unit?> DeleteAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder.TenantsRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<Stream> DeleteAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder.TenantsRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::CleanAspire.Api.Client.Models.Unit> DeleteAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder.TenantsRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
-            return await RequestAdapter.SendPrimitiveAsync<Stream>(requestInfo, default, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.Unit>(requestInfo, global::CleanAspire.Api.Client.Models.Unit.CreateFromDiscriminatorValue, default, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Returns a list of all tenants in the system.
@@ -106,22 +106,22 @@ namespace CleanAspire.Api.Client.Tenants
         /// <summary>
         /// Updates the details of an existing tenant.
         /// </summary>
-        /// <returns>A <see cref="Stream"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.Models.Unit"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<Stream?> PutAsync(global::CleanAspire.Api.Client.Models.UpdateTenantCommand body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::CleanAspire.Api.Client.Models.Unit?> PutAsync(global::CleanAspire.Api.Client.Models.UpdateTenantCommand body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<Stream> PutAsync(global::CleanAspire.Api.Client.Models.UpdateTenantCommand body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::CleanAspire.Api.Client.Models.Unit> PutAsync(global::CleanAspire.Api.Client.Models.UpdateTenantCommand body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             _ = body ?? throw new ArgumentNullException(nameof(body));
             var requestInfo = ToPutRequestInformation(body, requestConfiguration);
-            return await RequestAdapter.SendPrimitiveAsync<Stream>(requestInfo, default, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.Unit>(requestInfo, global::CleanAspire.Api.Client.Models.Unit.CreateFromDiscriminatorValue, default, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Deletes one or more tenants by their unique IDs.
@@ -139,6 +139,7 @@ namespace CleanAspire.Api.Client.Tenants
 #endif
             var requestInfo = new RequestInformation(Method.DELETE, UrlTemplate, PathParameters);
             requestInfo.Configure(requestConfiguration);
+            requestInfo.Headers.TryAdd("Accept", "application/json");
             return requestInfo;
         }
         /// <summary>
@@ -200,6 +201,7 @@ namespace CleanAspire.Api.Client.Tenants
             _ = body ?? throw new ArgumentNullException(nameof(body));
             var requestInfo = new RequestInformation(Method.PUT, "{+baseurl}/tenants", PathParameters);
             requestInfo.Configure(requestConfiguration);
+            requestInfo.Headers.TryAdd("Accept", "application/json");
             requestInfo.SetContentFromParsable(RequestAdapter, "application/json", body);
             return requestInfo;
         }
