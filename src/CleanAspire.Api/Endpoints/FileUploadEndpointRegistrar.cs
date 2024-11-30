@@ -141,7 +141,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
             }
             if (!File.Exists(filePath))
             {
-                return TypedResults.NotFound($"File '{path}' does not exist.");
+                return TypedResults.NotFound($"File '{filePath}' does not exist.");
             }
             FileStream fileStream;
             try

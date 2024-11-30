@@ -98,7 +98,7 @@ public class Theme
 
                 // **Overlay**
                 OverlayDark = "rgba(0,0,0,0.5)", // Semi-transparent black, used for overlays
-
+                OverlayLight = "rgba(30,30,30,0.4)",
                 // **App Bar and Navigation**
                 AppbarBackground = "#1E1E1E", // Same as surface color
                 AppbarText = "#FFFFFF", // White, app bar text color
@@ -107,6 +107,8 @@ public class Theme
 
                 // **Contrast Text for Primary Color**
                 PrimaryContrastText = "#FFFFFF", // White, text on primary color
+
+
             },
             Shadows = new()
             {
