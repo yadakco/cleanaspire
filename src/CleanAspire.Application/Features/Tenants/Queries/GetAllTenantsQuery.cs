@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using CleanAspire.Application.Common.Interfaces.FusionCache;
 using CleanAspire.Application.Features.Tenants.DTOs;
 namespace CleanAspire.Application.Features.Tenants.Queries;
 
