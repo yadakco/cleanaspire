@@ -1,0 +1,97 @@
+﻿@page "/products/index"
+
+<PageTitle>Counter</PageTitle>
+
+<MudDataGrid T="ProductDto" Dense="true" Hover="true"
+             @ref="_table"
+             ServerData="@(ServerReload)"
+             MultiSelection="true"
+             SelectOnRowClick="false"
+             @bind-RowsPerPage="_defaultPageSize"
+             @bind-SelectedItems="_selectedItems"
+             @bind-SelectedItem="_currentDto">
+    <ToolBarContent>
+        <MudStack Row Spacing="0" Class="flex-grow-1" Justify="Justify.SpaceBetween">
+            <MudStack Row AlignItems="AlignItems.Start">
+                <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Size="Size.Large" />
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.subtitle2">@L[Title]</MudText>
+                    <MudText Typo="Typo.body2">@L["View all available products in our inventory."]</MudText>
+                </MudStack>
+            </MudStack>
+            <MudStack Spacing="0" AlignItems="AlignItems.End">
+                <MudStack Row Spacing="1">
+                    <MudButton Size="Size.Small" OnClick="()=>_table.ReloadServerData()" Disabled="@_loading">
+                        <MudIcon Icon="@Icons.Material.Filled.Refresh" />
+                        <MudText>@L["Refresh"]</MudText>
+                    </MudButton>
+
+                    <MudButton Size="Size.Small" >
+                        <MudIcon Icon="@Icons.Material.Filled.Add" />
+                        <MudText>@L["New"]</MudText>
+                    </MudButton>
+                    <MudButton Size="Size.Small" Disabled="@(!_selectedItems.Any())">
+                        <MudIcon Icon="@Icons.Material.Outlined.Delete" />
+                        <MudText>@L["Delete"]</MudText>
+                    </MudButton>
+                </MudStack>
+                <MudStack Row Spacing="1">
+                    <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Value="@_keywords" Placeholder="@L["Keywords"]" Adornment="Adornment.End"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
+                    </MudTextField>
+                </MudStack>
+            </MudStack>
+        </MudStack>
+
+    </ToolBarContent>
+    <Columns>
+        <SelectColumn ShowInFooter="false"></SelectColumn>
+        <PropertyColumn Title="@L["SKU"]" Property="x => x.Sku" />
+        <PropertyColumn Title="@L["Name"]" Property="x => x.Name" />
+        <PropertyColumn Title="@L["Category"]" Property="x => x.Category" />
+        <PropertyColumn Title="@L["UOM"]" Property="x => x.Uom" />
+        <PropertyColumn Title="@L["Price"]" Property="x => x.Price" Sortable="false" />
+        <PropertyColumn Title="@L["Currency"]" Property="x => x.Currency" />
+
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="ProductDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    public string Title = "Products";
+    private HashSet<ProductDto> _selectedItems = new();
+    private ProductDto _currentDto = new();
+    private MudDataGrid<ProductDto> _table = default!;
+    private int _defaultPageSize = 15;
+    private string _keywords = string.Empty;
+    private bool _loading = false;
+
+    private async Task<GridData<ProductDto>> ServerReload(GridState<ProductDto> state)
+    {
+        try
+        {
+            _loading = true;
+            var query = new ProductsWithPaginationQuery();
+            query.PageNumber = state.Page;
+            query.PageSize = state.PageSize;
+            query.Keywords = _keywords;
+            query.OrderBy = state.SortDefinitions.FirstOrDefault()?.SortBy ?? "Id";
+            query.SortDirection = state.SortDefinitions.FirstOrDefault()?.Descending ?? true ? SortDirection.Descending.ToString() : SortDirection.Ascending.ToString();
+            var result = await ApiClient.Products.Pagination.PostAsync(query);
+
+            return new GridData<ProductDto> { TotalItems = (int)result.TotalItems, Items = result.Items };
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+    private async Task OnSearch(string text)
+    {
+        _selectedItems = new HashSet<ProductDto>();
+        _keywords = text;
+        await _table.ReloadServerData();
+    }
+}

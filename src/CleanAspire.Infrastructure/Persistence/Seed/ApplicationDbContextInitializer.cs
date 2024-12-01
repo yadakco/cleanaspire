@@ -116,50 +116,55 @@ public class ApplicationDbContextInitializer
         var products = new List<Product>
 {
     new Product
-    {
-        Name = "Sony Bravia 65-inch 4K TV",
-        Description = "Sony's 65-inch Bravia 4K Ultra HD smart TV with HDR support and X-Motion Clarity. Features a slim bezel, Dolby Vision, and an immersive sound system. Perfect for high-definition streaming and gaming.",
-        Price = 1200,
-        Quantity = 30,
-        UOM = "PCS",
-        Currency = "USD"
-    },
-    new Product
-    {
-        Name = "Tesla Model S Plaid",
-        Description = "Tesla's flagship electric vehicle with a top speed of 200 mph and 0-60 in under 2 seconds. Equipped with Autopilot, long-range battery, and premium interior. Suitable for eco-conscious luxury seekers.",
-        Price = 120000,
-        Quantity = 5,
-        UOM = "PCS",
-        Currency = "USD"
-    },
-    new Product
-    {
-        Name = "Apple iPhone 14 Pro Max",
-        Description = "Apple's latest iPhone featuring a 6.7-inch OLED display, A16 Bionic chip, advanced camera system with 48 MP main camera, and longer battery life. Ideal for photography and heavy app users.",
-        Price = 1099,
-        Quantity = 150,
-        UOM = "PCS",
-        Currency = "USD"
-    },
-    new Product
-    {
-        Name = "Sony WH-1000XM5 Noise Cancelling Headphones",
-        Description = "Premium noise-cancelling over-ear headphones with 30-hour battery life, adaptive sound control, and Hi-Res audio support. Designed for frequent travelers and audiophiles seeking uninterrupted sound.",
-        Price = 349,
-        Quantity = 200,
-        UOM = "PCS",
-        Currency = "USD"
-    },
-    new Product
-    {
-        Name = "Apple MacBook Pro 16-inch M2 Max",
-        Description = "Apple’s most powerful laptop featuring the M2 Max chip, a stunning 16-inch Liquid Retina XDR display, 64GB of unified memory, and up to 8TB SSD storage. Ideal for creative professionals needing high performance.",
-        Price = 4200,
-        Quantity = 15,
-        UOM = "PCS",
-        Currency = "USD"
-    }
+{
+    Name = "Sony Bravia 65-inch 4K TV",
+    Description = "Sony's 65-inch Bravia 4K Ultra HD smart TV with HDR support and X-Motion Clarity. Features a slim bezel, Dolby Vision, and an immersive sound system. Perfect for high-definition streaming and gaming.",
+    Price = 1200,
+    SKU = "BRAVIA-65-4K",
+    UOM = "PCS",
+    Currency = "USD",
+    Category = ProductCategory.Electronics
+},
+new Product
+{
+    Name = "Tesla Model S Plaid",
+    Description = "Tesla's flagship electric vehicle with a top speed of 200 mph and 0-60 in under 2 seconds. Equipped with Autopilot, long-range battery, and premium interior. Suitable for eco-conscious luxury seekers.",
+    Price = 120000,
+    SKU = "TESLA-MODEL-S-PLAID",
+    UOM = "PCS",
+    Currency = "USD",
+    Category = ProductCategory.Electronics
+},
+new Product
+{
+    Name = "Apple iPhone 14 Pro Max",
+    Description = "Apple's latest iPhone featuring a 6.7-inch OLED display, A16 Bionic chip, advanced camera system with 48 MP main camera, and longer battery life. Ideal for photography and heavy app users.",
+    Price = 1099,
+    SKU = "IP14PRO-MAX",
+    UOM = "PCS",
+    Currency = "USD",
+    Category = ProductCategory.Electronics
+},
+new Product
+{
+    Name = "Sony WH-1000XM5 Noise Cancelling Headphones",
+    Description = "Premium noise-cancelling over-ear headphones with 30-hour battery life, adaptive sound control, and Hi-Res audio support. Designed for frequent travelers and audiophiles seeking uninterrupted sound.",
+    Price = 349,
+    SKU = "WH-1000XM5",
+    UOM = "PCS",
+    Currency = "USD",
+    Category = ProductCategory.Electronics
+},
+new Product
+{
+    Name = "Apple MacBook Pro 16-inch M2 Max",
+    Description = "Apple’s most powerful laptop featuring the M2 Max chip, a stunning 16-inch Liquid Retina XDR display, 64GB of unified memory, and up to 8TB SSD storage. Ideal for creative professionals needing high performance.",
+    Price = 4200,
+    SKU = "MACBOOK-PRO-M2-MAX",
+    UOM = "PCS",
+    Currency = "USD",
+    Category = ProductCategory.Electronics
+}
 };
         await _context.Products.AddRangeAsync(products);
         await _context.SaveChangesAsync();

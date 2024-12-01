@@ -5,10 +5,13 @@
 global using System;
 global using System.Collections.Generic;
 global using System.Linq;
-global using System.Text;
 global using System.Threading.Tasks;
+global using CleanAspire.Domain;
 global using Microsoft.EntityFrameworkCore;
 global using CleanAspire.Application.Common.Interfaces;
+global using CleanAspire.Application.Common.Interfaces.FusionCache;
+global using CleanAspire.Application.Common.Models;
+global using CleanAspire.Application.Common;
 global using CleanAspire.Domain.Entities;
 global using Mediator;
 global using Microsoft.Extensions.Logging;
