@@ -1,0 +1,52 @@
+﻿@page "/products/edit/{id:string}"
+@using CleanAspire.ClientApp.Components.Breadcrumbs
+
+
+<PageTitle>@Title</PageTitle>
+
+<Breadcrumbs OnSaveButtonClick="Save" Saving="_saving" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
+@code {
+    public string? Title
+    [Parameter]
+    public string Id { get; set; }
+    private bool _saving;
+    private UpdateProductCommand _model = new UpdateProductCommand();
+    private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Home", href: "/"),
+        new BreadcrumbItem("Products", href: "/products/index")
+    };
+    protected override async Task OnInitializedAsync(){
+        try
+        {
+            var result = await ApiClient.Products[Id].GetAsync();
+            if(result!=null){
+                _model = new()
+                    {
+                        Id = result.Id,
+                        Sku= result.Sku,
+                        Name = result.Name,
+                        Category = result.Category,
+                        Uom = result.Uom,
+                        Price = result.Price,
+                        Currency = result.Currency,
+                        Description = result.Description
+                    };
+            }
+        }
+        catch (ApiException e)
+        {
+            Logger.LogError(e, e.Message);
+            Snackbar.Add(L["Failed to create product."], Severity.Error);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, e.Message);
+            Snackbar.Add(L["An error occurred while creating the product."], Severity.Error);
+        };
+    }
+    private Task Save()
+    {
+        return Task.CompletedTask;
+    }
+}

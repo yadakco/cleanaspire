@@ -8,28 +8,28 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace CleanAspire.Api.Client.Identity.Logout
+namespace CleanAspire.Api.Client.Account.Logout
 {
     /// <summary>
-    /// Builds and executes requests for operations under \identity\logout
+    /// Builds and executes requests for operations under \account\logout
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class LogoutRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Identity.Logout.LogoutRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Account.Logout.LogoutRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public LogoutRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/identity/logout", pathParameters)
+        public LogoutRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/logout", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Identity.Logout.LogoutRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Account.Logout.LogoutRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public LogoutRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/identity/logout", rawUrl)
+        public LogoutRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/logout", rawUrl)
         {
         }
         /// <summary>
@@ -71,11 +71,11 @@ namespace CleanAspire.Api.Client.Identity.Logout
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::CleanAspire.Api.Client.Identity.Logout.LogoutRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.Account.Logout.LogoutRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::CleanAspire.Api.Client.Identity.Logout.LogoutRequestBuilder WithUrl(string rawUrl)
+        public global::CleanAspire.Api.Client.Account.Logout.LogoutRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::CleanAspire.Api.Client.Identity.Logout.LogoutRequestBuilder(rawUrl, RequestAdapter);
+            return new global::CleanAspire.Api.Client.Account.Logout.LogoutRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
