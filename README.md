@@ -1,33 +1,61 @@
-## CleanAspire - Modern .NET 9 Minimal API + Blazor WebAssembly PWA Template
+## CleanAspire - .NET 9 Minimal API + Blazor WebAssembly PWA Template with Aspire Support 
 [![.NET](https://github.com/neozhu/cleanaspire/actions/workflows/dotnet.yml/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/dotnet.yml)
 [![CodeQL](https://github.com/neozhu/cleanaspire/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/github-code-scanning/codeql)
 [![Build and Push Docker Image](https://github.com/neozhu/cleanaspire/actions/workflows/docker.yml/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/docker.yml)
 
 ![blazorclient](https://github.com/user-attachments/assets/013b167b-59fa-42d7-a2f7-ffec301c4e11)
-### Overview
 
-**CleanAspire** is a cutting-edge open-source project combining the latest .NET 9 Minimal API with Blazor WebAssembly, all organized with the principles of **Clean Architecture**. This template is built to accelerate the development of scalable and maintainable Progressive Web Applications (PWA) while keeping the codebase neat, modular, and future-proof.
+### 🚀 Overview  
+
+**CleanAspire** is a cutting-edge, open-source template built on **.NET 9**, designed to accelerate the development of **lightweight**, **fast**, and **simple** Blazor WebAssembly or Progressive Web Applications (PWA). It seamlessly integrates **Minimal APIs**, **Aspire**, and **Scalar** for modern API documentation.  
+
+With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAspire provides developers with the tools to create responsive and maintainable web applications with minimal effort. The template also supports **Microsoft.Kiota** to simplify API client generation, ensuring consistency and productivity in every project.  
 
 
-### Features
+### 🔑 Key Features  
 
-- **.NET 9 Minimal API** for lightweight, high-performance backend services.
-- **Blazor WebAssembly** for a modern, responsive client-side PWA.
-- **Clean Architecture** principles to promote separation of concerns, maintainability, and scalability.
-- **Minimal Boilerplate** for developers to jump-start their projects without repetitive setup.
-- **RESTful APIs** that are efficient and easy to use.
-- **Strong Typing** throughout the client and server to leverage the full power of C#.
-- **Ready-to-Deploy** template for Azure, AWS, Docker, and other cloud platforms.
+1. **Built-in Aspire Support**  
+   - Fully integrated with **Aspire** for efficient application hosting and configuration.  
+   - Simplifies the setup process while providing a robust foundation for lightweight applications.  
 
-### Why CleanAspire?
+2. **Fast and Minimal .NET 9 Minimal APIs**  
+   - Uses the latest .NET 9 features to create high-performance and efficient APIs.  
+   - Includes **Scalar** for modern and concise OpenAPI documentation, replacing traditional Swagger tools.  
 
-- **Speed Up Development**: Start coding your features instead of setting up boilerplate code.
-- **Modern and Performant**: Benefit from .NET 9's new features and the rich interactivity of Blazor WebAssembly as a PWA.
-- **Modular and Testable**: Clean Architecture makes maintaining and testing your project a breeze.
-- **Community-driven**: CleanAspire is open-source, encouraging contributions and collaboration from developers worldwide.
+3. **Designed for Simplicity and Speed**  
+   - Adopts extreme code simplicity for rapid development without sacrificing functionality.  
+   - Ideal for developers looking to build quick, responsive Blazor WebAssembly applications or PWAs.  
+
+4. **Blazor WebAssembly and PWA Integration**  
+   - Combines the power of Blazor WebAssembly for interactive and lightweight client-side UIs.  
+   - PWA capabilities ensure offline support and a seamless native-like experience.  
+
+5. **Streamlined API Client Integration**  
+   - Utilizes **Microsoft.Kiota** to automatically generate strongly-typed API clients, reducing development overhead.  
+   - Ensures consistent and error-free client-server communication.  
+
+6. **Clean Architecture**  
+   - Promotes modular, maintainable, and testable codebases through clear architectural layers.  
+
+7. **Cloud-Ready with Docker**  
+   - Preconfigured for Docker, enabling easy deployment to cloud platforms or local environments.  
+
+8. **Integrated CI/CD Pipelines**  
+   - Includes GitHub Actions workflows for automated building, testing, and deployment.  
+
+
+### 🌟 Why Choose CleanAspire?  
+
+- **Lightweight and Fast:** Designed to create high-performance, minimal Blazor WebAssembly or PWA projects.  
+- **Effortless Development:** Extreme simplicity in code makes it easy to start quickly and scale effectively.  
+- **Advanced API Integration:** Automate client-side API generation with Microsoft.Kiota for faster results.  
+- **Future-Ready Architecture:** Leverages the latest .NET 9 capabilities and Aspire hosting for modern web applications.
+- 
 
 ### OpenAPI documentation
 - https://apiservice.blazorserver.com/scalar/v1
+
+
 ### Here is an example of a docker-compose.yml file for a local Docker deployment:
 
 ```yml
