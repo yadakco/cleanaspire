@@ -13,10 +13,6 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
-using CleanAspire.Application.Common.Interfaces;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -31,16 +27,17 @@ public static class IdentityApiAdditionalEndpointsExtensions
         var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
         string? confirmEmailEndpointName = null;
-        var identityGroup = endpoints.MapGroup("/identity").RequireAuthorization().WithTags("Authentication", "Identity Management");
-        identityGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
+        var routeGroup = endpoints.MapGroup("/account").WithTags("Authentication", "Account Management");
+        routeGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
         {
             await signInManager.SignOutAsync();
             return Results.Ok();
         })
+        .RequireAuthorization()
         .WithSummary("Log out the current user.")
         .WithDescription("Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.");
 
-        identityGroup.MapGet("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
+        routeGroup.MapGet("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
             (ClaimsPrincipal claimsPrincipal, HttpContext context, IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -50,10 +47,11 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
+            .RequireAuthorization()
         .WithSummary("Retrieve the user's profile")
         .WithDescription("Fetches the profile information of the authenticated user. " +
          "Returns 404 if the user is not found. Requires authorization.");
-        identityGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
+        routeGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
             (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -89,12 +87,10 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
+        .RequireAuthorization()
         .WithSummary("Update user profile information.")
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
-
-
-        var routeGroup = endpoints.MapGroup("/account").WithTags("Authentication", "Identity Management");
         routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
@@ -120,7 +116,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
             await SendConfirmationEmailAsync(user, userManager, context, request.Email);
             return TypedResults.Ok();
-        }).WithSummary("User Signup")
+        }).AllowAnonymous()
+            .WithSummary("User Signup")
           .WithDescription("Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.");
 
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
@@ -157,7 +154,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 return TypedResults.Unauthorized();
             }
             return TypedResults.Text("Thank you for confirming your email.");
-        }).WithSummary("Confirm Email or Update Email Address")
+        }).AllowAnonymous()
+          .WithSummary("Confirm Email or Update Email Address")
         .WithDescription("Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.")
         .Add(endpointBuilder =>
         {

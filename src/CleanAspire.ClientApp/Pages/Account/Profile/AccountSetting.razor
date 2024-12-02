@@ -80,7 +80,7 @@
         {
             try
             {
-                await ApiClient.Identity.Profile.PostAsync(new ProfileRequest()
+                await ApiClient.Account.Profile.PostAsync(new ProfileRequest()
                     {
                         AvatarUrl = model.AvatarUrl,
                         Email = newEmailAddress,

@@ -13,6 +13,7 @@ using Microsoft.Kiota.Serialization.Json;
 using Microsoft.Kiota.Serialization.Text;
 using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Multipart;
+using CleanAspire.ClientApp.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -54,6 +55,7 @@ builder.Services.AddSingleton<ApiClient>(sp =>
     return apiClient;
 
 });
+builder.Services.AddSingleton<ApiClientService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddOidcAuthentication(options =>

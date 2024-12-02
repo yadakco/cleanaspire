@@ -286,12 +286,7 @@
             new Order { OrderNumber = "ORD0019", Amount = 450.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 7-13 days", OrderDate = DateTime.Now.AddDays(-11), CustomerName = "Samuel", ShippingAddress = "1616 Oak Ln", Product = "Epson EcoTank ET-8550 Wireless All-in-One Printer" },
             new Order { OrderNumber = "ORD0020", Amount = 999.99M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-2), CustomerName = "Tina", ShippingAddress = "1717 Pine Ave", Product = "Apple MacBook Pro 14-inch, M2 Pro, 16GB RAM, 512GB SSD" }
         };
-    private string weather = "";
-    protected override async Task OnInitializedAsync()
-    {
-        var weatherres = await ApiClient.Weatherforecast.GetAsync();
-        weather = System.Text.Json.JsonSerializer.Serialize(weatherres);
-    }
+
 
 
 
