@@ -1,4 +1,6 @@
 ﻿using CleanAspire.ClientApp.Components;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Options;
 using MudBlazor;
 
 namespace CleanAspire.ClientApp.Services;
@@ -27,13 +29,33 @@ public class DialogServiceHelper
             { nameof(ConfirmationDialog.ContentText), contentText }
         };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
-        var dialog = _dialogService.Show<ConfirmationDialog>(title, parameters, options);
+        var dialog = await _dialogService.ShowAsync<ConfirmationDialog>(title, parameters, options);
         var result = await dialog.Result;
         if (result is not null && !result.Canceled)
         {
             await onConfirm();
         }
         else if (onCancel != null)
+        {
+            await onCancel();
+        }
+    }
+
+    public async Task ShowDialogAsync<T>(
+        string title,
+        DialogParameters<T> parameters,
+        DialogOptions? options = null,
+        Func<DialogResult, Task>? onConfirm = null,
+        Func<Task>? onCancel = null) where T : ComponentBase
+    {
+        options = options ?? new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await _dialogService.ShowAsync<T>(title, parameters, options);
+        var result = await dialog.Result;
+        if (result is not null && !result.Canceled && onConfirm is not null)
+        {
+            await onConfirm(result);
+        }
+        else if (result is not null && result.Canceled && onCancel is not null)
         {
             await onCancel();
         }
