@@ -7,7 +7,7 @@ using CleanAspire.Application.Features.Products.EventHandlers;
 namespace CleanAspire.Application.Features.Products.Commands;
 public record DeleteProductCommand(params IEnumerable<string> Ids) : IFusionCacheRefreshRequest<Unit>
 {
-    public IEnumerable<string>? Tags => new[] { "tenants" };
+    public IEnumerable<string>? Tags => new[] { "products" };
 }
 
 

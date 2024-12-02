@@ -9,6 +9,7 @@
              MultiSelection="true"
              SelectOnRowClick="false"
              RowClick="@(r=>Edit(r.Item))"
+             RowStyleFunc="_rowStyleFunc"
              @bind-RowsPerPage="_defaultPageSize"
              @bind-SelectedItems="_selectedItems"
              @bind-SelectedItem="_currentDto">
@@ -31,7 +32,7 @@
                         <MudIcon Icon="@Icons.Material.Filled.Add" />
                         <MudText>@L["New"]</MudText>
                     </MudButton>
-                    <MudButton Size="Size.Small" Disabled="@(!_selectedItems.Any())">
+                    <MudButton Size="Size.Small" Disabled="@(!_selectedItems.Any())" OnClick="Delete">
                         <MudIcon Icon="@Icons.Material.Outlined.Delete" />
                         <MudText>@L["Delete"]</MudText>
                     </MudButton>
@@ -80,7 +81,6 @@
             query.OrderBy = state.SortDefinitions.FirstOrDefault()?.SortBy ?? "Id";
             query.SortDirection = state.SortDefinitions.FirstOrDefault()?.Descending ?? true ? SortDirection.Descending.ToString() : SortDirection.Ascending.ToString();
             var result = await ApiClient.Products.Pagination.PostAsync(query);
-
             return new GridData<ProductDto> { TotalItems = (int)result.TotalItems, Items = result.Items };
         }
         finally
@@ -88,6 +88,13 @@
             _loading = false;
         }
     }
+    private Func<ProductDto, int, string> _rowStyleFunc => (x, i) =>
+    {
+        if (!string.IsNullOrEmpty(x.Id))
+            return "cursor:pointer";
+
+        return "";
+    };
     private async Task OnSearch(string text)
     {
         _selectedItems = new HashSet<ProductDto>();
@@ -113,11 +120,22 @@
         {
             if (_selectedItems.Any())
             {
-                var ids = _selectedItems.Select(x => x.Id).ToArray();
-                await ApiClient.Products.DeleteAsync(request => request.QueryParameters.Ids = ids);
+                var ids = _selectedItems.Select(x => x.Id).ToList();
+                var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.DeleteAsync(new DeleteProductCommand() { Ids = ids }));
+                result.Switch(
+                   async ok =>
+                    {
+                        await _table.ReloadServerData();
+                        _selectedItems.Clear();
+                        Snackbar.Add(L["Selected items have been deleted."], Severity.Success);
+                    },
+                    error =>
+                    {
+                        Snackbar.Add(L["Failed to delete selected items."], Severity.Error);
+                    });
+
             }
-            await _table.ReloadServerData();
-            _selectedItems.Clear();
+
         });
     }
     private void Edit(ProductDto dto)

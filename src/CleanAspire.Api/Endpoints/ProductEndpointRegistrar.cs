@@ -44,12 +44,12 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
         .WithDescription("Updates the details of an existing product.");
 
         // Delete products by IDs
-        group.MapDelete("/",  (IMediator mediator, [FromQuery] string[] ids) => mediator.Send(new DeleteProductCommand(ids)))
+        group.MapDelete("/", (IMediator mediator, [FromBody] DeleteProductCommand command) => mediator.Send(command))
         .WithSummary("Delete products by IDs")
         .WithDescription("Deletes one or more products by their unique IDs.");
 
         // Get products with pagination and filtering
-        group.MapPost("/pagination",  ([FromServices] IMediator mediator, [FromBody] ProductsWithPaginationQuery query) => mediator.Send(query))
+        group.MapPost("/pagination", ([FromServices] IMediator mediator, [FromBody] ProductsWithPaginationQuery query) => mediator.Send(query))
         .Produces<PaginatedResult<ProductDto>>()
         .WithSummary("Get products with pagination")
         .WithDescription("Returns a paginated list of products based on search keywords, page size, and sorting options.");
