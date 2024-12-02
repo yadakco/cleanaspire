@@ -12,7 +12,6 @@ using SixLabors.ImageSharp;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
 
 namespace CleanAspire.Api.Endpoints;
 
