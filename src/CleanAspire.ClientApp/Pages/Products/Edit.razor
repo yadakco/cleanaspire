@@ -73,22 +73,24 @@
     {
         var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products[Id].GetAsync());
         result.Switch(
-            success =>
+            ok =>
             {
                 model = new()
                     {
-                        Id = success.Id,
-                        Sku = success.Sku,
-                        Name = success.Name,
-                        Category = success.Category,
-                        Uom = success.Uom,
-                        Price = success.Price,
-                        Currency = success.Currency,
-                        Description = success.Description
+                        Id = ok.Id,
+                        Sku = ok.Sku,
+                        Name = ok.Name,
+                        Category = ok.Category,
+                        Uom = ok.Uom,
+                        Price = ok.Price,
+                        Currency = ok.Currency,
+                        Description = ok.Description
                     };
                 _breadcrumbItems.Add(new BreadcrumbItem(model.Sku, href: $"/products/edit/{Id}"));
             },
-            error => Snackbar.Add(L["Failed to load product details. Please try again later."], Severity.Error)
+            error => {
+                Snackbar.Add(L["Failed to load product details. Please try again later."], Severity.Error);
+            }
         );
 
 
