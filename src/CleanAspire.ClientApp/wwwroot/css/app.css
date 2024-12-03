@@ -105,6 +105,12 @@
     font-weight: 600;
     color: #8898aa;
 }
+.appbar-special-menu
+.mud-list-item-disabled
+.mud-typography-body2 {
+    font-weight: 600;
+    color: rgba(136, 152, 170, 0.6);
+}
 .layout-menu-shadow {
     box-shadow: 0 30px 60px rgba(0,0,0,0.12) !important;
 }

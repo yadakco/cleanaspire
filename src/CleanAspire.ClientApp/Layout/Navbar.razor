@@ -50,7 +50,7 @@
                                 {
                                     <MudListItem Href="@nav.Href" Disabled="@(string.IsNullOrEmpty(nav.Href))">
                                         <div class="d-flex">
-                                            <MudText Typo="Typo.body1" Color="Color.Primary">@L[nav.Label]</MudText>
+                                        <MudText Typo="Typo.body1" Color="@(string.IsNullOrEmpty(nav.Href)?Color.Default:Color.Primary)">@L[nav.Label]</MudText>
                                         </div>
                                         <MudText Typo="Typo.body2">@L[nav.Description]</MudText>
                                     </MudListItem>
