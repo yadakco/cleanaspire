@@ -27,9 +27,6 @@ namespace CleanAspire.Infrastructure;
 
 public static class DependencyInjection
 {
-    private const string SMTP_CLIENT_OPTIONS_KEY = "SmtpClientOptions";
-    private const string SMTP_CLIENT_OPTIONS_DEFAULT_FROM_EMAIL = "SmtpClientOptions:DefaultFromEmail";
-    private const string DEFAULT_FROM_EMAIL = "noreply@blazorserver.com";
     private const string DATABASE_SETTINGS_KEY = "DatabaseSettings";
     private const string NPGSQL_ENABLE_LEGACY_TIMESTAMP_BEHAVIOR = "Npgsql.EnableLegacyTimestampBehavior";
     private const string MSSQL_MIGRATIONS_ASSEMBLY = "CleanAspire.Migrators.MSSQL";

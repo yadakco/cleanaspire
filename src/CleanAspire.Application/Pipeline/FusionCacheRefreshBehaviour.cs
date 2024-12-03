@@ -1,6 +1,4 @@
-﻿using CleanAspire.Application.Common.Interfaces.FusionCache;
-
-namespace CleanAspire.Application.Pipeline;
+﻿namespace CleanAspire.Application.Pipeline;
 
 
 /// <summary>
