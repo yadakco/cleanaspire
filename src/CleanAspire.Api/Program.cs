@@ -1,29 +1,23 @@
 ﻿using System.Text.Json.Serialization;
 using CleanAspire.Api;
 using CleanAspire.Application;
-using CleanAspire.Application.Common.Interfaces;
 using CleanAspire.Application.Common.Services;
-using CleanAspire.Domain.Entities;
 using CleanAspire.Domain.Identities;
 using CleanAspire.Infrastructure;
 using CleanAspire.Infrastructure.Persistence;
-using CleanAspire.Infrastructure.Persistence.Seed;
-using CleanAspire.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Mono.TextTemplating;
 using Scalar.AspNetCore;
-using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using CleanAspire.Api.Identity;
 using Microsoft.Extensions.FileProviders;
 using CleanAspire.Api.Endpoints;
+using CleanAspire.Infrastructure.Configurations;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
+builder.RegisterSerilog();
 
 
 builder.Services.AddApplication();
@@ -68,6 +62,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 {
     // Don't serialize null values
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
     // Pretty print JSON
     options.SerializerOptions.WriteIndented = true;
 });
@@ -83,27 +78,7 @@ await app.InitializeDatabaseAsync();
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 app.MapEndpointDefinitions();
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
 app.UseCors("wasm");
-app.MapGet("/weatherforecast", () =>
-{
-
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-}).WithTags("Weather")
-  .WithSummary("Get the weather forecast for the next 5 days.")
-  .WithDescription("Returns an array of weather forecast data including the date, temperature, and weather summary for the next 5 days. Each forecast entry provides information about the expected temperature and a brief summary of the weather conditions.");
-
 app.Use(async (context, next) =>
 {
     var currentUserContextSetter = context.RequestServices.GetRequiredService<ICurrentUserContextSetter>();
@@ -135,10 +110,6 @@ app.UseStaticFiles(new StaticFileOptions
 });
 await app.RunAsync();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
 
 
 
