@@ -33,15 +33,15 @@ public static class NavbarMenu
                     new MenuItem
                     {
                         Label = "Stock Inquiry",
-                        Href = "/products/stock",
-                        Status = PageStatus.ComingSoon,
+                        Href = "",
+                        Status = PageStatus.Completed,
                         Description = "Check product stock levels."
                     },
                     new MenuItem
                     {
                         Label = "Best Sellers",
-                        Href = "/products/bestsellers",
-                        Status = PageStatus.ComingSoon,
+                        Href = "",
+                        Status = PageStatus.Completed,
                         Description = "See our top-selling products."
                     }
                 }
