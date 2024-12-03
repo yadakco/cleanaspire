@@ -27,21 +27,21 @@ public static class NavbarMenu
                     {
                         Label = "All Products",
                         Href = "/products/index",
-                        Status = PageStatus.Completed,
+                        Status = PageStatus.New,
                         Description = "View all available products in our inventory."
                     },
                     new MenuItem
                     {
                         Label = "Stock Inquiry",
                         Href = "/products/stock",
-                        Status = PageStatus.Completed,
+                        Status = PageStatus.ComingSoon,
                         Description = "Check product stock levels."
                     },
                     new MenuItem
                     {
                         Label = "Best Sellers",
                         Href = "/products/bestsellers",
-                        Status = PageStatus.New,
+                        Status = PageStatus.ComingSoon,
                         Description = "See our top-selling products."
                     }
                 }
