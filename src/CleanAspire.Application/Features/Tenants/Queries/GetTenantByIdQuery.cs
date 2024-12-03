@@ -1,5 +1,4 @@
-﻿using CleanAspire.Application.Common.Interfaces.FusionCache;
-using CleanAspire.Application.Features.Tenants.DTOs;
+﻿using CleanAspire.Application.Features.Tenants.DTOs;
 
 namespace CleanAspire.Application.Features.Tenants.Queries;
 

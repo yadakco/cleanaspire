@@ -72,6 +72,10 @@ namespace CleanAspire.Migrators.SQLite.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("Created")
                         .HasColumnType("TEXT");
 
@@ -86,9 +90,6 @@ namespace CleanAspire.Migrators.SQLite.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(450)
                         .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("BLOB");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("TEXT");
@@ -105,8 +106,10 @@ namespace CleanAspire.Migrators.SQLite.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UOM")
                         .HasMaxLength(450)
