@@ -11,12 +11,13 @@ using Microsoft.OpenApi;
 using CleanAspire.Api.Identity;
 using Microsoft.Extensions.FileProviders;
 using CleanAspire.Api.Endpoints;
+using CleanAspire.Infrastructure.Configurations;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
+builder.RegisterSerilog();
 
 
 builder.Services.AddApplication();
@@ -109,10 +110,6 @@ app.UseStaticFiles(new StaticFileOptions
 });
 await app.RunAsync();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
 
 
 

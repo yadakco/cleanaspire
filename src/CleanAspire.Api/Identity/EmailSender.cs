@@ -16,7 +16,7 @@ public class EmailSender : IEmailSender
     private readonly string _defaultFromEmail;
     public EmailSender(IConfiguration configuration)
     {
-        _sendGridApiKey = configuration["SendGrid:ApiKey"]?? "";
+        _sendGridApiKey = configuration["SendGrid:ApiKey"] ?? "";
         _defaultFromEmail = configuration["SendGrid:DefaultFromEmail"] ?? "noreply@blazorserver.com";
     }
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
@@ -28,9 +28,9 @@ public class EmailSender : IEmailSender
 
         var client = new Client(_sendGridApiKey);
         var from = new StrongGrid.Models.MailAddress(_defaultFromEmail, "noreply");
-        var to = new StrongGrid.Models.MailAddress(email,email);
-        var messageId = await client.Mail.SendToSingleRecipientAsync(to:to,from:from, subject:subject, htmlContent:htmlMessage,textContent: htmlMessage);
+        var to = new StrongGrid.Models.MailAddress(email, email);
+        var messageId = await client.Mail.SendToSingleRecipientAsync(to: to, from: from, subject: subject, htmlContent: htmlMessage, textContent: htmlMessage);
     }
 }
 
- 
+
