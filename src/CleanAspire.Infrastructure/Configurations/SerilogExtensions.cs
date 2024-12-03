@@ -31,6 +31,7 @@ public static class SerilogExtensions
                 .MinimumLevel.Override("MudBlazor", LogEventLevel.Information)
                 .MinimumLevel.Override("Serilog", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore.AddOrUpdate", LogEventLevel.Error)
+                .MinimumLevel.Override("ZiggyCreatures.Caching.Fusion.FusionCache", LogEventLevel.Error)
                 .Enrich.FromLogContext()
                 .Enrich.WithUtcTime()
                 .Enrich.WithUserInfo()
