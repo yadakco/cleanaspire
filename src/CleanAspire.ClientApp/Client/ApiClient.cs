@@ -4,15 +4,14 @@ using CleanAspire.Api.Client.Account;
 using CleanAspire.Api.Client.ConfirmEmail;
 using CleanAspire.Api.Client.FileNamespace;
 using CleanAspire.Api.Client.ForgotPassword;
-using CleanAspire.Api.Client.Identity;
 using CleanAspire.Api.Client.Login;
 using CleanAspire.Api.Client.Manage;
+using CleanAspire.Api.Client.Products;
 using CleanAspire.Api.Client.Refresh;
 using CleanAspire.Api.Client.Register;
 using CleanAspire.Api.Client.ResendConfirmationEmail;
 using CleanAspire.Api.Client.ResetPassword;
 using CleanAspire.Api.Client.Tenants;
-using CleanAspire.Api.Client.Weatherforecast;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
 using System.Collections.Generic;
@@ -47,11 +46,6 @@ namespace CleanAspire.Api.Client
         {
             get => new global::CleanAspire.Api.Client.ForgotPassword.ForgotPasswordRequestBuilder(PathParameters, RequestAdapter);
         }
-        /// <summary>The identity property</summary>
-        public global::CleanAspire.Api.Client.Identity.IdentityRequestBuilder Identity
-        {
-            get => new global::CleanAspire.Api.Client.Identity.IdentityRequestBuilder(PathParameters, RequestAdapter);
-        }
         /// <summary>The login property</summary>
         public global::CleanAspire.Api.Client.Login.LoginRequestBuilder Login
         {
@@ -61,6 +55,11 @@ namespace CleanAspire.Api.Client
         public global::CleanAspire.Api.Client.Manage.ManageRequestBuilder Manage
         {
             get => new global::CleanAspire.Api.Client.Manage.ManageRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The products property</summary>
+        public global::CleanAspire.Api.Client.Products.ProductsRequestBuilder Products
+        {
+            get => new global::CleanAspire.Api.Client.Products.ProductsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The refresh property</summary>
         public global::CleanAspire.Api.Client.Refresh.RefreshRequestBuilder Refresh
@@ -86,11 +85,6 @@ namespace CleanAspire.Api.Client
         public global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder Tenants
         {
             get => new global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder(PathParameters, RequestAdapter);
-        }
-        /// <summary>The weatherforecast property</summary>
-        public global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder Weatherforecast
-        {
-            get => new global::CleanAspire.Api.Client.Weatherforecast.WeatherforecastRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>
         /// Instantiates a new <see cref="global::CleanAspire.Api.Client.ApiClient"/> and sets the default values.

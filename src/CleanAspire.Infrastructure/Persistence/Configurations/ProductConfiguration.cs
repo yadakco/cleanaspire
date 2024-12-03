@@ -13,6 +13,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
+        builder.Property(x => x.Category).HasConversion<string>();
         builder.HasIndex(x => x.Name).IsUnique();
         builder.Property(x=>x.Name).HasMaxLength(80).IsRequired();
         builder.Ignore(e => e.DomainEvents);

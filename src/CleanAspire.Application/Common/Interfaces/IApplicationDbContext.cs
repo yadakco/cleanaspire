@@ -1,7 +1,4 @@
-﻿using CleanAspire.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-
-namespace CleanAspire.Application.Common.Interfaces;
+﻿namespace CleanAspire.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
