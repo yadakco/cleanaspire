@@ -26,11 +26,13 @@ public static class IdentityApiAdditionalEndpointsExtensions
         ArgumentNullException.ThrowIfNull(endpoints);
         var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
+        var logger = endpoints.ServiceProvider.GetRequiredService<ILogger<IEndpointRouteBuilder>>();
         string? confirmEmailEndpointName = null;
         var routeGroup = endpoints.MapGroup("/account").WithTags("Authentication", "Account Management");
         routeGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
         {
             await signInManager.SignOutAsync();
+            logger.LogInformation("User has been logged out successfully.");
             return Results.Ok();
         })
         .RequireAuthorization()
@@ -45,6 +47,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             {
                 return TypedResults.NotFound();
             }
+            logger.LogInformation("User profile retrieved successfully.");
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
             .RequireAuthorization()
@@ -114,6 +117,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             {
                 return CreateValidationProblem(result);
             }
+            logger.LogInformation("User signup request received: {@SignupRequest}", request);
             await SendConfirmationEmailAsync(user, userManager, context, request.Email);
             return TypedResults.Ok();
         }).AllowAnonymous()
