@@ -1,5 +1,6 @@
 ﻿using CleanAspire.Application.Features.Products.DTOs;
 using CleanAspire.Application.Features.Products.EventHandlers;
+using CleanAspire.Application.Pipeline;
 
 namespace CleanAspire.Application.Features.Products.Commands;
 public record CreateProductCommand(
@@ -10,7 +11,7 @@ public record CreateProductCommand(
     decimal Price,
     string? Currency,
     string? UOM
-) : IFusionCacheRefreshRequest<string>
+) : IFusionCacheRefreshRequest<string>, IRequiresValidation
 {
     public IEnumerable<string>? Tags => new[] { "products" };
 }
