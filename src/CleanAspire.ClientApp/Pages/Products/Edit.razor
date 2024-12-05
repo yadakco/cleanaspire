@@ -7,8 +7,7 @@
 <Breadcrumbs OnSaveButtonClick="Save" Saving="_saving" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
 @if (model is not null)
 {
-    <EditForm @ref="editForm" Model="@model" OnValidSubmit="OnValidSubmit">
-        <DataAnnotationsValidator />
+    <MudForm @ref="editForm" @bind-IsValid="@success" @bind-Errors="@errors">
         <MudGrid>
             <MudItem xs="12" md="6">
                 <MudTextField @bind-Value="model.Sku" For="@(() => model.Sku)"
@@ -52,18 +51,20 @@
                 </MudTextField>
             </MudItem>
             <MudItem xs="12" md="12" Class="d-flex justify-end">
-                <MudButton ButtonType="ButtonType.Submit" Disabled="@_saving" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
+                <MudButton Disabled="@_saving" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
             </MudItem>
         </MudGrid>
-    </EditForm>
+    </MudForm>
 }
 @code {
     public string? Title;
     [Parameter]
     public string? Id { get; set; }
     private bool _saving;
+    bool success;
+    string[] errors = { };
     private UpdateProductCommand? model;
-    private EditForm editForm = default!;
+    private MudForm editForm = default!;
     private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: "/"),
@@ -88,7 +89,12 @@
                     };
                 _breadcrumbItems.Add(new BreadcrumbItem(model.Sku, href: $"/products/edit/{Id}"));
             },
-            error => {
+            invalid =>
+            {
+                Snackbar.Add(L[invalid.Message ?? "Failed to load product details"], Severity.Error);
+            },
+            error =>
+            {
                 Snackbar.Add(L["Failed to load product details. Please try again later."], Severity.Error);
             }
         );
@@ -97,28 +103,30 @@
     }
     private async Task Save()
     {
-
-        if (editForm?.EditContext?.Validate() == true)
+        editForm?.Validate();
+        if (success == true)
         {
-            await OnValidSubmit();
+            _saving = true;
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PutAsync(model));
+            _saving = result.Match(
+                ok =>
+                {
+                    Snackbar.Add(L["Product details saved successfully!"], Severity.Success);
+                    return false;
+                },
+                invalid =>
+                {
+                    Snackbar.Add(L[invalid.Message ?? "Failed to create product."], Severity.Error);
+                    return false;
+                },
+                error =>
+                {
+                    Snackbar.Add(L["Failed to save product details. Please check your inputs or try again later."], Severity.Error);
+                    return false;
+                }
+            );
         }
 
     }
-    private async Task OnValidSubmit()
-    {
-        _saving = true;
-        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PutAsync(model));
-        _saving = result.Match(
-            ok =>
-            {
-                Snackbar.Add(L["Product details saved successfully!"], Severity.Success);
-                return false;
-            },
-            error =>
-            {
-                Snackbar.Add(L["Failed to save product details. Please check your inputs or try again later."], Severity.Error);
-                return false;
-            }
-        );
-    }
+
 }
