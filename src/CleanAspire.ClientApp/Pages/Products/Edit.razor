@@ -88,6 +88,10 @@
                     };
                 _breadcrumbItems.Add(new BreadcrumbItem(model.Sku, href: $"/products/edit/{Id}"));
             },
+            invalid =>
+            {
+                Snackbar.Add(L[invalid.Message ?? "Failed to load product details"], Severity.Error);
+            },
             error => {
                 Snackbar.Add(L["Failed to load product details. Please try again later."], Severity.Error);
             }
@@ -112,6 +116,11 @@
             ok =>
             {
                 Snackbar.Add(L["Product details saved successfully!"], Severity.Success);
+                return false;
+            },
+            invalid =>
+            {
+                Snackbar.Add(L[invalid.Message ?? "Failed to create product."], Severity.Error);
                 return false;
             },
             error =>
