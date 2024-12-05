@@ -35,16 +35,19 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
 
         // Create a new product
         group.MapPost("/", ([FromServices] IMediator mediator, [FromBody] CreateProductCommand command) => mediator.Send(command))
+            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Create a new product")
         .WithDescription("Creates a new product with the provided details.");
 
         // Update an existing product
         group.MapPut("/", ([FromServices] IMediator mediator, [FromBody] UpdateProductCommand command) => mediator.Send(command))
+            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update an existing product")
         .WithDescription("Updates the details of an existing product.");
 
         // Delete products by IDs
         group.MapDelete("/", (IMediator mediator, [FromBody] DeleteProductCommand command) => mediator.Send(command))
+            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Delete products by IDs")
         .WithDescription("Deletes one or more products by their unique IDs.");
 

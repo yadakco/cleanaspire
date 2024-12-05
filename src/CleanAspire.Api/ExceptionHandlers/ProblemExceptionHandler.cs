@@ -27,54 +27,53 @@ public class ProblemExceptionHandler : IExceptionHandler
     {
         var problemDetails = exception switch
         {
-            ValidationException ex => new ProblemDetails
+            ValidationException ex => new HttpValidationProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Validation Error",
                 Detail = "One or more validation errors occurred.",
-                Instance = httpContext.Request.Path,
-                Extensions = { ["errors"] = ex.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray()
-                )
-            }
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
+                Errors = ex.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    )
             },
             UniqueConstraintException => new ProblemDetails
             {
-                Status = StatusCodes.Status409Conflict,
+                Status = StatusCodes.Status400BadRequest,
                 Title = "Unique Constraint Violation",
                 Detail = "A unique constraint violation occurred.",
-                Instance = httpContext.Request.Path
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
             CannotInsertNullException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Null Value Error",
                 Detail = "A required field was null.",
-                Instance = httpContext.Request.Path
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
             MaxLengthExceededException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Max Length Exceeded",
                 Detail = "A value exceeded the maximum allowed length.",
-                Instance = httpContext.Request.Path
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
             },
             NumericOverflowException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Numeric Overflow",
                 Detail = "A numeric value caused an overflow.",
-                Instance = httpContext.Request.Path
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
             ReferenceConstraintException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Reference Constraint Violation",
                 Detail = "A foreign key reference constraint was violated.",
-                Instance = httpContext.Request.Path
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
             _ => null // Unhandled exceptions
         };
@@ -84,7 +83,7 @@ public class ProblemExceptionHandler : IExceptionHandler
             // Return true to continue processing if the exception type is not handled.
             return true;
         }
-
+        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status400BadRequest;
         // Write ProblemDetails to the response
         return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
