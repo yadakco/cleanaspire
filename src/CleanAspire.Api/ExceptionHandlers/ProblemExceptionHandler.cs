@@ -11,6 +11,7 @@ using EntityFramework.Exceptions.Common;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanAspire.Api.ExceptionHandlers;
 
@@ -29,7 +30,7 @@ public class ProblemExceptionHandler : IExceptionHandler
         {
             ValidationException ex => new HttpValidationProblemDetails
             {
-                Status = StatusCodes.Status400BadRequest,
+                Status = StatusCodes.Status422UnprocessableEntity,
                 Title = "Validation Error",
                 Detail = "One or more validation errors occurred.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
@@ -74,6 +75,13 @@ public class ProblemExceptionHandler : IExceptionHandler
                 Title = "Reference Constraint Violation",
                 Detail = "A foreign key reference constraint was violated.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
+            },
+            DbUpdateException => new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Database Update Error",
+                Detail = "An error occurred while updating the database.",
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
             },
             _ => null // Unhandled exceptions
         };

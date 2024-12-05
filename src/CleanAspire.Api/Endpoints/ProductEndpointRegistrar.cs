@@ -24,6 +24,7 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
             return await mediator.Send(query);
         })
         .Produces<IEnumerable<ProductDto>>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("Get all products")
         .WithDescription("Returns a list of all products in the system.");
@@ -32,6 +33,7 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
         group.MapGet("/{id}", (IMediator mediator, [FromRoute] string id) => mediator.Send(new GetProductByIdQuery(id)))
         .Produces<ProductDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("Get product by ID")
         .WithDescription("Returns the details of a specific product by its unique ID.");
@@ -39,7 +41,8 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
         // Create a new product
         group.MapPost("/", ([FromServices] IMediator mediator, [FromBody] CreateProductCommand command) => mediator.Send(command))
              .Produces<string>(StatusCodes.Status201Created)
-            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("Create a new product")
         .WithDescription("Creates a new product with the provided details.");
@@ -47,7 +50,8 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
         // Update an existing product
         group.MapPut("/", ([FromServices] IMediator mediator, [FromBody] UpdateProductCommand command) => mediator.Send(command))
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("Update an existing product")
@@ -56,7 +60,8 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
         // Delete products by IDs
         group.MapDelete("/", (IMediator mediator, [FromBody] DeleteProductCommand command) => mediator.Send(command))
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("Delete products by IDs")
         .WithDescription("Deletes one or more products by their unique IDs.");
