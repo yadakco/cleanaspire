@@ -9,67 +9,71 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace CleanAspire.Api.Client.Account.Signup
+namespace CleanAspire.Api.Client.Account.UpdateEmail
 {
     /// <summary>
-    /// Builds and executes requests for operations under \account\signup
+    /// Builds and executes requests for operations under \account\updateEmail
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    public partial class SignupRequestBuilder : BaseRequestBuilder
+    public partial class UpdateEmailRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Account.Signup.SignupRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Account.UpdateEmail.UpdateEmailRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public SignupRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/signup", pathParameters)
+        public UpdateEmailRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/updateEmail", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Account.Signup.SignupRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.Account.UpdateEmail.UpdateEmailRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public SignupRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/signup", rawUrl)
+        public UpdateEmailRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/updateEmail", rawUrl)
         {
         }
         /// <summary>
-        /// Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.
+        /// Allows users to update their email address and receive a confirmation email if it changes.
         /// </summary>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
-        /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 400 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 404 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task PostAsync(global::CleanAspire.Api.Client.Models.SignupRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task PostAsync(global::CleanAspire.Api.Client.Models.UpdateEmailRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task PostAsync(global::CleanAspire.Api.Client.Models.SignupRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task PostAsync(global::CleanAspire.Api.Client.Models.UpdateEmailRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             _ = body ?? throw new ArgumentNullException(nameof(body));
             var requestInfo = ToPostRequestInformation(body, requestConfiguration);
             var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
             {
-                { "400", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
+                { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
+                { "404", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
+                { "422", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
             };
             await RequestAdapter.SendNoContentAsync(requestInfo, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.
+        /// Allows users to update their email address and receive a confirmation email if it changes.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::CleanAspire.Api.Client.Models.SignupRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::CleanAspire.Api.Client.Models.UpdateEmailRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::CleanAspire.Api.Client.Models.SignupRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::CleanAspire.Api.Client.Models.UpdateEmailRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             _ = body ?? throw new ArgumentNullException(nameof(body));
@@ -82,18 +86,18 @@ namespace CleanAspire.Api.Client.Account.Signup
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::CleanAspire.Api.Client.Account.Signup.SignupRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.Account.UpdateEmail.UpdateEmailRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::CleanAspire.Api.Client.Account.Signup.SignupRequestBuilder WithUrl(string rawUrl)
+        public global::CleanAspire.Api.Client.Account.UpdateEmail.UpdateEmailRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::CleanAspire.Api.Client.Account.Signup.SignupRequestBuilder(rawUrl, RequestAdapter);
+            return new global::CleanAspire.Api.Client.Account.UpdateEmail.UpdateEmailRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class SignupRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
+        public partial class UpdateEmailRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

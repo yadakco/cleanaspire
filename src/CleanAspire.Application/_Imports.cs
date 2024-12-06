@@ -13,6 +13,7 @@ global using CleanAspire.Application.Common.Interfaces.FusionCache;
 global using CleanAspire.Application.Common.Models;
 global using CleanAspire.Application.Common;
 global using CleanAspire.Domain.Entities;
+global using FluentValidation;
 global using Mediator;
 global using Microsoft.Extensions.Logging;
 global using ZiggyCreatures.Caching.Fusion;

@@ -26,7 +26,6 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         {
             // the user info endpoint is secured, so if the user isn't logged in this will fail
             var profileResponse = await apiClient.Account.Profile.GetAsync();
-            Console.WriteLine(profileResponse);
             profileStore.Set(profileResponse);
             if (profileResponse != null)
             {
@@ -36,6 +35,9 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                         new(ClaimTypes.NameIdentifier,profileResponse.UserId),
                         new(ClaimTypes.Name,profileResponse.Username),
                         new(ClaimTypes.Email, profileResponse.Email),
+                        new(ClaimTypes.GivenName, profileResponse.Nickname),
+                        new(ClaimTypes.Locality, profileResponse.TimeZoneId),
+                        new(ClaimTypes.Country, profileResponse.LanguageCode),
                     };
 
                 // set the principal
