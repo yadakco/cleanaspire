@@ -14,6 +14,7 @@ using Microsoft.Kiota.Serialization.Text;
 using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Multipart;
 using CleanAspire.ClientApp.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -28,13 +29,16 @@ var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).
 builder.Services.AddSingleton(clientAppSettings);
 
 builder.Services.TryAddMudBlazor(builder.Configuration);
-builder.Services.AddHttpClient("apiservice", (sp,options) => {
+
+var httpClientBuilder =  builder.Services.AddHttpClient("apiservice", (sp, options) => {
     var settings = sp.GetRequiredService<ClientAppSettings>();
     options.BaseAddress = new Uri(settings.ServiceBaseUrl);
 
 }).AddHttpMessageHandler<CookieHandler>();
+
 builder.Services.AddSingleton<ApiClient>(sp =>
 {
+
     ApiClientBuilder.RegisterDefaultSerializer<JsonSerializationWriterFactory>();
     ApiClientBuilder.RegisterDefaultSerializer<TextSerializationWriterFactory>();
     ApiClientBuilder.RegisterDefaultSerializer<FormSerializationWriterFactory>();
@@ -42,6 +46,7 @@ builder.Services.AddSingleton<ApiClient>(sp =>
     ApiClientBuilder.RegisterDefaultDeserializer<JsonParseNodeFactory>();
     ApiClientBuilder.RegisterDefaultDeserializer<TextParseNodeFactory>();
     ApiClientBuilder.RegisterDefaultDeserializer<FormParseNodeFactory>();
+
     var settings = sp.GetRequiredService<ClientAppSettings>();
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient("apiservice");

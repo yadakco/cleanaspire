@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using CleanAspire.Application.Features.Products.EventHandlers;
+using CleanAspire.Application.Pipeline;
 
 namespace CleanAspire.Application.Features.Products.Commands;
-public record DeleteProductCommand(params IEnumerable<string> Ids) : IFusionCacheRefreshRequest<Unit>
+public record DeleteProductCommand(params IEnumerable<string> Ids) : IFusionCacheRefreshRequest<Unit>, IRequiresValidation
 {
     public IEnumerable<string>? Tags => new[] { "products" };
 }
