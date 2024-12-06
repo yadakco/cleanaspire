@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CleanAspire.Application.Features.Products.DTOs;
+using CleanAspire.Application.Pipeline;
 
 namespace CleanAspire.Application.Features.Products.Commands;
 public record UpdateProductCommand(
@@ -14,7 +15,7 @@ public record UpdateProductCommand(
     decimal Price,
     string? Currency,
     string? UOM
-) : IFusionCacheRefreshRequest<Unit>
+) : IFusionCacheRefreshRequest<Unit>, IRequiresValidation
 {
     public IEnumerable<string>? Tags => new[] { "products" };
 }
