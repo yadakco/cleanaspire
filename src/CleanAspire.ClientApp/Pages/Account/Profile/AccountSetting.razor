@@ -109,9 +109,9 @@
             result.Switch(
             ok =>
             {
-                Navigation.NavigateTo("/account/signin");
                 showDeleteAccountDialog = false;
                 Snackbar.Add(L["Your account has been deleted successfully."], Severity.Info);
+                Navigation.NavigateTo("/account/signin", true);
             },
             invalid =>
             {

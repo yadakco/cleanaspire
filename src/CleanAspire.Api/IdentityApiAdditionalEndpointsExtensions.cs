@@ -122,7 +122,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Allows users to update their email address and receive a confirmation email if it changes.");
 
 
-        routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
+        routeGroup.MapPost("/signup", async Task<Results<Created, ValidationProblem>>
                 ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
             {
                 var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -147,7 +147,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 }
                 logger.LogInformation("User signup request received: {@SignupRequest}", request);
                 await SendConfirmationEmailAsync(user, userManager, context, request.Email);
-                return TypedResults.Ok();
+                return TypedResults.Created();
             })
             .AllowAnonymous()
             .WithSummary("User Signup")
