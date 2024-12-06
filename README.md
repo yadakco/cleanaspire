@@ -3,7 +3,7 @@
 [![CodeQL](https://github.com/neozhu/cleanaspire/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/github-code-scanning/codeql)
 [![Build and Push Docker Image](https://github.com/neozhu/cleanaspire/actions/workflows/docker.yml/badge.svg)](https://github.com/neozhu/cleanaspire/actions/workflows/docker.yml)
 
-![blazorclient](https://github.com/user-attachments/assets/013b167b-59fa-42d7-a2f7-ffec301c4e11)
+![blazorclient](./blazorclient.jpg)
 
 ### 🚀 Overview  
 
@@ -62,7 +62,7 @@ With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAsp
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.31
+    image: blazordevlab/cleanaspire-api:0.0.41
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -80,7 +80,7 @@ services:
 
 
   webfrontend:
-    image: blazordevlab/cleanaspire-clientapp:0.0.31
+    image: blazordevlab/cleanaspire-clientapp:0.0.41
     ports:
       - "8016:80"
       - "8017:443"
