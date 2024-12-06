@@ -4,15 +4,15 @@
 <PageTitle>Counter</PageTitle>
 
 <MudDataGrid T="ProductDto" Dense="true" Hover="true"
-             @ref="_table"
-             ServerData="@(ServerReload)"
-             MultiSelection="true"
-             SelectOnRowClick="false"
-             RowClick="@(r=>Edit(r.Item))"
-             RowStyleFunc="_rowStyleFunc"
-             @bind-RowsPerPage="_defaultPageSize"
-             @bind-SelectedItems="_selectedItems"
-             @bind-SelectedItem="_currentDto">
+@ref="_table"
+ServerData="@(ServerReload)"
+MultiSelection="true"
+SelectOnRowClick="false"
+RowClick="@(r=>Edit(r.Item))"
+RowStyleFunc="_rowStyleFunc"
+@bind-RowsPerPage="_defaultPageSize"
+@bind-SelectedItems="_selectedItems"
+@bind-SelectedItem="_currentDto">
     <ToolBarContent>
         <MudStack Row Spacing="0" Class="flex-grow-1" Justify="Justify.SpaceBetween">
             <MudStack Row AlignItems="AlignItems.Start">
@@ -39,7 +39,7 @@
                 </MudStack>
                 <MudStack Row Spacing="1">
                     <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Value="@_keywords" Placeholder="@L["Keywords"]" Adornment="Adornment.End"
-                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
+                    AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
                     </MudTextField>
                 </MudStack>
             </MudStack>
@@ -51,9 +51,11 @@
         <PropertyColumn Title="@L["Name"]" Property="x => x.Name" />
         <PropertyColumn Title="@L["Category"]" Property="x => x.Category" />
         <PropertyColumn Title="@L["UOM"]" Property="x => x.Uom" />
-        <PropertyColumn Title="@L["Price"]" Property="x => x.Price" Sortable="false" />
-        <PropertyColumn Title="@L["Currency"]" Property="x => x.Currency" />
-
+        <PropertyColumn Title="@L["Price"]" Property="x => x.Price" Sortable="false">
+            <CellTemplate>
+                @($"{context.Item.Price?.ToString("#,#")} {context.Item.Currency}")
+            </CellTemplate>
+        </PropertyColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ProductDto" />
@@ -65,7 +67,7 @@
     private HashSet<ProductDto> _selectedItems = new();
     private ProductDto _currentDto = new();
     private MudDataGrid<ProductDto> _table = default!;
-    private int _defaultPageSize = 15;
+    private int _defaultPageSize = 10;
     private string _keywords = string.Empty;
     private bool _loading = false;
 
@@ -110,7 +112,7 @@
             if (state is not null && !state.Canceled)
             {
                 await _table.ReloadServerData();
-                _selectedItems.Clear();
+                _selectedItems = new();
             }
         });
     }
@@ -126,7 +128,8 @@
                    async ok =>
                     {
                         await _table.ReloadServerData();
-                        _selectedItems.Clear();
+                        _selectedItems = new();
+                        StateHasChanged();
                         Snackbar.Add(L["Selected items have been deleted."], Severity.Success);
                     },
                     invalid =>
