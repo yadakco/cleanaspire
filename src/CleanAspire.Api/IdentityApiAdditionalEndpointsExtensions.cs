@@ -170,7 +170,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 return TypedResults.NotFound();
             }
             var userName = await userManager.GetUserNameAsync(user);
-            if (!string.IsNullOrEmpty(request.Username) || userName != request.Username)
+            if (string.IsNullOrEmpty(request.Username) || userName != request.Username)
             {
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidUserName(request.Username)));
             }
