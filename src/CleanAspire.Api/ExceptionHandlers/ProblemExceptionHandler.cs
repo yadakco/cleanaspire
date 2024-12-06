@@ -83,7 +83,20 @@ public class ProblemExceptionHandler : IExceptionHandler
                 Detail = "An error occurred while updating the database.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
             },
-            _ => null // Unhandled exceptions
+            KeyNotFoundException ex => new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Resource Not Found",
+                Detail = ex.Message,
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
+            },
+            _ => new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Unhandled Exception",
+                Detail = "An unexpected error occurred. Please try again later.",
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
+            }
         };
 
         if (problemDetails is null)
