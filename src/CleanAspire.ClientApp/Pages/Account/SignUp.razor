@@ -45,21 +45,25 @@
     private TenantDto tenantDto = new();
     private async Task OnValidSubmit(EditContext context)
     {
-        try
-        {
-            waiting = true;
-            var result = await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id });
-            Navigation.NavigateTo("/account/signupsuccessful");
-        }
-        catch (Exception e)
-        {
-            Logger.LogError(e, e.Message);
-            Snackbar.Add(L["An error occurred while creating your account. Please try again later."], Severity.Error);
-        }
-        finally
-        {
-            waiting = false;
-        }
+        waiting = true;
+        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id }));
+        result.Switch(
+            ok =>
+            {
+                Snackbar.Add(L["Account created successfully. Please check your email to verify your account."], Severity.Success);
+                Navigation.NavigateTo("/account/signupsuccessful");
+                waiting = false;
+            },
+            invalid =>
+            {
+                Snackbar.Add(invalid.Message, Severity.Error);
+                waiting = false;
+            },
+            error =>
+            {
+                Snackbar.Add(error.Message, Severity.Error);
+                waiting = false;
+            });
     }
     public class SignupModel
     {
@@ -87,7 +91,7 @@
         [MaxLength(50, ErrorMessage = "Nickname cannot exceed 50 characters.")]
         public string? SuperiorId { get; init; }
         [Required]
-        public TenantDto? Tenant { get; set; } 
+        public TenantDto? Tenant { get; set; }
 
         [MaxLength(20, ErrorMessage = "Provider cannot exceed 20 characters.")]
         public string? Provider { get; set; } = "Local";
