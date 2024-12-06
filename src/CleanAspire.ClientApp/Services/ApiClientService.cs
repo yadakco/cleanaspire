@@ -42,7 +42,7 @@ public class ApiClientService
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            return new ApiClientError("An unexpected error occurred.", ex);
+            return new ApiClientError(ex.Message, ex);
         }
     }
 
@@ -72,7 +72,7 @@ public class ApiClientService
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            return new ApiClientError("An unexpected error occurred.", ex);
+            return new ApiClientError(ex.Message, ex);
         }
     }
 }

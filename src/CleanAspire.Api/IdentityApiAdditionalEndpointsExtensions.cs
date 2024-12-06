@@ -50,10 +50,12 @@ public static class IdentityApiAdditionalEndpointsExtensions
             logger.LogInformation("User profile retrieved successfully.");
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
-            .RequireAuthorization()
+        .RequireAuthorization()
         .WithSummary("Retrieve the user's profile")
         .WithDescription("Fetches the profile information of the authenticated user. " +
          "Returns 404 if the user is not found. Requires authorization.");
+
+
         routeGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
             (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
@@ -94,35 +96,88 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithSummary("Update user profile information.")
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
-        routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+        routeGroup.MapPost("/updateEmail", async Task<Results<Ok, ValidationProblem, NotFound>>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] UpdateEmailRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
-            var user = new TUser();
-            if (!userManager.SupportsUserEmail)
+            if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
-                throw new NotSupportedException($"{nameof(MapIdentityApiAdditionalEndpoints)} requires a user store with email support.");
+                return TypedResults.NotFound();
             }
-            if (user is not ApplicationUser appUser)
-                throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
-            appUser.Email = request.Email;
-            appUser.UserName = request.Email;
-            appUser.Nickname = request.Nickname;
-            appUser.Provider = request.Provider;
-            appUser.TenantId = request.TenantId;
-            appUser.TimeZoneId = request.TimeZoneId;
-            appUser.LanguageCode = request.LanguageCode;
-            var result = await userManager.CreateAsync(user, request.Password);
+
+            if (!string.IsNullOrEmpty(request.NewEmail) && !_emailAddressAttribute.IsValid(request.NewEmail))
+            {
+                return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(request.NewEmail)));
+            }
+            var email = await userManager.GetEmailAsync(user);
+            if (email != request.NewEmail)
+            {
+                await SendConfirmationEmailAsync(user, userManager, context, request.NewEmail, isChange: true);
+            }
+
+            return TypedResults.Ok();
+        })
+        .RequireAuthorization()
+        .WithSummary("Update user email address.")
+        .WithDescription("Allows users to update their email address and receive a confirmation email if it changes.");
+
+
+        routeGroup.MapPost("/signup", async Task<Results<Ok, ValidationProblem>>
+                ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            {
+                var userManager = sp.GetRequiredService<UserManager<TUser>>();
+                var user = new TUser();
+                if (!userManager.SupportsUserEmail)
+                {
+                    throw new NotSupportedException($"{nameof(MapIdentityApiAdditionalEndpoints)} requires a user store with email support.");
+                }
+                if (user is not ApplicationUser appUser)
+                    throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
+                appUser.Email = request.Email;
+                appUser.UserName = request.Email;
+                appUser.Nickname = request.Nickname;
+                appUser.Provider = request.Provider;
+                appUser.TenantId = request.TenantId;
+                appUser.TimeZoneId = request.TimeZoneId;
+                appUser.LanguageCode = request.LanguageCode;
+                var result = await userManager.CreateAsync(user, request.Password);
+                if (!result.Succeeded)
+                {
+                    return CreateValidationProblem(result);
+                }
+                logger.LogInformation("User signup request received: {@SignupRequest}", request);
+                await SendConfirmationEmailAsync(user, userManager, context, request.Email);
+                return TypedResults.Ok();
+            })
+            .AllowAnonymous()
+            .WithSummary("User Signup")
+            .WithDescription("Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.");
+
+        routeGroup.MapDelete("/deleteOwnerAccount", async Task<Results<Ok, ValidationProblem, NotFound>>
+            (ClaimsPrincipal claimsPrincipal, SignInManager<TUser> signInManager, [FromBody] DeleteUserRequest request, [FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
+            {
+                return TypedResults.NotFound();
+            }
+            var userName = await userManager.GetUserNameAsync(user);
+            if (!string.IsNullOrEmpty(request.Username) || userName != request.Username)
+            {
+                return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidUserName(request.Username)));
+            }
+            var result = await userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                return CreateValidationProblem(result);
+                return TypedResults.NotFound();
             }
-            logger.LogInformation("User signup request received: {@SignupRequest}", request);
-            await SendConfirmationEmailAsync(user, userManager, context, request.Email);
+            await signInManager.SignOutAsync();
+            logger.LogInformation("User account deleted successfully.");
             return TypedResults.Ok();
-        }).AllowAnonymous()
-            .WithSummary("User Signup")
-          .WithDescription("Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.");
+        })
+        .RequireAuthorization()
+        .WithSummary("Delete own user account.")
+        .WithDescription("Allows users to delete their own account permanently.");
 
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
             ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
@@ -160,13 +215,13 @@ public static class IdentityApiAdditionalEndpointsExtensions
             return TypedResults.Text("Thank you for confirming your email.");
         }).AllowAnonymous()
           .WithSummary("Confirm Email or Update Email Address")
-        .WithDescription("Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.")
-        .Add(endpointBuilder =>
-        {
-            var finalPattern = ((RouteEndpointBuilder)endpointBuilder).RoutePattern.RawText;
-            confirmEmailEndpointName = $"{nameof(MapIdentityApiAdditionalEndpoints)}-{finalPattern}";
-            endpointBuilder.Metadata.Add(new EndpointNameMetadata(confirmEmailEndpointName));
-        });
+          .WithDescription("Processes email confirmation or email change requests for a user. It validates the confirmation code, verifies the user ID, and updates the email if a new one is provided. Returns a success message upon successful confirmation or email update.")
+          .Add(endpointBuilder =>
+          {
+              var finalPattern = ((RouteEndpointBuilder)endpointBuilder).RoutePattern.RawText;
+              confirmEmailEndpointName = $"{nameof(MapIdentityApiAdditionalEndpoints)}-{finalPattern}";
+              endpointBuilder.Metadata.Add(new EndpointNameMetadata(confirmEmailEndpointName));
+          });
 
 
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
@@ -248,6 +303,23 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
         return TypedResults.ValidationProblem(errorDictionary);
     }
+}
+
+public class UpdateEmailRequest
+{
+    [Required]
+    [Description("The new email address. Must be in a valid email format.")]
+    [MaxLength(80, ErrorMessage = "Email cannot exceed 80 characters.")]
+    [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
+    public string NewEmail { get; set; } = string.Empty;
+}
+
+public class DeleteUserRequest
+{
+    [Description("Unique username for the user.")]
+    [MaxLength(50, ErrorMessage = "Username cannot exceed 50 characters.")]
+    [RegularExpression("^[a-zA-Z0-9_]*$", ErrorMessage = "Username can only contain letters, numbers, and underscores.")]
+    public required string Username { get; init; }
 }
 
 public sealed class ProfileRequest

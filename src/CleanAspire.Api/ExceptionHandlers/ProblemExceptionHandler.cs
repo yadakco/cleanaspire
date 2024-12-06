@@ -92,7 +92,7 @@ public class ProblemExceptionHandler : IExceptionHandler
             },
             _ => new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
+                Status = StatusCodes.Status400BadRequest,
                 Title = "Unhandled Exception",
                 Detail = "An unexpected error occurred. Please try again later.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
