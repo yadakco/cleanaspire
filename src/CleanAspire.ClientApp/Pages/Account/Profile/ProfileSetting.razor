@@ -1,10 +1,10 @@
 ﻿@using CleanAspire.ClientApp.Components.Autocompletes
 @using Microsoft.Kiota.Abstractions
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="@model" class="d-flex flex-grow-1" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
-    <div class="d-flex flex-row gap-3">
-        <div class="d-flex flex-column gap-2">
+    <div class="d-flex flex-grow-1 flex-wrap gap-3">
+        <div class="d-flex flex-grow-1 flex-column gap-2">
             <MudText Typo="Typo.h4">@L["Public profile"]</MudText>
             <MudTextField Label="@L["Nickname"]" @bind-Value="model.Nickname" For="@(() => model.Nickname)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit"></MudTextField>
             <MudTextField Label="@L["User name"]" @bind-Value="model.Username" For="@(() => model.Username)" ShrinkLabel="true" Adornment="Adornment.End" IconSize="Size.Small" AdornmentIcon="@Icons.Material.Filled.Edit"></MudTextField>
