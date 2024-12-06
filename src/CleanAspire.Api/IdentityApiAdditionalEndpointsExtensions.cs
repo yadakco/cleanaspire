@@ -93,6 +93,10 @@ public static class IdentityApiAdditionalEndpointsExtensions
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
         .RequireAuthorization()
+        .Produces<ProfileResponse>(StatusCodes.Status200OK)
+        .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update user profile information.")
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
@@ -118,6 +122,10 @@ public static class IdentityApiAdditionalEndpointsExtensions
             return TypedResults.Ok();
         })
         .RequireAuthorization()
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update user email address.")
         .WithDescription("Allows users to update their email address and receive a confirmation email if it changes.");
 
@@ -176,6 +184,10 @@ public static class IdentityApiAdditionalEndpointsExtensions
             return TypedResults.Ok();
         })
         .RequireAuthorization()
+        .Produces(StatusCodes.Status204NoContent)
+        .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Delete own user account.")
         .WithDescription("Allows users to delete their own account permanently.");
 
