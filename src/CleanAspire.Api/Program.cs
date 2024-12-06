@@ -12,6 +12,8 @@ using CleanAspire.Api.Identity;
 using Microsoft.Extensions.FileProviders;
 using CleanAspire.Api.Endpoints;
 using CleanAspire.Infrastructure.Configurations;
+using Microsoft.AspNetCore.Http.Features;
+using CleanAspire.Api.ExceptionHandlers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,21 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 builder.Services.AddAuthorizationBuilder();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+        var activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+        if (activity != null)
+        {
+            context.ProblemDetails.Extensions.TryAdd("traceId", activity.Id);
+        }
+    };
+});
+builder.Services.AddExceptionHandler<ProblemExceptionHandler>();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {

@@ -129,6 +129,10 @@
                         _selectedItems.Clear();
                         Snackbar.Add(L["Selected items have been deleted."], Severity.Success);
                     },
+                    invalid =>
+                    {
+                        Snackbar.Add(L[invalid.Message ?? "Failed to delete selected items."], Severity.Error);
+                    },
                     error =>
                     {
                         Snackbar.Add(L["Failed to delete selected items."], Severity.Error);
