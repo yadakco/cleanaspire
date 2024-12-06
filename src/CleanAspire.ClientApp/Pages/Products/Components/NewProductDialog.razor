@@ -1,8 +1,7 @@
 ﻿
 <MudDialog>
     <DialogContent>
-        <EditForm @ref="editForm" Model="@model" OnValidSubmit="OnValidSubmit">
-            <DataAnnotationsValidator />
+        <MudForm @ref="editForm" @bind-IsValid="@success" @bind-Errors="@errors">
             <MudGrid>
                 <MudItem xs="12" md="6">
                     <MudTextField @bind-Value="model.Sku" For="@(() => model.Sku)"
@@ -46,7 +45,7 @@
                     </MudTextField>
                 </MudItem>
             </MudGrid>
-        </EditForm>
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">@L["Cancel"]</MudButton>
@@ -55,38 +54,39 @@
 </MudDialog>
 
 @code {
+    bool success;
+    string[] errors = { };
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
     private CreateProductCommand model = new CreateProductCommand();
-    private EditForm editForm = default!;
+    private MudForm editForm = default!;
     private bool _saving;
     private void Cancel() => MudDialog.Cancel();
     private async Task Submit()
     {
-
-        if (editForm?.EditContext?.Validate() == true)
+        editForm?.Validate();
+        if (success)
         {
-            await OnValidSubmit();
+            _saving = true;
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PostAsync(model));
+            _saving = result.Match(
+                ok =>
+                {
+                    Snackbar.Add(L["Product created successfully!"], Severity.Success);
+                    MudDialog.Close(DialogResult.Ok(true));
+                    return false;
+                },
+                invalid =>
+                {
+                    Snackbar.Add(L[invalid.Message ?? "Failed to create product."], Severity.Error);
+                    return false;
+                },
+                error =>
+                {
+                    Snackbar.Add(L["Failed to create product."], Severity.Error);
+                    return false;
+                }
+            );
         }
-
-    }
-    private async Task OnValidSubmit()
-    {
-        _saving = true;
-        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PostAsync(model));
-        _saving = result.Match(
-            ok =>
-            {
-                Snackbar.Add(L["Product created successfully!"], Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-                return false;
-            },
-            error =>
-            {
-                Snackbar.Add(L["Failed to create product."], Severity.Error);
-                return false;
-            }
-        );
-
 
     }
 }
