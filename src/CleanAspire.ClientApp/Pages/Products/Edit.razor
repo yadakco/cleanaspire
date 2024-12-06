@@ -5,65 +5,69 @@
 <PageTitle>@Title</PageTitle>
 
 <Breadcrumbs OnSaveButtonClick="Save" Saving="_saving" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
-@if (model is not null)
-{
-    <EditForm @ref="editForm" Model="@model" OnValidSubmit="OnValidSubmit">
-        <DataAnnotationsValidator />
-        <MudGrid>
-            <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="model.Sku" For="@(() => model.Sku)"
-                              Label="@L["SKU"]" Placeholder="@L["SKU"]"
-                              Required="true" RequiredError="@L["Sku is required"]">
-                </MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="model.Name" For="@(() => model.Name)"
-                              Label="@L["Name"]" Placeholder="@L["Name"]"
-                              Required="true" RequiredError="@L["Name is required"]">
-                </MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="6">
-                <MudEnumSelect TEnum="NullableOfProductCategoryDto?" @bind-Value="model.Category" For="@(() => model.Category)"
-                               Label="@L["Category"]" Placeholder="@L["Category"]"
-                               Required="true" RequiredError="@L["Category is required"]">
-                </MudEnumSelect>
-            </MudItem>
-            <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="model.Uom" For="@(() => model.Uom)"
-                              Label="@L["UOM"]" Placeholder="@L["Uom"]"
-                              Required="false" RequiredError="@L["Uom is required"]">
-                </MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="6">
-                <MudNumericField @bind-Value="model.Price" For="@(() => model.Price)"
-                                 Label="@L["Price"]" Placeholder="@L["Price"]"
-                                 Required="true" RequiredError="@L["Price is required"]">
-                </MudNumericField>
-            </MudItem>
-            <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="model.Currency" For="@(() => model.Currency)"
-                              Label="@L["Currency"]" Placeholder="@L["Currency"]"
-                              Required="true" RequiredError="@L["Currency is required"]">
-                </MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="12">
-                <MudTextField @bind-Value="model.Description" For="@(() => model.Description)"
-                              Label="@L["Description"]" Placeholder="@L["Description"]">
-                </MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="12" Class="d-flex justify-end">
-                <MudButton ButtonType="ButtonType.Submit" Disabled="@_saving" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
-            </MudItem>
-        </MudGrid>
-    </EditForm>
-}
+<MudPaper Class="pa-5">
+    @if (model is not null)
+    {
+        <MudForm @ref="editForm" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="model.Sku" For="@(() => model.Sku)"
+                                  Label="@L["SKU"]" Placeholder="@L["SKU"]"
+                                  Required="true" RequiredError="@L["Sku is required"]">
+                    </MudTextField>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="model.Name" For="@(() => model.Name)"
+                                  Label="@L["Name"]" Placeholder="@L["Name"]"
+                                  Required="true" RequiredError="@L["Name is required"]">
+                    </MudTextField>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudEnumSelect TEnum="NullableOfProductCategoryDto?" @bind-Value="model.Category" For="@(() => model.Category)"
+                                   Label="@L["Category"]" Placeholder="@L["Category"]"
+                                   Required="true" RequiredError="@L["Category is required"]">
+                    </MudEnumSelect>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="model.Uom" For="@(() => model.Uom)"
+                                  Label="@L["UOM"]" Placeholder="@L["Uom"]"
+                                  Required="false" RequiredError="@L["Uom is required"]">
+                    </MudTextField>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="model.Price" For="@(() => model.Price)"
+                                     Label="@L["Price"]" Placeholder="@L["Price"]"
+                                     Required="true" RequiredError="@L["Price is required"]">
+                    </MudNumericField>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="model.Currency" For="@(() => model.Currency)"
+                                  Label="@L["Currency"]" Placeholder="@L["Currency"]"
+                                  Required="true" RequiredError="@L["Currency is required"]">
+                    </MudTextField>
+                </MudItem>
+                <MudItem xs="12" md="12">
+                    <MudTextField @bind-Value="model.Description" For="@(() => model.Description)"
+                                  Label="@L["Description"]" Placeholder="@L["Description"]">
+                    </MudTextField>
+                </MudItem>
+                <MudItem xs="12" md="12" Class="d-flex justify-end">
+                    <MudButton Disabled="@_saving" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    }
+</MudPaper>
+
 @code {
     public string? Title;
     [Parameter]
     public string? Id { get; set; }
     private bool _saving;
+    bool success;
+    string[] errors = { };
     private UpdateProductCommand? model;
-    private EditForm editForm = default!;
+    private MudForm editForm = default!;
     private List<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: "/"),
@@ -88,8 +92,13 @@
                     };
                 _breadcrumbItems.Add(new BreadcrumbItem(model.Sku, href: $"/products/edit/{Id}"));
             },
-            error => {
-                Snackbar.Add(L["Failed to load product details. Please try again later."], Severity.Error);
+            invalid =>
+            {
+                Snackbar.Add(invalid.Message, Severity.Error);
+            },
+            error =>
+            {
+                Snackbar.Add(error.Message, Severity.Error);
             }
         );
 
@@ -97,28 +106,31 @@
     }
     private async Task Save()
     {
-
-        if (editForm?.EditContext?.Validate() == true)
+        editForm?.Validate();
+        if (success == true)
         {
-            await OnValidSubmit();
+            _saving = true;
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PutAsync(model));
+            _saving = result.Match(
+                ok =>
+                {
+                    Snackbar.Add(L["Product details saved successfully!"], Severity.Success);
+                    return false;
+                },
+                invalid =>
+                {
+                    Snackbar.Add(invalid.Message, Severity.Error);
+                    return false;
+                },
+                error =>
+                {
+                    Snackbar.Add(error.Message, Severity.Error);
+                    return false;
+
+                }
+                );
         }
 
     }
-    private async Task OnValidSubmit()
-    {
-        _saving = true;
-        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PutAsync(model));
-        _saving = result.Match(
-            ok =>
-            {
-                Snackbar.Add(L["Product details saved successfully!"], Severity.Success);
-                return false;
-            },
-            error =>
-            {
-                Snackbar.Add(L["Failed to save product details. Please check your inputs or try again later."], Severity.Error);
-                return false;
-            }
-        );
-    }
+
 }

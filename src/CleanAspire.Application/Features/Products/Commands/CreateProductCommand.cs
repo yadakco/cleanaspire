@@ -1,5 +1,6 @@
 ﻿using CleanAspire.Application.Features.Products.DTOs;
 using CleanAspire.Application.Features.Products.EventHandlers;
+using CleanAspire.Application.Pipeline;
 
 namespace CleanAspire.Application.Features.Products.Commands;
 public record CreateProductCommand(
@@ -10,12 +11,12 @@ public record CreateProductCommand(
     decimal Price,
     string? Currency,
     string? UOM
-) : IFusionCacheRefreshRequest<string>
+) : IFusionCacheRefreshRequest<ProductDto>, IRequiresValidation
 {
     public IEnumerable<string>? Tags => new[] { "products" };
 }
 
-public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, string>
+public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, ProductDto>
 {
     private readonly IApplicationDbContext _context;
 
@@ -24,7 +25,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         _context = context;
     }
 
-    public async ValueTask<string> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ProductDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         var product = new Product
         {
@@ -40,6 +41,6 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         _context.Products.Add(product);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return product.Id;
+        return new ProductDto() { Id = product.Id, Name = product.Name, SKU = product.SKU };
     }
 }
