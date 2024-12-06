@@ -78,34 +78,50 @@
     {
         if (success)
         {
-            try
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.UpdateEmail.PostAsync(new  UpdateEmailRequest()
+                {
+                    NewEmail = newEmailAddress
+                }));
+            result.Switch(
+            ok =>
             {
-                await ApiClient.Account.Profile.PostAsync(new ProfileRequest()
-                    {
-                        AvatarUrl = model.AvatarUrl,
-                        Email = newEmailAddress,
-                        LanguageCode = model.LanguageCode,
-                        Nickname = model.Nickname,
-                        TimeZoneId = model.TimeZoneId,
-                        Username = model.Username,
-                        SuperiorId = model.SuperiorId,
-                        TenantId = model.TenantId
-
-                    });
                 showChangeEmailDialog = false;
                 Snackbar.Add(L["Email change request sent successfully. Please check your new email for confirmation."], Severity.Info);
-            }
-            catch (Exception e)
+            },
+            invalid =>
             {
-                Logger.LogError(e, e.Message);
-                Snackbar.Add(L["An error occurred while trying to change your email. Please try again later."], Severity.Error);
-            }
+                Snackbar.Add(invalid.Message, Severity.Error);
+            },
+            error =>
+            {
+                Snackbar.Add(L["Failed to update email address."], Severity.Error);
+            });
         }
     }
-    private Task OnDeleteAccount()
+    private async Task OnDeleteAccount()
     {
         if (deleteSuccess)
         {
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.DeleteOwnerAccount.DeleteAsync(new DeleteUserRequest()
+                {
+                    Username = confirmUsername
+                }));
+            result.Switch(
+            ok =>
+            {
+                Navigation.NavigateTo("/account/signin");
+                showDeleteAccountDialog = false;
+                Snackbar.Add(L["Your account has been deleted successfully."], Severity.Info);
+            },
+            invalid =>
+            {
+                Snackbar.Add(invalid.Message, Severity.Error);
+            },
+            error =>
+            {
+                Snackbar.Add(L["Failed to update email address."], Severity.Error);
+            });
+
             try
             {
                 // var user =await PocketbaseClient.Data.UsersCollection.GetByIdAsync(userInfo.Id);

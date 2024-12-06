@@ -28,7 +28,7 @@
                 <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                     <ActivatorContent>
                         <MudIconButton Color="Color.Info"
-                                       Icon="@Icons.Material.Filled.PhotoCamera">
+                        Icon="@Icons.Material.Filled.PhotoCamera">
                         </MudIconButton>
                     </ActivatorContent>
                 </MudFileUpload>
@@ -44,7 +44,7 @@
     private ProfileModel model = new();
     private ProfileResponse? userModel => UserProfileStore.Profile;
 
-    protected override async Task OnInitializedAsync()
+    protected override  Task OnInitializedAsync()
     {
         model = new ProfileModel
             {
@@ -58,27 +58,22 @@
                 TenantId = userModel?.TenantId,
                 TimeZoneId = userModel?.TimeZoneId
             };
+        return Task.CompletedTask;
     }
 
     private async Task UploadFiles(IBrowserFile file)
     {
         try
         {
-
             var request = new MultipartBody();
             request.AddOrReplacePart("overwrite", "text/plain", "false");
             request.AddOrReplacePart("folder", "text/plain", $"{model.Id}");
-            // request.AddOrReplacePart("cropSize[width]", "text/plain", "150");
-            // request.AddOrReplacePart("cropSize[height]", "text/plain", "150");
             request.AddOrReplacePart("cropSize_width", "text/plain", $"{150}");
             request.AddOrReplacePart("cropSize_height", "text/plain", $"{150}");
-            var i = 0;
-
             var filename = file.Name;
             var stream = new MemoryStream();
             await file.OpenReadStream(int.MaxValue).CopyToAsync(stream);
             request.AddOrReplacePart($"files[0]", "application/octet-stream", stream, filename);
-
             var response = await ApiClient.File.Image.PostAsync(request);
             if (response is not null && response.Any())
             {
@@ -94,32 +89,33 @@
     }
     private async Task OnValidSubmit(EditContext context)
     {
-        try
-        {
-            var profile = await ApiClient.Account.Profile.PostAsync(new ProfileRequest()
-                {
-                    AvatarUrl = model.AvatarUrl,
-                    Email = model.Email,
-                    LanguageCode = model.LanguageCode,
-                    Nickname = model.Nickname,
-                    TimeZoneId = model.TimeZoneId,
-                    Username = model.Username,
-                    SuperiorId = model.SuperiorId,
-                    TenantId = model.TenantId,
-                });
-            if (profile != null)
+        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.Profile.PostAsync(new ProfileRequest()
             {
-                UserProfileStore.Set(profile);
+                AvatarUrl = model.AvatarUrl,
+                Email = model.Email,
+                LanguageCode = model.LanguageCode,
+                Nickname = model.Nickname,
+                TimeZoneId = model.TimeZoneId,
+                Username = model.Username,
+                SuperiorId = model.SuperiorId,
+                TenantId = model.TenantId,
+            }));
+        result.Switch(
+            ok =>
+            {
+                UserProfileStore.Set(ok);
                 Snackbar.Add(L["User profile updated successfully."], Severity.Info);
                 StateHasChanged();
+            },
+            invalid =>
+            {
+                Snackbar.Add(invalid.Message, Severity.Error);
+            },
+            error =>
+            {
+                Snackbar.Add(error.Message, Severity.Error);
             }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            Snackbar.Add(L["Error updating user profile. Please try again."] + e.Message, Severity.Error);
-        }
-
+            );
     }
 
     public class ProfileModel
