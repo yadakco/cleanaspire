@@ -78,7 +78,7 @@
     {
         if (success)
         {
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.UpdateEmail.PostAsync(new  UpdateEmailRequest()
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.UpdateEmail.PostAsync(new UpdateEmailRequest()
                 {
                     NewEmail = newEmailAddress
                 }));
@@ -119,26 +119,9 @@
             },
             error =>
             {
-                Snackbar.Add(L["Failed to update email address."], Severity.Error);
+                Snackbar.Add(L["Failed to delete your account."], Severity.Error);
             });
-
-            try
-            {
-                // var user =await PocketbaseClient.Data.UsersCollection.GetByIdAsync(userInfo.Id);
-                // PocketbaseClient.Data.UsersCollection.Delete(user);
-                // await PocketbaseClient.Data.SaveChangesAsync();
-                Navigation.NavigateTo("/account/signin");
-                showDeleteAccountDialog = false;
-                Snackbar.Add(L["Your account has been deleted successfully."], Severity.Info);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, e.Message);
-                Snackbar.Add(L["An error occurred while trying to delete your account. Please try again later."], Severity.Error);
-            }
-
         }
-        return Task.CompletedTask;
     }
 
     private string? userNameMatch(string? arg)
