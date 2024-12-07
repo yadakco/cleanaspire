@@ -30,7 +30,9 @@
             </div>
         </EditForm>
     </div>
-
+    <MudText Typo="Typo.overline" Style="position:absolute; bottom:8px; right:8px;">
+        @(AppSettings.Version)
+    </MudText>
 </MudPaper>
 @code {
     private SignInModel model = new SignInModel()
