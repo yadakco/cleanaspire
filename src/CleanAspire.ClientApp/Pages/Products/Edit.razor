@@ -30,7 +30,7 @@
                     </MudEnumSelect>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <PicklistAutocomplete T="string" PickList="UOM" @bind-Value="model.Uom" For="@(() => model.Uom)"
+                    <PicklistAutocomplete T="string" PickList="PicklistType.UOM" @bind-Value="model.Uom" For="@(() => model.Uom)"
                                   Label="@L["UOM"]" Placeholder="@L["Uom"]"
                                   Required="false" RequiredError="@L["Uom is required"]">
                     </PicklistAutocomplete>
@@ -42,7 +42,7 @@
                     </MudNumericField>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <PicklistAutocomplete T="string" PickList="Currency" @bind-Value="model.Currency" For="@(() => model.Currency)"
+                    <PicklistAutocomplete T="string" PickList="PicklistType.Currency" @bind-Value="model.Currency" For="@(() => model.Currency)"
                                   Label="@L["Currency"]" Placeholder="@L["Currency"]"
                                   Required="true" RequiredError="@L["Currency is required"]">
                     </PicklistAutocomplete>
