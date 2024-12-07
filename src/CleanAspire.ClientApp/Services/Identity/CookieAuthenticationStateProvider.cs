@@ -8,6 +8,7 @@ using System.Text.Json;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Kiota.Abstractions;
 
 namespace CleanAspire.ClientApp.Services.Identity;
 
@@ -57,18 +58,19 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         try
         {
             // login with cookies
-            await apiClient.Login.PostAsync(request, options =>
-            {
-                options.QueryParameters.UseCookies = remember;
-                options.QueryParameters.UseSessionCookies = !remember;
-            }, cancellationToken);
+            var response = await apiClient.Login.PostAsync(request, options =>
+             {
+                 options.QueryParameters.UseCookies = remember;
+                 options.QueryParameters.UseSessionCookies = !remember;
+             }, cancellationToken);
             // need to refresh auth state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-
+            return response ?? new AccessTokenResponse();
         }
-        catch { }
-        return new AccessTokenResponse();
-
+        catch (ApiException ex)
+        {
+            throw; // Re-throwing the exception without changing the stack information
+        }
     }
 
     public async Task LogoutAsync(CancellationToken cancellationToken = default)

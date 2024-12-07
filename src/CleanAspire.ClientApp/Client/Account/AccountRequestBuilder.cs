@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using CleanAspire.Api.Client.Account.ConfirmEmail;
 using CleanAspire.Api.Client.Account.DeleteOwnerAccount;
+using CleanAspire.Api.Client.Account.ForgotPassword;
 using CleanAspire.Api.Client.Account.Logout;
 using CleanAspire.Api.Client.Account.Profile;
 using CleanAspire.Api.Client.Account.Signup;
@@ -29,6 +30,11 @@ namespace CleanAspire.Api.Client.Account
         public global::CleanAspire.Api.Client.Account.DeleteOwnerAccount.DeleteOwnerAccountRequestBuilder DeleteOwnerAccount
         {
             get => new global::CleanAspire.Api.Client.Account.DeleteOwnerAccount.DeleteOwnerAccountRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The forgotPassword property</summary>
+        public global::CleanAspire.Api.Client.Account.ForgotPassword.ForgotPasswordRequestBuilder ForgotPassword
+        {
+            get => new global::CleanAspire.Api.Client.Account.ForgotPassword.ForgotPasswordRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The logout property</summary>
         public global::CleanAspire.Api.Client.Account.Logout.LogoutRequestBuilder Logout
