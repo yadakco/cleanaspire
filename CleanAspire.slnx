@@ -16,6 +16,14 @@
     <Project Path="src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj" Id="7d6e47cc-90f1-4c19-af96-1de7eed7928c" />
     <Project Path="src/Migrators/Migrators.SQLite/Migrators.SQLite.csproj" Id="67226f2c-5d75-4b76-b5f8-e42a4bc1bbb1" />
   </Folder>
+  <Folder Name="/src/PushNotifications/" Id="02ea681e-c7d8-13c7-8484-4ac65e1b71e8">
+    <Project Path="src/PushNotifications/CleanAspire.PushNotifications.Services.Abstractions/CleanAspire.PushNotifications.Services.Abstractions.csproj" />
+    <Project Path="src/PushNotifications/CleanAspire.PushNotifications.Services.Cosmos/CleanAspire.PushNotifications.Services.Cosmos.csproj" />
+    <Project Path="src/PushNotifications/CleanAspire.PushNotifications.Services.LiteDB/CleanAspire.PushNotifications.Services.LiteDB.csproj" />
+    <Project Path="src/PushNotifications/CleanAspire.PushNotifications.Services.PushService/CleanAspire.PushNotifications.Services.PushService.csproj" />
+    <Project Path="src/PushNotifications/CleanAspire.PushNotifications.Services.Sqlite/CleanAspire.PushNotifications.Services.Sqlite.csproj" Id="db15d61e-0136-32e1-fa7f-f992b6690387" />
+    <Project Path="src/PushNotifications/CleanAspire.PushNotifications.Services/CleanAspire.PushNotifications.Services.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CleanAspire.Tests/CleanAspire.Tests.csproj" />
   </Folder>

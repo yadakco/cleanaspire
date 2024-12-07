@@ -1,0 +1,17 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Lib.Net.Http.WebPush;
+
+namespace CleanAspire.PushNotifications.Services.Abstractions;
+
+public interface IPushSubscriptionStore
+{
+    Task StoreSubscriptionAsync(PushSubscription subscription);
+
+    Task DiscardSubscriptionAsync(string endpoint);
+
+    Task ForEachSubscriptionAsync(Action<PushSubscription> action);
+
+    Task ForEachSubscriptionAsync(Action<PushSubscription> action, CancellationToken cancellationToken);
+}

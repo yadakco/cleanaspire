@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+      <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CleanAspire.PushNotifications.Services.Cosmos\CleanAspire.PushNotifications.Services.Cosmos.csproj" />
+    <ProjectReference Include="..\CleanAspire.PushNotifications.Services.LiteDB\CleanAspire.PushNotifications.Services.LiteDB.csproj" />
+    <ProjectReference Include="..\CleanAspire.PushNotifications.Services.PushService\CleanAspire.PushNotifications.Services.PushService.csproj" />
+    <ProjectReference Include="..\CleanAspire.PushNotifications.Services.Sqlite\CleanAspire.PushNotifications.Services.Sqlite.csproj" />
+  </ItemGroup>
+
+</Project>
