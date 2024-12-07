@@ -13,7 +13,7 @@
     <ItemGroup>
         <PackageReference Include="Bogus" Version="35.6.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-        <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.0" />
+        <!--<PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.0" />-->
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.0" />
         <PackageReference Include="Scalar.AspNetCore" Version="1.2.45" />
@@ -26,6 +26,7 @@
         <ProjectReference Include="..\Migrators\Migrators.MSSQL\Migrators.MSSQL.csproj" />
         <ProjectReference Include="..\Migrators\Migrators.PostgreSQL\Migrators.PostgreSQL.csproj" />
         <ProjectReference Include="..\Migrators\Migrators.SQLite\Migrators.SQLite.csproj" />
+        <ProjectReference Include="..\PushNotifications\CleanAspire.PushNotifications.Services\CleanAspire.PushNotifications.Services.csproj" />
 
     </ItemGroup>
 

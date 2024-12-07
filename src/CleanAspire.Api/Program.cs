@@ -14,6 +14,7 @@ using CleanAspire.Api.Endpoints;
 using CleanAspire.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http.Features;
 using CleanAspire.Api.ExceptionHandlers;
+using CleanAspire.PushNotifications.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,12 @@ builder.RegisterSerilog();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddPushSubscriptionStore(builder.Configuration)
+                .AddPushNotificationService(builder.Configuration)
+                .AddPushNotificationsQueue();
+
+
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 builder.Services.AddAuthorizationBuilder();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();
@@ -109,7 +116,7 @@ app.Use(async (context, next) =>
         currentUserContextSetter.Clear();
     }
 });
-
+app.UsePushSubscriptionStore();
 app.MapDefaultEndpoints();
 app.MapIdentityApi<ApplicationUser>();
 app.MapIdentityApiAdditionalEndpoints<ApplicationUser>();
