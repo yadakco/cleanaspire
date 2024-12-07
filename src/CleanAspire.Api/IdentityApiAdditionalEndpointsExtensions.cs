@@ -13,6 +13,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
+using Microsoft.AspNetCore.Identity.Data;
+using StrongGrid.Resources;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -238,9 +240,11 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
         {
-            if (confirmEmailEndpointName is null)
+            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
+            var clientBaseUrl = configuration["ClientBaseUrl"];
+            if (string.IsNullOrEmpty(clientBaseUrl))
             {
-                throw new NotSupportedException("No email confirmation endpoint was registered!");
+                throw new InvalidOperationException("Client base URL is not configured.");
             }
             var code = isChange
                 ? await userManager.GenerateChangeEmailTokenAsync(user, email)
@@ -248,22 +252,42 @@ public static class IdentityApiAdditionalEndpointsExtensions
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             var userId = await userManager.GetUserIdAsync(user);
-            var routeValues = new RouteValueDictionary()
-            {
-                ["userId"] = userId,
-                ["code"] = code,
-            };
-
-            if (isChange)
-            {
-                // This is validated by the /confirmEmail endpoint on change.
-                routeValues.Add("changedEmail", email);
-            }
-            var confirmEmailUrl = linkGenerator.GetUriByName(context, confirmEmailEndpointName, routeValues)
-            ?? throw new NotSupportedException($"Could not find endpoint named '{confirmEmailEndpointName}'.");
-
+  
+            // Construct the client-side URL
+            var confirmEmailUrl = isChange
+                ? $"{clientBaseUrl}/account/profile?userId={userId}&code={code}&changedEmail={email}"
+                : $"{clientBaseUrl}/account/confirm-email?userId={userId}&code={code}";
+            //var emailContent = isChange ? GenerateChangeEmailContent(confirmEmailUrl)
+            //                            : GenerateSignupEmailContent(confirmEmailUrl);
             await emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
         }
+        routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
+            (HttpContext context, [FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
+        {
+            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
+            var clientBaseUrl = configuration["ClientBaseUrl"];
+            if (string.IsNullOrEmpty(clientBaseUrl))
+            {
+                throw new InvalidOperationException("Client base URL is not configured.");
+            }
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var user = await userManager.FindByEmailAsync(resetRequest.Email);
+
+            if (user is not null && await userManager.IsEmailConfirmedAsync(user))
+            {
+                var email = await userManager.GetEmailAsync(user);
+                var code = await userManager.GeneratePasswordResetTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var resetLink = $"{clientBaseUrl}/account/confirm-password-reset?email={email}&code={code}";
+                await emailSender.SendPasswordResetLinkAsync(user, resetRequest.Email, HtmlEncoder.Default.Encode(resetLink));
+            }
+
+            // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
+            // returned a 400 for an invalid code given a valid user email.
+            return TypedResults.Ok();
+        }).AllowAnonymous()
+          .WithSummary("Request a password reset link")
+          .WithDescription("Generates and sends a password reset link to the user's email if the email is registered and confirmed.");
         return endpoints;
     }
     private static async Task<ProfileResponse> CreateInfoResponseAsync<TUser>(TUser user, UserManager<TUser> userManager)
@@ -314,6 +338,108 @@ public static class IdentityApiAdditionalEndpointsExtensions
         }
 
         return TypedResults.ValidationProblem(errorDictionary);
+    }
+
+
+    static string GenerateSignupEmailContent(string confirmEmailUrl)
+    {
+        return $@"
+        <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }}
+                    .email-container {{
+                        max-width: 600px;
+                        margin: auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background: #f9f9f9;
+                    }}
+                    .email-header {{
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }}
+                    .email-link {{
+                        display: inline-block;
+                        margin: 20px 0;
+                        padding: 10px 20px;
+                        background: #007bff;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                    }}
+                    .email-link:hover {{
+                        background: #0056b3;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='email-container'>
+                    <p>Hello,</p>
+                    <p>Thank you for signing up. Please confirm your email address by clicking the button below:</p>
+                    <a href='{HtmlEncoder.Default.Encode(confirmEmailUrl)}' class='email-link'>Confirm Email</a>
+                    <p>If the button above doesn't work, copy and paste the following URL into your browser:</p>
+                    <p>{HtmlEncoder.Default.Encode(confirmEmailUrl)}</p>
+                    <p>Thank you,<br>The Team</p>
+                </div>
+            </body>
+        </html>";
+    }
+
+    static string GenerateChangeEmailContent(string confirmEmailUrl)
+    {
+        return $@"
+        <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }}
+                    .email-container {{
+                        max-width: 600px;
+                        margin: auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background: #f9f9f9;
+                    }}
+                    .email-header {{
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }}
+                    .email-link {{
+                        display: inline-block;
+                        margin: 20px 0;
+                        padding: 10px 20px;
+                        background: #28a745;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                    }}
+                    .email-link:hover {{
+                        background: #218838;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='email-container'>
+                    <p>Hello,</p>
+                    <p>We received a request to update your email address. To confirm this change, please click the button below:</p>
+                    <a href='{HtmlEncoder.Default.Encode(confirmEmailUrl)}' class='email-link'>Confirm New Email</a>
+                    <p>If the button above doesn't work, copy and paste the following URL into your browser:</p>
+                    <p>{HtmlEncoder.Default.Encode(confirmEmailUrl)}</p>
+                    <p>If you did not request this change, please ignore this email or contact support for assistance.</p>
+                    <p>Thank you,<br>The Team</p>
+                </div>
+            </body>
+        </html>";
     }
 }
 
