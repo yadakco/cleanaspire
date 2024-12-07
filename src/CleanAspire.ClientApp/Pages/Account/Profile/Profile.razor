@@ -15,7 +15,7 @@
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["Profile picture"]</MudText>
-                                 <MudText Style="min-width:200px">@L["Add a profile picture to personalize your account"]</MudText>
+                        <MudText Style="min-width:200px">@L["Add a profile picture to personalize your account"]</MudText>
                         @if (userModel?.AvatarUrl != null)
                         {
                             <MudAvatar Size="Size.Large">
@@ -28,7 +28,7 @@
                                 @userModel?.Username?.FirstOrDefault()
                             </MudAvatar>
                         }
-                       
+
                     </div>
                 </MudListItem>
                 <MudListItem>
@@ -48,7 +48,7 @@
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["Language"]</MudText>
-                        <MudText Style="min-width:200px">@Localization.SupportedLanguages.FirstOrDefault(x=>x.Code== userModel?.LanguageCode)?.DisplayName</MudText>
+                        <MudText Style="min-width:200px">@Localization.SupportedLanguages.FirstOrDefault(x => x.Code == userModel?.LanguageCode)?.DisplayName</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
                     </div>
                 </MudListItem>
@@ -60,11 +60,47 @@
                     </div>
                 </MudListItem>
             }
-            
+
         </MudList>
     </MudPaper>
 </div>
 @code {
     private ProfileResponse? userModel => UserProfileStore.Profile;
- 
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+    [SupplyParameterFromQuery(Name = "userId")]
+    public string? UserId { get; set; }
+    [SupplyParameterFromQuery(Name = "changedEmail")]
+    public string? ChangedEmail { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Code) && !string.IsNullOrEmpty(UserId) && !string.IsNullOrEmpty(ChangedEmail))
+        {
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.ConfirmEmail.GetAsync(requestConfiguration =>
+            {
+                requestConfiguration.QueryParameters.Code = Code;
+                requestConfiguration.QueryParameters.UserId = UserId;
+                requestConfiguration.QueryParameters.ChangedEmail = ChangedEmail;
+            }
+               ));
+
+            result.Switch(
+               async ok =>
+                {
+                    Snackbar.Add(L["Email confirmation successful. Your email has been updated."], Severity.Info);
+                    var profileResponse = await ApiClient.Account.Profile.GetAsync();
+                    UserProfileStore.Set(profileResponse);
+                    StateHasChanged();
+                },
+                invalid =>
+                {
+                    Snackbar.Add(invalid.Message, Severity.Error);
+                },
+                error =>
+                {
+                    Snackbar.Add(L["An unexpected error occurred while confirming your email. Please try again later."], Severity.Error);
+                });
+        }
+    }
+
 }

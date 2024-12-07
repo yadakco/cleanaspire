@@ -1,4 +1,4 @@
-﻿@page "/_/auth/confirm-email-change/{token}"
+﻿@page "/account/confirm-email-change"
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 <PageTitle>@L["Change email confirm"]</PageTitle>
@@ -26,13 +26,17 @@
     </div>
 </MudPaper>
 @code {
-    [Parameter]
-    public string? Token { get; set; }
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+    [SupplyParameterFromQuery(Name = "userId")]
+    public string? UserId { get; set; }
+    [SupplyParameterFromQuery(Name = "changedEmail")]
+    public string? ChangedEmail { get; set; }
     private EmailChangeConfirmModel model = new();
     private string? message;
     protected override void OnInitialized()
     {
-        if (string.IsNullOrEmpty(Token))
+        if (string.IsNullOrEmpty(Code))
         {
             message = L["Invalid or missing token. Please check your verification link."];
         }
@@ -40,8 +44,7 @@
         {
             try
             {
-                model.EmailChangeResetToken = Token;
-                model.NewEmail = getEmailFromToken(Token); ;
+                
             }
             catch (Exception e)
             {
@@ -50,42 +53,8 @@
             }
         }
     }
-    private string getEmailFromToken(string token)
-    {
-        // Split the token into its parts
-        var parts = token.Split('.');
-        if (parts.Length != 3)
-        {
-            throw new ArgumentException("Invalid token format");
-        }
-
-        // Decode the payload part (second part) from Base64
-        var payload = parts[1];
-        var jsonBytes = parseBase64WithoutPadding(payload);
-        var keyValuePairs = JsonSerializer.Deserialize<IDictionary<string, object>>(jsonBytes);
-        // Extract the email from the dictionary
-        if (keyValuePairs != null && keyValuePairs.TryGetValue("newEmail", out var email))
-        {
-            return email?.ToString() ?? throw new ArgumentException(L["Email not found in token"]);
-        }
-        else
-        {
-            throw new ArgumentException(L["Email not found in token"]);
-        }
-    }
-    private byte[] parseBase64WithoutPadding(string base64)
-    {
-        switch (base64.Length % 4)
-        {
-            case 2:
-                base64 += "==";
-                break;
-            case 3:
-                base64 += "=";
-                break;
-        }
-        return Convert.FromBase64String(base64);
-    }
+     
+    
 
     private async Task OnValidSubmit(EditContext context)
     {

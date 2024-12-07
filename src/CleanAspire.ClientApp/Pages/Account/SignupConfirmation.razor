@@ -1,4 +1,4 @@
-﻿@page "/_/auth/confirm-verification/{token}"
+﻿@page "/account/confirm-email"
 
 <PageTitle>@L["Confirm Verification"]</PageTitle>
 <MudPaper Elevation="3" Class="pa-8" Width="100%" MaxWidth="500px">
@@ -19,29 +19,45 @@
     </div>
 </MudPaper>
 @code {
-    [Parameter]
-    public string? Token { get; set; }
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+    [SupplyParameterFromQuery(Name = "userId")]
+    public string? UserId { get; set; }
     private bool success { get; set; }
     private string? message { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrEmpty(Token))
+        if (string.IsNullOrEmpty(Code))
         {
             message = L["Invalid or missing token. Please check your verification link."];
         }
         else
         {
-            try
+
+            var result = await ApiClientService.ExecuteAsync(() => ApiClient.ConfirmEmail.GetAsync(requestConfiguration =>
             {
-                // await PocketbaseClient.Auth.User.ConfirmVerificationAsync(Token);
-                success = true;
-                message = L["Your email has been successfully verified. You can now sign in."];
+                requestConfiguration.QueryParameters.Code = Code;
+                requestConfiguration.QueryParameters.UserId = UserId;
             }
-            catch (Exception e)
-            {
-                Logger.LogError(e,e.Message);
-                message = L["Verification failed. The token may be invalid or expired."];
-            }
+               ));
+
+            result.Switch(
+                ok =>
+                {
+                    success = true;
+                    message = L["Your email has been successfully verified. You can now sign in."];
+                },
+                invalid =>
+                {
+                    message = invalid.Message;
+                },
+                error =>
+                {
+                    message = L["Verification failed. The token may be invalid or expired."];
+                });
+            success = true;
+            message = L["Your email has been successfully verified. You can now sign in."];
+
         }
     }
 }
