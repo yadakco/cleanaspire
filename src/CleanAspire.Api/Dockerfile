@@ -10,6 +10,12 @@ COPY ["src/CleanAspire.ServiceDefaults/CleanAspire.ServiceDefaults.csproj", "src
 COPY ["src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj", "src/Migrators/Migrators.MSSQL/"]
 COPY ["src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj", "src/Migrators/Migrators.PostgreSQL/"]
 COPY ["src/Migrators/Migrators.SQLite/Migrators.SQLite.csproj", "src/Migrators/Migrators.SQLite/"]
+COPY ["src/PushNotifications/CleanAspire.PushNotifications.Services/CleanAspire.PushNotifications.Services.csproj", "src/PushNotifications/CleanAspire.PushNotifications.Services/"]
+COPY ["src/PushNotifications/CleanAspire.PushNotifications.Services.Abstractions/CleanAspire.PushNotifications.Services.Abstractions.csproj", "src/PushNotifications/CleanAspire.PushNotifications.Services.Abstractions/"]
+COPY ["src/PushNotifications/CleanAspire.PushNotifications.Services.Cosmos/CleanAspire.PushNotifications.Services.Cosmos.csproj", "src/PushNotifications/CleanAspire.PushNotifications.Services.Cosmos/"]
+COPY ["src/PushNotifications/CleanAspire.PushNotifications.Services.LiteDB/CleanAspire.PushNotifications.Services.LiteDB.csproj", "src/PushNotifications/CleanAspire.PushNotifications.Services.LiteDB/"]
+COPY ["src/PushNotifications/CleanAspire.PushNotifications.Services.PushService/CleanAspire.PushNotifications.Services.PushService.csproj", "src/PushNotifications/CleanAspire.PushNotifications.Services.PushService/"]
+COPY ["src/PushNotifications/CleanAspire.PushNotifications.Services.Sqlite/CleanAspire.PushNotifications.Services.Sqlite.csproj", "src/PushNotifications/CleanAspire.PushNotifications.Services.Sqlite/"]
 
 RUN dotnet restore "src/CleanAspire.Api/CleanAspire.Api.csproj"
 
