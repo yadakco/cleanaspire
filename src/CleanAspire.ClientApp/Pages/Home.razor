@@ -1,91 +1,93 @@
 ﻿@page "/"
 @using Microsoft.Kiota.Abstractions
-
+@using System.Text
+@using System.Net.Http.Headers
+@inject IHttpClientFactory HttpClientFactory
 <PageTitle>Home</PageTitle>
 
 <MudPaper Class="pa-4 mb-3">
     <style>
 
         .circle {
-        width: 0.5rem;
-        height: 0.5rem;
-        display: inline-block;
+            width: 0.5rem;
+            height: 0.5rem;
+            display: inline-block;
         }
 
         .rounded-circle {
-        border-radius: 50%;
+            border-radius: 50%;
         }
 
         .bg-success {
-        background-color: #28a745 !important;
+            background-color: #28a745 !important;
         }
 
         .bg-warning {
-        background-color: #ffc107 !important;
+            background-color: #ffc107 !important;
         }
 
         .bg-primary {
-        background-color: #0d6efd !important;
+            background-color: #0d6efd !important;
         }
 
         .bg-danger {
-        background-color: #dc3545 !important;
+            background-color: #dc3545 !important;
         }
 
         .bg-secondary {
-        background-color: #6c757d !important;
+            background-color: #6c757d !important;
         }
 
         .bg-dark {
-        background-color: #343a40 !important;
+            background-color: #343a40 !important;
         }
 
         .bar-label {
-        font-size: .625rem;
-        color: #6c757d;
+            font-size: .625rem;
+            color: #6c757d;
         }
 
         .text-nowrap {
-        white-space: nowrap;
+            white-space: nowrap;
         }
 
         .fw-semibold {
-        font-weight: 600;
+            font-weight: 600;
         }
 
         .small, small {
-        font-size: .875em;
+            font-size: .875em;
         }
 
         .progress {
-        background-color: #e9ecef;
-        border-radius: 0.25rem;
-        overflow: hidden;
-        height: 8px;
-        display: flex;
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+            overflow: hidden;
+            height: 8px;
+            display: flex;
         }
 
         .progress-bar {
-        height: 100%;
-        transition: width 0.6s ease;
+            height: 100%;
+            transition: width 0.6s ease;
         }
 
         @@media (max-width: 850px) {
-        .flex-row {
-        flex-wrap: wrap;
-        }
+            .flex-row {
+                flex-wrap: wrap;
+            }
         }
 
         .fw-bold {
-        font-weight: 700 !important;
+            font-weight: 700 !important;
         }
 
         .fs-5 {
-        font-size: 1.25rem !important;
+            font-size: 1.25rem !important;
         }
 
         .text-muted {
-        color: var(--mud-palette-text-secondary);
+            color: var(--mud-palette-text-secondary);
         }
     </style>
     <div class="d-flex flex-row gap-3">
@@ -195,8 +197,8 @@
     <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
         <ActivatorContent>
             <MudButton Variant="Variant.Filled"
-            Color="Color.Primary"
-            StartIcon="@Icons.Material.Filled.CloudUpload">
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.CloudUpload">
                 Multiple Files
             </MudButton>
         </ActivatorContent>
@@ -210,7 +212,7 @@
                 {
                     <tr @onclick="()=>OnDownloadFile(item.Url)" style="cursor:pointer">
                         <td><Thumbnail Path="@item.Path" FileUrl="@item.Url"> </Thumbnail></td>
-                        <td><FileSizeFormatter  FileSizeInBytes="@((int)item.Size)"></FileSizeFormatter></td>
+                        <td><FileSizeFormatter FileSizeInBytes="@((int)item.Size)"></FileSizeFormatter></td>
                         <td style="width:50px"><MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" title="@L["Delete"]" OnClick="@(()=>DeleteFile(item))"></MudIconButton></td>
                     </tr>
                 }
@@ -220,8 +222,8 @@
 
 </MudPaper>
 <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 pa-2" Elevation="0">
-    <MudButton Variant="Variant.Filled">Default</MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary">Primary</MudButton>
+    <MudButton Variant="Variant.Filled">Subscribe</MudButton>
+    <MudButton Variant="Variant.Filled" OnClick="Send" Color="Color.Primary">Send Notifications</MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Info">Info</MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Error">Error</MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Secondary">Secondary</MudButton>
@@ -260,7 +262,6 @@
         z-index: 9999;
     }
 
-
 </style>
 @code {
     public List<Order> Orders = new List<Order>
@@ -286,11 +287,6 @@
             new Order { OrderNumber = "ORD0019", Amount = 450.00M, Currency = "EUR", Status = "Awaiting payment", OverdueStatus = "Overdue 7-13 days", OrderDate = DateTime.Now.AddDays(-11), CustomerName = "Samuel", ShippingAddress = "1616 Oak Ln", Product = "Epson EcoTank ET-8550 Wireless All-in-One Printer" },
             new Order { OrderNumber = "ORD0020", Amount = 999.99M, Currency = "EUR", Status = "Paid in full", OverdueStatus = "", OrderDate = DateTime.Now.AddDays(-2), CustomerName = "Tina", ShippingAddress = "1717 Pine Ave", Product = "Apple MacBook Pro 14-inch, M2 Pro, 16GB RAM, 512GB SSD" }
         };
-
-
-
-
-
     public class Order
     {
         public string OrderNumber { get; set; }
@@ -303,6 +299,47 @@
         public string ShippingAddress { get; set; }
         public string Product { get; set; }
     }
+
+
+
+    private async Task Send()
+    {
+        var random = new Random();
+        var titlesAndMessages = new[]
+        {
+            new { Title = "Seize the Day", Message = "Don't wait for tomorrow. Start now and make it happen!" },
+            new { Title = "Teamwork Wins", Message = "Together we can achieve more. Let’s move forward as one!" },
+            new { Title = "Innovation Ahead", Message = "Think outside the box and embrace new challenges." },
+            new { Title = "Stay Curious", Message = "Knowledge is power. Keep learning and exploring!" },
+            new { Title = "Small Steps Matter", Message = "Every journey begins with a single step. Keep going!" }
+        };
+
+        var selected = titlesAndMessages[random.Next(titlesAndMessages.Length)];
+        var client = HttpClientFactory.CreateClient("Webpushr");
+        try
+        {
+            string payload = $@"{{
+                ""title"": ""{selected.Title}"",
+                ""message"": ""{selected.Message}"",
+                ""target_url"": ""https://github.com/neozhu/cleanaspire"",
+                ""icon"":""icon-192.png""
+            }}";
+            HttpContent httpContent = new StringContent(payload, Encoding.UTF8);
+            httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var httpResponseMessage = await client.PostAsync("/v1/notification/send/all", httpContent).ConfigureAwait(false);
+            string resp = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            httpContent.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            client.Dispose();
+
+        }
+        client.Dispose();
+    }
+
 
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
@@ -321,7 +358,7 @@
             request.AddOrReplacePart($"files[{i++}]", "application/octet-stream", stream, filename);
         }
         var response = await ApiClient.File.Upload.PostAsync(request);
-        if(response is not null && response.Any())
+        if (response is not null && response.Any())
         {
             fileUploadResponses.AddRange(response);
         }
