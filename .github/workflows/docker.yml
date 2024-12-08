@@ -33,9 +33,8 @@ jobs:
 
       
       - name: Build and push CleanAspire.ClientApp image
-        working-directory: ./src/CleanAspire.ClientApp
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-clientapp:${{ steps.version.outputs.version }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-clientapp:${{ steps.version.outputs.version }} -f src/CleanAspire.ClientApp/Dockerfile .
           docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-clientapp:${{ steps.version.outputs.version }}
 
       - name: Build and push CleanAspire.Api image
