@@ -23,7 +23,7 @@ public class WebpushrAuthHandler : DelegatingHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         WebpushrOptions? webpushrOptions;
-        var cachedOptionsJson = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "WebpushrConfig");
+        var cachedOptionsJson = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "_webpushrConfig");
         if (!string.IsNullOrEmpty(cachedOptionsJson))
         {
             webpushrOptions = JsonSerializer.Deserialize<WebpushrOptions>(cachedOptionsJson);
@@ -32,7 +32,7 @@ public class WebpushrAuthHandler : DelegatingHandler
         {
             webpushrOptions = await _apiClient.Webpushr.Config.GetAsync();
             var optionsJson = JsonSerializer.Serialize(webpushrOptions);
-            await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "WebpushrConfig", optionsJson);
+            await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "_webpushrConfig", optionsJson);
         }
         request.Headers.Clear();
         request.Headers.Add("webpushrKey", webpushrOptions?.ApiKey);
