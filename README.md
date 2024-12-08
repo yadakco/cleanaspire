@@ -40,7 +40,12 @@ With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAsp
 7. **Cloud-Ready with Docker**  
    - Preconfigured for Docker, enabling easy deployment to cloud platforms or local environments.  
 
-8. **Integrated CI/CD Pipelines**  
+8. **Real-Time Web Push Notifications**
+   - Integrated **Webpushr** to deliver instant browser notifications.
+   - Keeps users informed and engaged with real-time updates.
+   - Fully customizable notifications with targeted delivery and analytics support.
+
+9. **Integrated CI/CD Pipelines**  
    - Includes GitHub Actions workflows for automated building, testing, and deployment.  
 
 
@@ -74,6 +79,9 @@ services:
       - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7123
       - SendGrid__ApiKey=<your API key>
       - SendGrid__DefaultFromEmail=<your email>
+      - Webpushr__Token=<your-webpushr-token>
+      - Webpushr__ApiKey=<your-webpushr-api-keys>
+      - Webpushr__PublicKey=<your-webpushr-public-key>
     ports:
       - "8019:80"
       - "8018:443"
@@ -109,6 +117,34 @@ services:
 4. **Access the Application**:
    Open your browser and go to `https://localhost:5001` to see the Blazor WebAssembly PWA in action.
 
+### How to Register and Configure Webpushr
+
+1. **Register on Webpushr**  
+   - Visit the [Webpushr website](https://www.webpushr.com/) and sign up for an account.  
+   - Complete the registration process to access your dashboard.  
+
+2. **Obtain Required Keys**  
+   - Navigate to the API configuration section in your Webpushr dashboard.  
+   - Copy the following keys:  
+     - **Token**  
+     - **API Key**  
+     - **Public Key**  
+
+3. **Add Configuration to `appsettings.json`**  
+   Add the keys obtained from Webpushr into your application configuration file as follows:  
+   ```json
+   "Webpushr": {
+       "Token": "your-webpushr-token",
+       "APIKey": "your-webpushr-api-key",
+       "PublicKey": "your-webpushr-public-key"
+   }
+   ```
+
+4. **Integrate Webpushr in the Application**  
+   - Use the `PublicKey` for initializing Webpushr on the client-side to enable browser notifications.  
+   - Use the `Token` and `API Key` securely on the server-side for API communication with Webpushr.
+
+
 ### Architecture
 
 CleanAspire is structured following the **Clean Architecture** approach, dividing the solution into distinct layers:
@@ -116,23 +152,41 @@ CleanAspire is structured following the **Clean Architecture** approach, dividin
 ```
 CleanAspire/
 │
+├── Solution Items/
+│   ├── .editorconfig
+│
 ├── src/
 │   ├── CleanAspire.Api/                # API Layer - .NET Minimal API
-│   ├── CleanAspire.Application/        # Application Layer - Business Logic
-│   ├── CleanAspire.WebAssembly/        # UI Layer - Blazor WebAssembly (PWA)
-│   ├── CleanAspire.Infrastructure/     # Infrastructure Layer - Data Access, External Services
-│   ├── CleanAspire.Domain/             # Domain Layer - Core Entities, including EF entities
+│   │   └── CleanAspire.Api.csproj
 │   ├── CleanAspire.AppHost/            # Hosting Layer - Application hosting and configuration
-│   └── CleanAspire.ServiceDefaults/    # Service Defaults - Predefined configurations for services
+│   │   └── CleanAspire.AppHost.csproj
+│   ├── CleanAspire.Application/        # Application Layer - Business Logic
+│   │   └── CleanAspire.Application.csproj
+│   ├── CleanAspire.ClientApp/          # Client App Layer - Blazor WebAssembly or other client logic
+│   │   └── CleanAspire.ClientApp.csproj
+│   ├── CleanAspire.Domain/             # Domain Layer - Core Entities, including EF entities
+│   │   └── CleanAspire.Domain.csproj
+│   ├── CleanAspire.Infrastructure/     # Infrastructure Layer - Data Access, External Services
+│   │   └── CleanAspire.Infrastructure.csproj
+│   ├── CleanAspire.ServiceDefaults/    # Service Defaults - Predefined configurations for services
+│   │   └── CleanAspire.ServiceDefaults.csproj
+│
+├── src/Migrators/
+│   ├── Migrators.MSSQL/                # SQL Server Migration Scripts
+│   │   └── Migrators.MSSQL.csproj
+│   ├── Migrators.PostgreSQL/           # PostgreSQL Migration Scripts
+│   │   └── Migrators.PostgreSQL.csproj
+│   ├── Migrators.SQLite/               # SQLite Migration Scripts
+│   │   └── Migrators.SQLite.csproj
 │
 ├── tests/
-│   ├── CleanAspire.Application.Tests/  # Unit Tests for Application Layer
-│   ├── CleanAspire.Api.Tests/          # Integration Tests for API Layer
-│   └── CleanAspire.WebAssembly.Tests/  # UI Tests for Blazor WebAssembly
+│   ├── CleanAspire.Tests/              # Unit and Integration Tests
+│   │   └── CleanAspire.Tests.csproj
 │
 ├── README.md                           # Project README
 ├── LICENSE                             # License Information
-└── CleanAspire.sln                     # Solution File for Visual Studio / VS Code
+└── CleanAspire.sln                     # Solution File
+
 ```
 
 ### Contributions
