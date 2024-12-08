@@ -67,7 +67,7 @@ With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAsp
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.45
+    image: blazordevlab/cleanaspire-api:0.0.47
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -88,7 +88,7 @@ services:
 
 
   webfrontend:
-    image: blazordevlab/cleanaspire-clientapp:0.0.45
+    image: blazordevlab/cleanaspire-clientapp:0.0.47
     ports:
       - "8016:80"
       - "8017:443"
