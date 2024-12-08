@@ -10,7 +10,7 @@
                     var webpushr = new Webpushr(JS);
                     await webpushr.SetupWebpushrAsync(ok.PublicKey!);
                 },
-                invild =>
+                invalid =>
                 {
                     Snackbar.Add(L["Invalid configuration received. Please check the Webpushr settings."], Severity.Error);
                 },
