@@ -25,7 +25,7 @@ RUN rm -rf ./*
 COPY --from=build /app/publish/wwwroot .
 
 # Copy the generated self-signed certificate and configure Nginx for HTTPS
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY src/CleanAspire.ClientApp/nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80 for HTTP traffic and 443 for HTTPS traffic
 EXPOSE 80
