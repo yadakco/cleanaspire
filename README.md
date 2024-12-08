@@ -79,6 +79,9 @@ services:
       - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7123
       - SendGrid__ApiKey=<your API key>
       - SendGrid__DefaultFromEmail=<your email>
+      - Webpushr__Token=<your-webpushr-token>
+      - Webpushr__ApiKey=<your-webpushr-api-keys>
+      - Webpushr__PublicKey=<your-webpushr-public-key>
     ports:
       - "8019:80"
       - "8018:443"

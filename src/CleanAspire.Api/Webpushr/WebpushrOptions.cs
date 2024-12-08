@@ -7,7 +7,7 @@ namespace CleanAspire.Api.Webpushr;
 public class WebpushrOptions
 {
     public static string Key = "Webpushr";
-    public string Token { get; set; }
-    public string APIKey { get; set; }
-    public string PublicKey { get; set; }
+    public string Token { get; set; } = string.Empty;
+    public string ApiKey { get; set; } = string.Empty;
+    public string PublicKey { get; set; } = string.Empty;
 }
