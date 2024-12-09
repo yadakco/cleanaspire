@@ -1,0 +1,43 @@
+﻿@inject OnlineStatusService OnlineStatusService
+
+<div class="network-status-indicator">
+    <MudTooltip Text="@statusTooltip">
+        <MudImage Src="@statusImage" Alt="Network Status" Width="15" Height="15" />
+    </MudTooltip>
+</div>
+
+@code {
+    private string statusImage = "loading.svg"; // Default loading image
+    private string statusTooltip = "Loading..."; // Default tooltip message
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize the service and JavaScript module
+        await OnlineStatusService.InitializeAsync();
+
+        // Get the current network status and update the image and tooltip
+        bool isOnline = await OnlineStatusService.GetOnlineStatusAsync();
+        UpdateStatus(isOnline);
+
+        // Subscribe to network status change events
+        OnlineStatusService.OnlineStatusChanged += UpdateStatus;
+
+        // Register the network status listener
+        await OnlineStatusService.RegisterOnlineStatusListenerAsync();
+    }
+
+    private void UpdateStatus(bool isOnline)
+    {
+        // Update the image and tooltip based on the network status
+        statusImage = isOnline ? "green-point.svg" : "red-point.svg";
+        statusTooltip = isOnline ? "Online" : "Offline";
+        InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Unsubscribe from events and dispose of resources
+        OnlineStatusService.OnlineStatusChanged -= UpdateStatus;
+        await OnlineStatusService.DisposeAsync();
+    }
+}
