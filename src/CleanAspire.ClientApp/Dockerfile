@@ -3,12 +3,15 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy the project files and restore dependencies
-COPY ["CleanAspire.ClientApp.csproj", "."]
-RUN dotnet restore "CleanAspire.ClientApp.csproj"
+COPY ["src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj", "src/CleanAspire.ClientApp/"]
+RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
+
+# Install wasm-tools for AOT
+RUN dotnet workload install wasm-tools --skip-manifest-update
 
 # Copy the entire source code and build the application in Release mode
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish /p:RunAOTCompilation=true
 
 # Stage 2: Serve the Blazor Client Application using Nginx
 FROM nginx:alpine AS final
@@ -25,7 +28,7 @@ RUN rm -rf ./*
 COPY --from=build /app/publish/wwwroot .
 
 # Copy the generated self-signed certificate and configure Nginx for HTTPS
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY src/CleanAspire.ClientApp/nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80 for HTTP traffic and 443 for HTTPS traffic
 EXPOSE 80
