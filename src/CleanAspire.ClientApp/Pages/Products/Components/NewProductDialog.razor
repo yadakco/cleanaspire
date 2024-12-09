@@ -69,22 +69,23 @@
         {
             _saving = true;
             var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PostAsync(model));
-            _saving = result.Match(
-                ok =>
+            result.Switch(
+               async ok =>
                 {
                     Snackbar.Add(L["Product created successfully!"], Severity.Success);
+                    await WebpushrService.SendNotificationAsync("New Product Launched!", $"Our new product, {ok.Name}, is now available. Click to learn more!", $"https://cleanaspire.blazorserver.com/products/edit/{ok.Id}");
                     MudDialog.Close(DialogResult.Ok(true));
-                    return false;
+                    _saving= false;
                 },
                 invalid =>
                 {
                     Snackbar.Add(L[invalid.Message ?? "Failed to create product."], Severity.Error);
-                    return false;
+                    _saving= false;
                 },
                 error =>
                 {
                     Snackbar.Add(L["Failed to create product."], Severity.Error);
-                    return false;
+                    _saving= false;
                 }
             );
         }
