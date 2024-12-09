@@ -73,7 +73,9 @@
                async ok =>
                 {
                     Snackbar.Add(L["Product created successfully!"], Severity.Success);
-                    await WebpushrService.SendNotificationAsync("New Product Launched!", $"Our new product, {ok.Name}, is now available. Click to learn more!", $"https://cleanaspire.blazorserver.com/products/edit/{ok.Id}");
+                    var baseUrl = Navigation.BaseUri.TrimEnd('/');
+                    var productUrl = $"{baseUrl}/products/edit/{ok.Id}";
+                    await WebpushrService.SendNotificationAsync("New Product Launched!", $"Our new product, {ok.Name}, is now available. Click to learn more!", $"{productUrl}");
                     MudDialog.Close(DialogResult.Ok(true));
                     _saving= false;
                 },
