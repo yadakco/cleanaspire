@@ -8,6 +8,7 @@ RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 
 # Install wasm-tools for AOT
 RUN dotnet workload install wasm-tools --skip-manifest-update
+RUN dotnet workload update
 
 # Copy the entire source code and build the application in Release mode
 COPY . .
