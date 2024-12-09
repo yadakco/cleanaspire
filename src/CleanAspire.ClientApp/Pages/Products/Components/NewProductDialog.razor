@@ -69,22 +69,25 @@
         {
             _saving = true;
             var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PostAsync(model));
-            _saving = result.Match(
-                ok =>
+            result.Switch(
+               async ok =>
                 {
                     Snackbar.Add(L["Product created successfully!"], Severity.Success);
+                    var baseUrl = Navigation.BaseUri.TrimEnd('/');
+                    var productUrl = $"{baseUrl}/products/edit/{ok.Id}";
+                    await WebpushrService.SendNotificationAsync("New Product Launched!", $"Our new product, {ok.Name}, is now available. Click to learn more!", $"{productUrl}");
                     MudDialog.Close(DialogResult.Ok(true));
-                    return false;
+                    _saving= false;
                 },
                 invalid =>
                 {
                     Snackbar.Add(L[invalid.Message ?? "Failed to create product."], Severity.Error);
-                    return false;
+                    _saving= false;
                 },
                 error =>
                 {
                     Snackbar.Add(L["Failed to create product."], Severity.Error);
-                    return false;
+                    _saving= false;
                 }
             );
         }
