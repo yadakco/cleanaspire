@@ -5,6 +5,7 @@
 using System.Text.Json;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
+using CleanAspire.ClientApp.Services.Interfaces;
 using Microsoft.JSInterop;
 
 namespace CleanAspire.ClientApp.Services;
@@ -12,27 +13,23 @@ namespace CleanAspire.ClientApp.Services;
 public class WebpushrAuthHandler : DelegatingHandler
 {
     private readonly ApiClient _apiClient;
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IStorageService _localStorage;
 
-    public WebpushrAuthHandler(ApiClient apiClient, IJSRuntime jsRuntime)
+
+    public WebpushrAuthHandler(ApiClient apiClient, IStorageService localStorage)
     {
         _apiClient = apiClient;
-        _jsRuntime = jsRuntime;
+        _localStorage = localStorage;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         WebpushrOptions? webpushrOptions;
-        var cachedOptionsJson = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "_webpushrConfig");
-        if (!string.IsNullOrEmpty(cachedOptionsJson))
-        {
-            webpushrOptions = JsonSerializer.Deserialize<WebpushrOptions>(cachedOptionsJson);
-        }
-        else
+        webpushrOptions = await _localStorage.GetItemAsync<WebpushrOptions>("_webpushrConfig");
+        if (webpushrOptions==null)
         {
             webpushrOptions = await _apiClient.Webpushr.Config.GetAsync();
-            var optionsJson = JsonSerializer.Serialize(webpushrOptions);
-            await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "_webpushrConfig", optionsJson);
+            await _localStorage.SetItemAsync("_webpushrConfig", webpushrOptions);
         }
         request.Headers.Clear();
         request.Headers.Add("webpushrKey", webpushrOptions?.ApiKey);
