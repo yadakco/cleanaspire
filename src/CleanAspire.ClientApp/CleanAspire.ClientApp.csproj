@@ -10,6 +10,9 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <RunAOTCompilation>true</RunAOTCompilation>
+        <BlazorWebAssemblyEnableLinker>true</BlazorWebAssemblyEnableLinker>
+        <PublishTrimmed>true</PublishTrimmed>
+        <WasmEnableInterpreter>true</WasmEnableInterpreter>
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
     <ItemGroup>
