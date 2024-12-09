@@ -6,9 +6,12 @@ WORKDIR /src
 COPY ["src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj", "src/CleanAspire.ClientApp/"]
 RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 
+# Install wasm-tools for AOT
+RUN dotnet workload install wasm-tools --skip-manifest-update
+
 # Copy the entire source code and build the application in Release mode
 COPY . .
-RUN dotnet publish -c Release -o /app/publish /p:RunAOTCompilation=true
+RUN dotnet publish -c Release -o /app/publish 
 
 # Stage 2: Serve the Blazor Client Application using Nginx
 FROM nginx:alpine AS final
