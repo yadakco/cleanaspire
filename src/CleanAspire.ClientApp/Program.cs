@@ -27,7 +27,7 @@ builder.Services.AddTransient<WebpushrAuthHandler>();
 builder.Services.AddSingleton<UserProfileStore>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
-builder.Services.AddSingleton(clientAppSettings);
+builder.Services.AddSingleton(clientAppSettings!);
 
 builder.Services.TryAddMudBlazor(builder.Configuration);
 
@@ -64,7 +64,7 @@ builder.Services.AddHttpClient("Webpushr", client =>
 {
     client.BaseAddress = new Uri("https://api.webpushr.com");
 }).AddHttpMessageHandler<WebpushrAuthHandler>();
-
+builder.Services.AddSingleton<WebpushrService>();
 
 builder.Services.AddSingleton<ApiClientService>();
 builder.Services.AddAuthorizationCore();

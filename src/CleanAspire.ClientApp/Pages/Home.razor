@@ -315,29 +315,7 @@
         };
 
         var selected = titlesAndMessages[random.Next(titlesAndMessages.Length)];
-        var client = HttpClientFactory.CreateClient("Webpushr");
-        try
-        {
-            string payload = $@"{{
-                ""title"": ""{selected.Title}"",
-                ""message"": ""{selected.Message}"",
-                ""target_url"": ""https://github.com/neozhu/cleanaspire"",
-                ""icon"":""icon-192.png""
-            }}";
-            HttpContent httpContent = new StringContent(payload, Encoding.UTF8);
-            httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var httpResponseMessage = await client.PostAsync("/v1/notification/send/all", httpContent).ConfigureAwait(false);
-            string resp = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            httpContent.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            client.Dispose();
-
-        }
-        client.Dispose();
+        await WebpushrService.SendNotificationAsync(selected.Title, selected.Message, "https://github.com/neozhu/cleanaspire");
     }
 
 
