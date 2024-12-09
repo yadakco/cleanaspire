@@ -14,12 +14,17 @@ using CleanAspire.Api.Endpoints;
 using CleanAspire.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http.Features;
 using CleanAspire.Api.ExceptionHandlers;
+using CleanAspire.Api.Webpushr;
+using System.Net.Http;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.RegisterSerilog();
+
+builder.Services.Configure<WebpushrOptions>(builder.Configuration.GetSection(WebpushrOptions.Key));
+
 
 
 builder.Services.AddApplication();
