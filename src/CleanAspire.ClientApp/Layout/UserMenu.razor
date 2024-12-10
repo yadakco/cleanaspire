@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject IIdentityManagement IdentityManagement
 @inject OnlineStatusService OnlineStatusService
-
+@inject LayoutService LayoutService
 <MudMenu Class="ml-1" PositionAtCursor="false" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.BottomLeft">
     <ActivatorContent>
         <MudStack Row="true" AlignItems="AlignItems.Center">
@@ -10,7 +10,11 @@
                 <div class="avatar-container">
                     @if (_isOnline == false)
                     {
-                        <div class="rotating-border"></div>
+                        <div class="rotating-border @(LayoutService.IsDarkMode ? "dark-mode" : "light-mode")"></div>
+                    }
+                    else
+                    {
+                        <div class="online-border @(LayoutService.IsDarkMode ? "dark-mode" : "light-mode")"></div>
                     }
                     @if (string.IsNullOrEmpty(userModel?.AvatarUrl))
                     {

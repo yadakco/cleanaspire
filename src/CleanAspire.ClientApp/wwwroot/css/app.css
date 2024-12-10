@@ -148,27 +148,81 @@
 
 .avatar-container {
     position: relative;
-    width: 40px; /* 容器宽度，与头像一致 */
-    height: 40px; /* 容器高度，与头像一致 */
+    width: 40px; /* Fixed container width, same as avatar */
+    height: 40px; /* Fixed container height, same as avatar */
 }
 
+/* Red rotating border (common style) */
 .rotating-border {
     position: absolute;
-    top: -4px; /* 向外扩展4px */
-    left: -4px; /* 向外扩展4px */
-    width: 48px; /* 光圈的宽度比头像大 */
-    height: 48px; /* 光圈的高度比头像大 */
-    border: 3px solid transparent; /* 默认透明 */
-    border-top: 3px solid rgba(255, 0, 0, 0.8); /* 红色旋转边框 */
-    border-radius: 50%; /* 圆形光圈 */
-    animation: spin 2s linear infinite; /* 旋转动画 */
-    z-index: 1; /* 在头像下方 */
+    top: -4px;
+    left: -4px;
+    width: 48px;
+    height: 48px;
+    border: 3px solid transparent; /* Default transparent */
+    border-radius: 50%;
+    animation: spin 2s linear infinite; /* Rotating animation */
+    z-index: 1;
     box-sizing: border-box;
+}
+
+    /* Red border in dark mode */
+    .rotating-border.dark-mode {
+        border-top: 3px solid rgba(255, 0, 0, 0.8); /* Dark red border */
+        box-shadow: 0 0 8px rgba(255, 0, 0, 0.6), 0 0 12px rgba(255, 50, 50, 0.4); /* Enhanced shadow */
+    }
+
+    /* Red border in light mode */
+    .rotating-border.light-mode {
+        border-top: 3px solid rgba(255, 50, 50, 0.8); /* Light red border */
+        box-shadow: 0 0 6px rgba(255, 50, 50, 0.5), 0 0 10px rgba(255, 100, 100, 0.3); /* Soft shadow */
+    }
+
+/* Dynamic green border (common style) */
+.online-border {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    animation: green-pulse 2s infinite; /* Breathing animation */
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+    /* Green border in dark mode */
+    .online-border.dark-mode {
+        border: 3px solid rgba(0, 128, 0, 1); /* Dark green border */
+        box-shadow: 0 0 8px rgba(0, 128, 0, 0.6), 0 0 12px rgba(0, 255, 0, 0.4);
+    }
+
+    /* Green border in light mode */
+    .online-border.light-mode {
+        border: 3px solid rgba(0, 200, 0, 1); /* Light green border */
+        box-shadow: 0 0 6px rgba(0, 200, 0, 0.5), 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+/* Breathing animation */
+@keyframes green-pulse {
+    0% {
+        box-shadow: 0 0 8px rgba(0, 128, 0, 0.6), 0 0 12px rgba(0, 255, 0, 0.4);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 10px rgba(0, 128, 0, 0.8), 0 0 14px rgba(0, 255, 0, 0.5);
+        transform: scale(1.03); /* Reduce scaling amplitude */
+    }
+
+    100% {
+        box-shadow: 0 0 8px rgba(0, 128, 0, 0.6), 0 0 12px rgba(0, 255, 0, 0.4);
+        transform: scale(1);
+    }
 }
 
 MudAvatar {
     position: relative;
-    z-index: 2; /* 确保头像在光圈上方 */
+    z-index: 2; /* Ensure avatar is above the border */
 }
 
 @keyframes spin {
@@ -179,11 +233,6 @@ MudAvatar {
     to {
         transform: rotate(360deg);
     }
-}
-
-MudAvatar {
-    position: relative;
-    z-index: 2; /* 保证头像在光圈上方 */
 }
 
 
