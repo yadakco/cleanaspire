@@ -15,6 +15,7 @@ using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Multipart;
 using CleanAspire.ClientApp.Services;
 using Microsoft.Extensions.DependencyInjection;
+using CleanAspire.ClientApp.Services.JsInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -25,6 +26,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddTransient<WebpushrAuthHandler>();
 builder.Services.AddSingleton<UserProfileStore>();
+builder.Services.AddSingleton<OnlineStatusService>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings!);
