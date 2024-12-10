@@ -65,7 +65,7 @@ public class Theme
             PaletteDark = new()
             {
                 // **Primary Colors**
-                Primary = "#bd93ff", // Deep blue, used for highlights and key elements
+                Primary = "#8a2be2", // Deep blue, used for highlights and key elements
                 Secondary = "#B0BEC5", // Light gray, secondary text color
 
                 // **Background and Surface**
