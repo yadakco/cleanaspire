@@ -3,17 +3,22 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.Json;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
+using CleanAspire.ClientApp.Services.IndexDb;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Kiota.Abstractions;
+using Tavenem.Blazor.IndexedDB;
 
 namespace CleanAspire.ClientApp.Services.Identity;
 
-public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileStore profileStore) : AuthenticationStateProvider, IIdentityManagement
+public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileStore profileStore, IServiceProvider serviceProvider) : AuthenticationStateProvider, IIdentityManagement
 {
+    private string _profileStoreName = "userProfile";
+    private string _tokenStoreName = "accessToken";
     private bool authenticated = false;
     private readonly ClaimsPrincipal unauthenticated = new(new ClaimsIdentity());
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -53,7 +58,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         return new AuthenticationState(user);
     }
 
-    public async Task<AccessTokenResponse> LoginAsync(LoginRequest request, bool remember = false, CancellationToken cancellationToken = default)
+    public async Task<AccessTokenResponse> LoginAsync(LoginRequest request, bool enableOffline, bool remember = true, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -63,6 +68,12 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                  options.QueryParameters.UseCookies = remember;
                  options.QueryParameters.UseSessionCookies = !remember;
              }, cancellationToken);
+
+            var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>("CleanAspire.IndexedDB");
+            await indexedDb[_tokenStoreName].StoreItemAsync(new LocalAccessTokenResponse() { AccessToken = request.Email, ExpiresIn = int.MaxValue, RefreshToken = request.Email, TokenType ="Email" });
+
+            var l = indexedDb[_tokenStoreName].GetAllAsync<LocalAccessTokenResponse>();
+            var x = await indexedDb[_tokenStoreName].Query<LocalAccessTokenResponse>().ToListAsync();
             // need to refresh auth state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
             return response ?? new AccessTokenResponse();
@@ -71,6 +82,9 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         {
             throw; // Re-throwing the exception without changing the stack information
         }
+        catch (Exception ex) {
+            throw;
+            }
     }
 
     public async Task LogoutAsync(CancellationToken cancellationToken = default)

@@ -87,6 +87,8 @@ builder.Services.AddScoped(
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+builder.Services.AddIndexedDbService(builder.Configuration);
+
 var app = builder.Build();
 
 

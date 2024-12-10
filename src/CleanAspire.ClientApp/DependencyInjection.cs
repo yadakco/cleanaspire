@@ -5,11 +5,16 @@ using Blazored.LocalStorage;
 using CleanAspire.ClientApp.Services.Interfaces;
 using CleanAspire.ClientApp.Services.UserPreferences;
 using CleanAspire.ClientApp.Services;
+using System.Text.Json;
+using CleanAspire.ClientApp.Services.IndexDb;
+using System.Text.Json.Serialization.Metadata;
+using CleanAspire.Api.Client.Models;
+using System.Text.Json.Serialization;
+using Tavenem.DataStorage;
 namespace CleanAspire.ClientApp;
 
 public static class DependencyInjection
 {
-     
     public static void TryAddMudBlazor(this IServiceCollection services, IConfiguration config)
     {
         #region register MudBlazor.Services
@@ -43,6 +48,32 @@ public static class DependencyInjection
         services.AddScoped<DialogServiceHelper>();
         #endregion
     }
- 
+
+    public static void AddIndexedDbService(this IServiceCollection services, IConfiguration config)
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        options.TypeInfoResolverChain.Add(LocalItemContext.Default.WithAddedModifier(static typeInfo =>
+        {
+            if (typeInfo.Type == typeof(IIdItem))
+            {
+                typeInfo.PolymorphismOptions ??= new JsonPolymorphismOptions
+                {
+                    IgnoreUnrecognizedTypeDiscriminators = true,
+                    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor,
+                };
+                typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalAccessTokenResponse), LocalAccessTokenResponse.ItemTypeName));
+                typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalProfileResponse), LocalProfileResponse.ItemTypeName));
+            }
+             
+        }));
+
+        services.AddIndexedDbService();
+        services.AddIndexedDb(
+            "CleanAspire.IndexedDB",
+            1,
+            options);
+    }
+
+
 }
 

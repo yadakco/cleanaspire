@@ -23,9 +23,13 @@
                 </MudTextField>
                 <MudTextField InputType="@PasswordInput" @bind-Value="model.Password" For="@(() => model.Password)" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonPasswordClick" AdornmentAriaLabel="Show Password"></MudTextField>
                 <div class="d-flex flex-row align-center justify-space-between">
-                    <MudCheckBox T="bool" @bind-Value="model.RememberMe">@L["remember me"]</MudCheckBox>
-                    <MudLink Href="/account/forgetpassword">@L["forget password?"]</MudLink>
+                    <!-- Enable Offline Access -->
+                    <MudCheckBox T="bool" @bind-Value="model.EnableOfflineAccess" Color="Color.Primary">
+                        @L["Enable offline access"]
+                    </MudCheckBox>
+                    <MudLink Href="/account/forgetpassword">@L["Forget password?"]</MudLink>
                 </div>
+               
                 <MudButton ButtonType="ButtonType.Submit" FullWidth="true" Color="Color.Primary" >@L["Sign In"]</MudButton>
             </div>
         </EditForm>
@@ -79,13 +83,22 @@
 
     public class SignInModel
     {
-        [Required]
+        [Required(ErrorMessage = "Username is required.")]
         public string Username { get; set; } = string.Empty;
-        [Required]
-        [StringLength(30, ErrorMessage = "Password must be at least 6 characters long.", MinimumLength = 6)]
-        [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{6,}$", ErrorMessage = "Password must be at least 6 characters long and contain at least one letter, one number, and one special character.")]
+
+        [Required(ErrorMessage = "Password is required.")]
+        [StringLength(30, ErrorMessage = "Password must be between 6 and 30 characters long.", MinimumLength = 6)]
+        [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{6,}$", ErrorMessage = "Password must contain at least one letter, one number, and one special character.")]
         public string Password { get; set; } = string.Empty;
+
+        [Display(Name = "Remember Me")]
         public bool RememberMe { get; set; } = true;
+
+        /// <summary>
+        /// Indicates whether the user wants to enable offline access.
+        /// </summary>
+        [Display(Name = "Enable Offline Access")]
+        public bool EnableOfflineAccess { get; set; } = false;
 
     }
 }
