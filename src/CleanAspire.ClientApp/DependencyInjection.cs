@@ -61,7 +61,7 @@ public static class DependencyInjection
                     IgnoreUnrecognizedTypeDiscriminators = true,
                     UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor,
                 };
-                typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalAccessTokenResponse), LocalAccessTokenResponse.ItemTypeName));
+                typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalCredential), LocalCredential.ItemTypeName));
                 typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalProfileResponse), LocalProfileResponse.ItemTypeName));
             }
         }));

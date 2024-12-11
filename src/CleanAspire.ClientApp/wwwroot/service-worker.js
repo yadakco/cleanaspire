@@ -6,7 +6,7 @@ const CACHE_NAME = 'cache-v1';
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll([]);
+            return cache.addAll(['_content/Tavenem.Blazor.IndexedDB/tavenem-indexeddb.js']);
         })
     );
 });

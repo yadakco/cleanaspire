@@ -9,7 +9,7 @@ namespace CleanAspire.ClientApp.Services.IndexDb;
 
 [JsonSerializable(typeof(IIdItem))]
 [JsonSerializable(typeof(LocalProfileResponse))]
-[JsonSerializable(typeof(LocalAccessTokenResponse))]
+[JsonSerializable(typeof(LocalCredential))]
 public partial class LocalItemContext : JsonSerializerContext
 {
     public const string STORENAME = "LocalItemStore";
@@ -39,7 +39,7 @@ public class LocalProfileResponse : IdItem
     public string? SuperiorId { get; init; }
 }
 
-public class LocalAccessTokenResponse : IdItem
+public class LocalCredential : IdItem
 {
     [JsonInclude]
     [JsonPropertyOrder(-1)]
@@ -48,10 +48,10 @@ public class LocalAccessTokenResponse : IdItem
         get => ItemTypeName;
         set { }
     }
-    public const string ItemTypeName = ":LocalAccessTokenResponse:";
-    [JsonInclude] public string? AccessToken { get; set; }
-    [JsonInclude] public long? ExpiresIn { get; set; }
-    [JsonInclude] public string? RefreshToken { get; set; }
-    [JsonInclude] public string? TokenType { get; set; }
+    public const string ItemTypeName = ":LocalCredential:";
+    public string? AccessToken { get; set; }
+    public long? ExpiresIn { get; set; }
+    public string? RefreshToken { get; set; }
+    public string? TokenType { get; set; }
 }
 

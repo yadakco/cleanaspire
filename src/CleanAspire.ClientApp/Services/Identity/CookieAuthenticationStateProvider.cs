@@ -22,6 +22,8 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
     {
         var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>(LocalItemContext.DATABASENAME);
         var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
+        var offlineState = serviceProvider.GetRequiredService<OfflineModeState>();
+        bool enableOffline = offlineState.Enabled;
         authenticated = false;
         // default to not authenticated
         var user = unauthenticated;
@@ -34,7 +36,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                 // the user info endpoint is secured, so if the user isn't logged in this will fail
                 profileResponse = await apiClient.Account.Profile.GetAsync();
                 // store the profile to indexedDB
-                if (profileResponse != null)
+                if (profileResponse != null && enableOffline)
                 {
                     var exists = await indexedDb[LocalItemContext.STORENAME].Query<LocalProfileResponse>().AnyAsync(x => x.UserId == profileResponse.UserId);
                     if (!exists)
@@ -55,7 +57,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                     }
                 }
             }
-            else
+            else if (enableOffline)
             {
                 var localProfile = await indexedDb[LocalItemContext.STORENAME].Query<LocalProfileResponse>().FirstOrDefaultAsync();
                 if (localProfile != null)
@@ -105,26 +107,26 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
     {
         var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>("CleanAspire.IndexedDB");
         var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
-        bool enableOffline = true;
+        var offlineState = serviceProvider.GetRequiredService<OfflineModeState>();
+        bool offlineModel = offlineState.Enabled;
         try
         {
             var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
-            if (enableOffline)
+            if (isOnline)
             {
-                if (isOnline)
+                // Online login
+                var response = await apiClient.Login.PostAsync(request, options =>
                 {
-                    // Online login
-                    var response = await apiClient.Login.PostAsync(request, options =>
-                    {
-                        options.QueryParameters.UseCookies = remember;
-                        options.QueryParameters.UseSessionCookies = !remember;
-                    }, cancellationToken);
-
+                    options.QueryParameters.UseCookies = remember;
+                    options.QueryParameters.UseSessionCookies = !remember;
+                }, cancellationToken);
+                if (offlineModel)
+                {
                     // Store response in IndexedDB for offline access
-                    var exists = await indexedDb[LocalItemContext.STORENAME].Query<LocalAccessTokenResponse>().AnyAsync(x => x.AccessToken == request.Email);
+                    var exists = await indexedDb[LocalItemContext.STORENAME].Query<LocalCredential>().AnyAsync(x => x.AccessToken == request.Email);
                     if (!exists)
                     {
-                        await indexedDb[LocalItemContext.STORENAME].StoreItemAsync(new LocalAccessTokenResponse()
+                        await indexedDb[LocalItemContext.STORENAME].StoreItemAsync(new LocalCredential()
                         {
                             AccessToken = request.Email,
                             ExpiresIn = int.MaxValue,
@@ -133,30 +135,18 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                         });
                     }
                 }
-                else
-                {
-                    // Offline login logic
-                    var storedToken = await indexedDb[LocalItemContext.STORENAME]
-                        .Query<LocalAccessTokenResponse>()
-                        .FirstOrDefaultAsync(x => x.AccessToken == request.Email);
-
-                    if (storedToken == null)
-                    {
-                        throw new InvalidOperationException("No offline data available for the provided email.");
-                    }
-                }
             }
-            else
+            else if (offlineModel)
             {
-                // Online-only login
-                var response = await apiClient.Login.PostAsync(request, options =>
-                {
-                    options.QueryParameters.UseCookies = remember;
-                    options.QueryParameters.UseSessionCookies = !remember;
-                }, cancellationToken);
+                // Offline login logic
+                var storedToken = await indexedDb[LocalItemContext.STORENAME]
+                    .Query<LocalCredential>()
+                    .FirstOrDefaultAsync(x => x.AccessToken == request.Email);
 
-                // Clear offline data for security
-                await indexedDb[LocalItemContext.STORENAME].ClearAsync();
+                if (storedToken == null)
+                {
+                    throw new InvalidOperationException("No offline data available for the provided email.");
+                }
             }
             // Refresh authentication state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
