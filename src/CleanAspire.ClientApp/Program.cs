@@ -26,7 +26,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddTransient<WebpushrAuthHandler>();
 builder.Services.AddSingleton<UserProfileStore>();
-builder.Services.AddSingleton<OnlineStatusService>();
+builder.Services.AddSingleton<OnlineStatusInterop>();
+builder.Services.AddSingleton<OfflineModeState>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings!);

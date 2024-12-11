@@ -1,7 +1,7 @@
 ﻿@using CleanAspire.ClientApp.Services.Identity
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ISignInManagement IdentityManagement
-@inject OnlineStatusService OnlineStatusService
+@inject OnlineStatusInterop OnlineStatusInterop
 @inject LayoutService LayoutService
 <MudMenu Class="ml-1" PositionAtCursor="false" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.BottomLeft">
     <ActivatorContent>
@@ -75,10 +75,10 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        bool isOnline = await OnlineStatusService.GetOnlineStatusAsync();
+        bool isOnline = await OnlineStatusInterop.GetOnlineStatusAsync();
         UpdateStatus(isOnline);
-        OnlineStatusService.OnlineStatusChanged += UpdateStatus;
-        await OnlineStatusService.RegisterOnlineStatusListenerAsync();
+        OnlineStatusInterop.OnlineStatusChanged += UpdateStatus;
+        await OnlineStatusInterop.RegisterOnlineStatusListenerAsync();
     }
     private void UpdateStatus(bool isOnline)
     {
@@ -91,7 +91,7 @@
     public async ValueTask DisposeAsync()
     {
         // Unsubscribe from events and dispose of resources
-        OnlineStatusService.OnlineStatusChanged -= UpdateStatus;
-        await OnlineStatusService.DisposeAsync();
+        OnlineStatusInterop.OnlineStatusChanged -= UpdateStatus;
+        await OnlineStatusInterop.DisposeAsync();
     }
 }

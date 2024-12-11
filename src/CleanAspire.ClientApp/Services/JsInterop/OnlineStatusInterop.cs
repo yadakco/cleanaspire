@@ -9,15 +9,15 @@ using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
-public class OnlineStatusService : IAsyncDisposable
+public class OnlineStatusInterop : IAsyncDisposable
 {
     private readonly IJSRuntime _jsRuntime;
     private IJSObjectReference? _jsModule;
-    private DotNetObjectReference<OnlineStatusService>? _dotNetRef;
+    private DotNetObjectReference<OnlineStatusInterop>? _dotNetRef;
 
     public event Action<bool>? OnlineStatusChanged;
 
-    public OnlineStatusService(IJSRuntime jsRuntime)
+    public OnlineStatusInterop(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
     }

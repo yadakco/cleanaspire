@@ -1,4 +1,5 @@
-﻿<div class="d-flex flex-column gap-2">
+﻿@inject OfflineModeState OfflineModeState
+<div class="d-flex flex-column gap-2">
     <MudText Typo="Typo.h4">@L["Offline Mode"]</MudText>
     <MudDivider />
     <MudAlert Severity="Severity.Warning">
@@ -21,11 +22,30 @@
                 <MudText Typo="Typo.body1" Color="Color.Primary">
                     @L["Enable Offline Mode"]
                 </MudText>
-                <MudSwitch Value="@IsOfflineModeEnabled" Color="Color.Primary" />
+                <MudSwitch T="bool" Value="@OfflineModeState.Enabled" Color="Color.Primary" ValueChanged="ValueChanged" />
             </div>
         </MudCardContent>
     </MudCard>
 </div>
 @code{
-    private bool IsOfflineModeEnabled { get; set; }
+    protected override Task OnInitializedAsync()
+    {
+        OfflineModeState.OnChange += UpdateStatus;
+        return base.OnInitializedAsync();
+    }
+    private async Task ValueChanged(bool value)
+    {
+        await OfflineModeState.SetOfflineModeAsync(value);
+    }
+    private async Task UpdateStatus()
+    {
+        await InvokeAsync(StateHasChanged);
+        
+    }
+    public ValueTask DisposeAsync()
+    {
+        // Unsubscribe from events and dispose of resources
+        OfflineModeState.OnChange -= UpdateStatus;
+        return ValueTask.CompletedTask;
+    }
 }

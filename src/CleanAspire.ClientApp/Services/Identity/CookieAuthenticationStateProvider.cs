@@ -21,14 +21,14 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>(LocalItemContext.DATABASENAME);
-        var onlineStatusService = serviceProvider.GetRequiredService<OnlineStatusService>();
+        var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
         authenticated = false;
         // default to not authenticated
         var user = unauthenticated;
         ProfileResponse? profileResponse = null;
         try
         {
-            var isOnline = await onlineStatusService.GetOnlineStatusAsync();
+            var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
             if (isOnline)
             {
                 // the user info endpoint is secured, so if the user isn't logged in this will fail
@@ -104,11 +104,11 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
     public async Task LoginAsync(LoginRequest request, bool remember = true, CancellationToken cancellationToken = default)
     {
         var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>("CleanAspire.IndexedDB");
-        var onlineStatusService = serviceProvider.GetRequiredService<OnlineStatusService>();
+        var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
         bool enableOffline = true;
         try
         {
-            var isOnline = await onlineStatusService.GetOnlineStatusAsync();
+            var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
             if (enableOffline)
             {
                 if (isOnline)
