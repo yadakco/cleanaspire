@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject OnlineStatusService OnlineStatusService
 <PageTitle>@L[AppSettings.AppName]</PageTitle>
 
 <MudRTLProvider RightToLeft="@LayoutService.IsRTL">
@@ -15,13 +15,13 @@
     public LayoutService LayoutService { get; set; } = default!;
     private MudThemeProvider _mudThemeProvider=default!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (LayoutService != null)
         {
             LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccured;
         }
-        base.OnInitialized();
+        await OnlineStatusService.InitializeAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

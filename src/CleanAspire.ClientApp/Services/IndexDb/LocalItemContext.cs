@@ -12,7 +12,8 @@ namespace CleanAspire.ClientApp.Services.IndexDb;
 [JsonSerializable(typeof(LocalAccessTokenResponse))]
 public partial class LocalItemContext : JsonSerializerContext
 {
-    public const string StoreName = "LocalItemStore";
+    public const string STORENAME = "LocalItemStore";
+    public const string DATABASENAME = "CleanAspire.IndexedDB";
 }
 
 
@@ -33,7 +34,6 @@ public class LocalProfileResponse : IdItem
     public required string UserId { get; init; }
     public required string Username { get; init; }
     public required string Email { get; init; }
-    public required bool IsEmailConfirmed { get; init; }
     public string? TimeZoneId { get; init; }
     public string? LanguageCode { get; init; }
     public string? SuperiorId { get; init; }

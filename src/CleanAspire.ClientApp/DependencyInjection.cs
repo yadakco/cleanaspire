@@ -64,12 +64,11 @@ public static class DependencyInjection
                 typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalAccessTokenResponse), LocalAccessTokenResponse.ItemTypeName));
                 typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(LocalProfileResponse), LocalProfileResponse.ItemTypeName));
             }
-             
         }));
 
         services.AddIndexedDbService();
         services.AddIndexedDb(
-            "CleanAspire.IndexedDB",
+            LocalItemContext.DATABASENAME,
             1,
             options);
     }

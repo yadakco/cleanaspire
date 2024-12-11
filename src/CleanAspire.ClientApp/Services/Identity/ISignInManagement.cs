@@ -6,10 +6,9 @@ using CleanAspire.Api.Client.Models;
 
 namespace CleanAspire.ClientApp.Services.Identity;
 
-public interface IIdentityManagement
+public interface ISignInManagement
 {
-    public Task<AccessTokenResponse> LoginAsync(LoginRequest request,bool enableOffline,bool remember=true, CancellationToken cancellationToken = default);
+    public Task LoginAsync(LoginRequest request,bool enableOffline,bool remember=true, CancellationToken cancellationToken = default);
     public Task LogoutAsync(CancellationToken cancellationToken = default);
-    public Task<Stream> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
 }
 

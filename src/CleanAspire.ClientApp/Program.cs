@@ -82,7 +82,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStat
 
 // register the account management interface
 builder.Services.AddScoped(
-    sp => (IIdentityManagement)sp.GetRequiredService<AuthenticationStateProvider>());
+    sp => (ISignInManagement)sp.GetRequiredService<AuthenticationStateProvider>());
 
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
