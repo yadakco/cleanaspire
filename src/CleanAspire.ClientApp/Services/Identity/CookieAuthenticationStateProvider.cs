@@ -2,10 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
-using System.Text.Json;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.IndexDb;
@@ -104,10 +101,11 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         return new AuthenticationState(user);
     }
 
-    public async Task LoginAsync(LoginRequest request, bool enableOffline, bool remember = true, CancellationToken cancellationToken = default)
+    public async Task LoginAsync(LoginRequest request, bool remember = true, CancellationToken cancellationToken = default)
     {
         var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>("CleanAspire.IndexedDB");
         var onlineStatusService = serviceProvider.GetRequiredService<OnlineStatusService>();
+        bool enableOffline = true;
         try
         {
             var isOnline = await onlineStatusService.GetOnlineStatusAsync();

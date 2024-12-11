@@ -8,7 +8,7 @@ namespace CleanAspire.ClientApp.Services.Identity;
 
 public interface ISignInManagement
 {
-    public Task LoginAsync(LoginRequest request,bool enableOffline,bool remember=true, CancellationToken cancellationToken = default);
+    public Task LoginAsync(LoginRequest request,bool remember=true, CancellationToken cancellationToken = default);
     public Task LogoutAsync(CancellationToken cancellationToken = default);
 }
 

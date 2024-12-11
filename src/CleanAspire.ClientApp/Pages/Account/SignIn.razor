@@ -1,5 +1,5 @@
 ﻿@page "/account/signin"
-@inject ISignInManagement IdentityManagement
+@inject ISignInManagement SignInManagement
 @using System.ComponentModel.DataAnnotations
 @using CleanAspire.ClientApp.Services.Identity
 <PageTitle>@L["Sign In"]</PageTitle>
@@ -18,25 +18,15 @@
             <DataAnnotationsValidator />
             <div class="d-flex flex-column gap-2">
                 <MudTextField @bind-Value="model.Username" For="@(() => model.Username)"
-                Label="@L["User name"]" Placeholder="@L["User name"]"
-                Required="true" RequiredError="@L["user name is required"]">
+                              Label="@L["User name"]" Placeholder="@L["User name"]"
+                              Required="true" RequiredError="@L["user name is required"]">
                 </MudTextField>
                 <MudTextField InputType="@PasswordInput" @bind-Value="model.Password" For="@(() => model.Password)" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonPasswordClick" AdornmentAriaLabel="Show Password"></MudTextField>
                 <div class="d-flex flex-row align-center justify-space-between">
-                    @if (displayMode == "browser")
-                    {
-                        <!-- Remember me -->
-                        <MudCheckBox T="bool" @bind-Value="model.RememberMe" Color="Color.Default">
-                            @L["Remember me"]
-                        </MudCheckBox>
-                    }
-                    else
-                    {
-                        <!-- Enable Offline Access -->
-                        <MudCheckBox T="bool" @bind-Value="model.EnableOfflineAccess" Color="Color.Primary">
-                            @L["Enable offline access"]
-                        </MudCheckBox>
-                    }
+                    <!-- Remember me -->
+                    <MudCheckBox T="bool" @bind-Value="model.RememberMe" Color="Color.Default">
+                        @L["Remember me"]
+                    </MudCheckBox>
                     <MudLink Href="/account/forgetpassword">@L["Forget password?"]</MudLink>
                 </div>
 
@@ -59,17 +49,13 @@
     bool isShow;
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-    string displayMode = "browser";
-    protected override async Task OnInitializedAsync()
-    {
-        displayMode = "standalone";// await (new DisplayModeInterop(JS)).GetDisplayModeAsync();
-    }
+
 
     private async Task OnValidSubmit(EditContext context)
     {
         try
         {
-            await IdentityManagement.LoginAsync(new Api.Client.Models.LoginRequest() { Email = model.Username, Password = model.Password }, model.EnableOfflineAccess, model.RememberMe);
+            await SignInManagement.LoginAsync(new Api.Client.Models.LoginRequest() { Email = model.Username, Password = model.Password }, model.RememberMe);
             StateHasChanged();
         }
         catch (Exception e)
@@ -108,12 +94,5 @@
 
         [Display(Name = "Remember Me")]
         public bool RememberMe { get; set; } = true;
-
-        /// <summary>
-        /// Indicates whether the user wants to enable offline access.
-        /// </summary>
-        [Display(Name = "Enable Offline Access")]
-        public bool EnableOfflineAccess { get; set; } = false;
-
     }
 }
