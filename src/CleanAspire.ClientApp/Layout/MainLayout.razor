@@ -22,7 +22,7 @@
         {
             LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccured;
         }
-        await OnlineStatusInterop.InitializeAsync();
+        OnlineStatusInterop.Initialize();
         await OfflineModeState.InitializeAsync();
     }
 

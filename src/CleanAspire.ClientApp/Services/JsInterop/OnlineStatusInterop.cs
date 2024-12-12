@@ -9,39 +9,21 @@ using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
-public class OnlineStatusInterop : IAsyncDisposable
+public class OnlineStatusInterop(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    private readonly IJSRuntime _jsRuntime;
-    private IJSObjectReference? _jsModule;
     private DotNetObjectReference<OnlineStatusInterop>? _dotNetRef;
 
     public event Action<bool>? OnlineStatusChanged;
 
-    public OnlineStatusInterop(IJSRuntime jsRuntime)
+    public void Initialize()
     {
-        _jsRuntime = jsRuntime;
-    }
-    public async Task InitializeAsync()
-    {
-        _jsModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/onlinestatus.js");
         _dotNetRef = DotNetObjectReference.Create(this);
+        jsRuntime.InvokeVoidAsync("onlineStatusInterop.addOnlineStatusListener", _dotNetRef);
     }
 
     public async Task<bool> GetOnlineStatusAsync()
     {
-        if (_jsModule == null)
-        {
-            throw new InvalidOperationException("JavaScript module is not initialized. Call InitializeAsync first.");
-        }
-        return await _jsModule.InvokeAsync<bool>("getOnlineStatus");
-    }
-    public async Task RegisterOnlineStatusListenerAsync()
-    {
-        if (_jsModule == null)
-        {
-            throw new InvalidOperationException("JavaScript module is not initialized. Call InitializeAsync first.");
-        }
-        await _jsModule.InvokeVoidAsync("addOnlineStatusListener", _dotNetRef);
+        return await jsRuntime.InvokeAsync<bool>("onlineStatusInterop.getOnlineStatus");
     }
 
     [JSInvokable]
@@ -50,15 +32,10 @@ public class OnlineStatusInterop : IAsyncDisposable
         OnlineStatusChanged?.Invoke(isOnline);
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        if (_dotNetRef != null)
-        {
-            _dotNetRef.Dispose();
-        }
-        if (_jsModule != null)
-        {
-            await _jsModule.DisposeAsync();
-        }
+        _dotNetRef?.Dispose();
+        return ValueTask.CompletedTask;
     }
 }
+
