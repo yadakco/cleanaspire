@@ -30,20 +30,6 @@ async function onInstall(event) {
 async function onActivate(event) {
     console.info('Service worker: Activate');
     const cache = await caches.open(cacheName);
-    const dynamicAssets = [
-        '/_content/Tavenem.Blazor.IndexedDB/tavenem-indexeddb.js'
-    ];
-
-    // 主动请求动态资源并缓存
-    await Promise.all(dynamicAssets.map(async (assetUrl) => {
-        try {
-            const response = await fetch(assetUrl, { cache: 'no-cache' });
-            await cache.put(assetUrl, response.clone());
-            console.info(`Service worker: Cached ${assetUrl}`);
-        } catch (err) {
-            console.warn(`Service worker: Failed to cache ${assetUrl}`, err);
-        }
-    }));
     // Delete unused caches
     const cacheKeys = await caches.keys();
     await Promise.all(cacheKeys
