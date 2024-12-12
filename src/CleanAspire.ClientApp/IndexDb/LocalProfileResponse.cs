@@ -5,17 +5,7 @@
 using System.Text.Json.Serialization;
 using Tavenem.DataStorage;
 
-namespace CleanAspire.ClientApp.Services.IndexDb;
-
-[JsonSerializable(typeof(IIdItem))]
-[JsonSerializable(typeof(LocalProfileResponse))]
-[JsonSerializable(typeof(LocalCredential))]
-public partial class LocalItemContext : JsonSerializerContext
-{
-    public const string STORENAME = "LocalItemStore";
-    public const string DATABASENAME = "CleanAspire.IndexedDB";
-}
-
+namespace CleanAspire.ClientApp.IndexDb;
 
 public class LocalProfileResponse : IdItem
 {
@@ -37,21 +27,5 @@ public class LocalProfileResponse : IdItem
     public string? TimeZoneId { get; init; }
     public string? LanguageCode { get; init; }
     public string? SuperiorId { get; init; }
-}
-
-public class LocalCredential : IdItem
-{
-    [JsonInclude]
-    [JsonPropertyOrder(-1)]
-    public override string IdItemTypeName
-    {
-        get => ItemTypeName;
-        set { }
-    }
-    public const string ItemTypeName = ":LocalCredential:";
-    public string? AccessToken { get; set; }
-    public long? ExpiresIn { get; set; }
-    public string? RefreshToken { get; set; }
-    public string? TokenType { get; set; }
 }
 

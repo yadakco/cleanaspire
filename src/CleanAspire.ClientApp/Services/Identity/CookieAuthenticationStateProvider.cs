@@ -5,7 +5,7 @@
 using System.Security.Claims;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
-using CleanAspire.ClientApp.Services.IndexDb;
+using CleanAspire.ClientApp.IndexDb;
 using CleanAspire.ClientApp.Services.JsInterop;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Kiota.Abstractions;

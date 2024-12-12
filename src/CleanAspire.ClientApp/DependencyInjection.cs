@@ -6,7 +6,7 @@ using CleanAspire.ClientApp.Services.Interfaces;
 using CleanAspire.ClientApp.Services.UserPreferences;
 using CleanAspire.ClientApp.Services;
 using System.Text.Json;
-using CleanAspire.ClientApp.Services.IndexDb;
+using CleanAspire.ClientApp.IndexDb;
 using System.Text.Json.Serialization.Metadata;
 using CleanAspire.Api.Client.Models;
 using System.Text.Json.Serialization;
