@@ -3,21 +3,9 @@
     {
         if (firstRender)
         {
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Webpushr.Config.GetAsync());
-            result.Switch(
-                async ok =>
-                {
-                    var webpushr = new Webpushr(JS);
-                    await webpushr.SetupWebpushrAsync(ok.PublicKey!);
-                },
-                invalid =>
-                {
-                    Snackbar.Add(L["Invalid configuration received. Please check the Webpushr settings."], Severity.Error);
-                },
-                error =>
-                {
-                    Snackbar.Add(L["An error occurred while fetching the Webpushr configuration. Please try again later."], Severity.Error);
-                });
+            var publicKey = await WebpushrService.GetPublicKeyAsync();
+            var webpushr = new Webpushr(JS);
+            await webpushr.SetupWebpushrAsync(publicKey!);
         }
     }
 }
