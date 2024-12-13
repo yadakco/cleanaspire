@@ -17,13 +17,13 @@ public class OfflineModeState
     {
         _storageService = storageService;
         // Initialize the OfflineModeEnabled with a default value
-        Enabled = false;
+        Enabled = true;
     }
     // Initialize the offline mode setting from localStorage
     public async Task InitializeAsync()
     {
         var storedValue = await _storageService.GetItemAsync<bool?>(OfflineModeKey);
-        Enabled = storedValue ?? false;
+        Enabled = storedValue ?? true;
     }
     // Update the OfflineModeEnabled and persist it to localStorage
     public async Task SetOfflineModeAsync(bool isEnabled)

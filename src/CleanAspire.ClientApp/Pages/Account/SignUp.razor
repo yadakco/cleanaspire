@@ -17,11 +17,11 @@
             <DataAnnotationsValidator />
             <div class="d-flex flex-column gap-2">
                 <MultiTenantAutocomplete T="TenantDto" For="(()=>model.Tenant)"
-                                         Placeholder="@L["Organization"]"
-                                         Label="@L["Select Organization"]"
-                                         Required="true"
-                                         RequiredError="@L["Organization selection is required"]"
-                                         @bind-Value="@model.Tenant">
+                Placeholder="@L["Organization"]"
+                Label="@L["Select Organization"]"
+                Required="true"
+                RequiredError="@L["Organization selection is required"]"
+                @bind-Value="@model.Tenant">
 
                 </MultiTenantAutocomplete>
                 <MudTextField @bind-Value="model.Email" For="@(() => model.Email)" Label="@L["Email"]" Placeholder="@L["Email"]" Required="true" RequiredError="@L["Email is required"]"></MudTextField>
@@ -46,7 +46,10 @@
     private async Task OnValidSubmit(EditContext context)
     {
         waiting = true;
-        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id }));
+        var result = await ApiClientService.ExecuteAsync(async () =>{
+            await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id });
+            return true;
+            });
         result.Switch(
             ok =>
             {
