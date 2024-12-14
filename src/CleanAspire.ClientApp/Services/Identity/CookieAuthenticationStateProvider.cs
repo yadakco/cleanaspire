@@ -5,22 +5,24 @@
 using System.Security.Claims;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
-using CleanAspire.ClientApp.IndexDb;
 using CleanAspire.ClientApp.Services.JsInterop;
 using Microsoft.AspNetCore.Components.Authorization;
+
+
+
 using Microsoft.Kiota.Abstractions;
-using Tavenem.Blazor.IndexedDB;
+
 
 namespace CleanAspire.ClientApp.Services.Identity;
 
 public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileStore profileStore, IServiceProvider serviceProvider) : AuthenticationStateProvider, ISignInManagement
 {
-
+    private const string CACHEKEY_CREDENTIAL = "_Credential";
     private bool authenticated = false;
     private readonly ClaimsPrincipal unauthenticated = new(new ClaimsIdentity());
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>(LocalItemContext.DATABASENAME);
+        var indexedDb = serviceProvider.GetRequiredService<IndexedDbCache>();
         var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
         var offlineState = serviceProvider.GetRequiredService<OfflineModeState>();
         bool enableOffline = offlineState.Enabled;
@@ -38,44 +40,12 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                 // store the profile to indexedDB
                 if (profileResponse != null && enableOffline)
                 {
-                    var exists = await indexedDb[LocalItemContext.STORENAME].Query<LocalProfileResponse>().AnyAsync(x => x.UserId == profileResponse.UserId);
-                    if (!exists)
-                    {
-                        await indexedDb[LocalItemContext.STORENAME].StoreItemAsync(new LocalProfileResponse()
-                        {
-                            AvatarUrl = profileResponse.AvatarUrl,
-                            Email = profileResponse.Email,
-                            LanguageCode = profileResponse.LanguageCode,
-                            Nickname = profileResponse.Nickname,
-                            Provider = profileResponse.Provider,
-                            SuperiorId = profileResponse.SuperiorId,
-                            TenantId = profileResponse.TenantId,
-                            TimeZoneId = profileResponse.TimeZoneId,
-                            UserId = profileResponse.UserId,
-                            Username = profileResponse.Username,
-                        });
-                    }
+                    await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME, CACHEKEY_CREDENTIAL, profileResponse);
                 }
             }
             else if (enableOffline)
             {
-                var localProfile = await indexedDb[LocalItemContext.STORENAME].Query<LocalProfileResponse>().FirstOrDefaultAsync();
-                if (localProfile != null)
-                {
-                    profileResponse = new ProfileResponse()
-                    {
-                        AvatarUrl = localProfile.AvatarUrl,
-                        Email = localProfile.Email,
-                        LanguageCode = localProfile.LanguageCode,
-                        Nickname = localProfile.Nickname,
-                        Provider = localProfile.Provider,
-                        SuperiorId = localProfile.SuperiorId,
-                        TenantId = localProfile.TenantId,
-                        TimeZoneId = localProfile.TimeZoneId,
-                        UserId = localProfile.UserId,
-                        Username = localProfile.Username,
-                    };
-                }
+                profileResponse = await indexedDb.GetDataAsync<ProfileResponse>(IndexedDbCache.DATABASENAME, CACHEKEY_CREDENTIAL);
             }
 
             profileStore.Set(profileResponse);
@@ -105,7 +75,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
 
     public async Task LoginAsync(LoginRequest request, bool remember = true, CancellationToken cancellationToken = default)
     {
-        var indexedDb = serviceProvider.GetRequiredKeyedService<IndexedDb>("CleanAspire.IndexedDB");
+        var indexedDb = serviceProvider.GetRequiredService<IndexedDbCache>();
         var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
         var offlineState = serviceProvider.GetRequiredService<OfflineModeState>();
         bool offlineModel = offlineState.Enabled;
@@ -123,26 +93,13 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                 if (offlineModel)
                 {
                     // Store response in IndexedDB for offline access
-                    var exists = await indexedDb[LocalItemContext.STORENAME].Query<LocalCredential>().AnyAsync(x => x.AccessToken == request.Email);
-                    if (!exists)
-                    {
-                        await indexedDb[LocalItemContext.STORENAME].StoreItemAsync(new LocalCredential()
-                        {
-                            AccessToken = request.Email,
-                            ExpiresIn = int.MaxValue,
-                            RefreshToken = request.Email,
-                            TokenType = "Email"
-                        });
-                    }
+                    await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME,request.Email!, request.Email);
                 }
             }
             else if (offlineModel)
             {
                 // Offline login logic
-                var storedToken = await indexedDb[LocalItemContext.STORENAME]
-                    .Query<LocalCredential>()
-                    .FirstOrDefaultAsync(x => x.AccessToken == request.Email);
-
+                var storedToken = await indexedDb.GetDataAsync<string>(IndexedDbCache.DATABASENAME, request.Email!);
                 if (storedToken == null)
                 {
                     throw new InvalidOperationException("No offline data available for the provided email.");

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CleanAspire.ClientApp;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary;
 using CleanAspire.ClientApp.Services.Identity;
@@ -14,8 +13,8 @@ using Microsoft.Kiota.Serialization.Text;
 using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Multipart;
 using CleanAspire.ClientApp.Services;
-using Microsoft.Extensions.DependencyInjection;
 using CleanAspire.ClientApp.Services.JsInterop;
+using CleanAspire.ClientApp.Services.Proxies;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -28,6 +27,8 @@ builder.Services.AddTransient<WebpushrAuthHandler>();
 builder.Services.AddSingleton<UserProfileStore>();
 builder.Services.AddSingleton<OnlineStatusInterop>();
 builder.Services.AddSingleton<OfflineModeState>();
+builder.Services.AddSingleton<IndexedDbCache>();
+builder.Services.AddSingleton<ProductServiceProxy>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings!);
@@ -88,10 +89,7 @@ builder.Services.AddScoped(
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-builder.Services.AddIndexedDbService(builder.Configuration);
-
 var app = builder.Build();
-
 
 
 await app.RunAsync();

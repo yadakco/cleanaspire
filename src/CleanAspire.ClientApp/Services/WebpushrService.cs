@@ -5,7 +5,6 @@
 using System.Net.Http.Headers;
 using System.Text;
 using CleanAspire.Api.Client;
-using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.Interfaces;
 
 namespace CleanAspire.ClientApp.Services;
