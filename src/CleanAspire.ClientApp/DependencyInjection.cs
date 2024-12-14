@@ -5,11 +5,11 @@ using Blazored.LocalStorage;
 using CleanAspire.ClientApp.Services.Interfaces;
 using CleanAspire.ClientApp.Services.UserPreferences;
 using CleanAspire.ClientApp.Services;
+
 namespace CleanAspire.ClientApp;
 
 public static class DependencyInjection
 {
-     
     public static void TryAddMudBlazor(this IServiceCollection services, IConfiguration config)
     {
         #region register MudBlazor.Services
@@ -43,6 +43,6 @@ public static class DependencyInjection
         services.AddScoped<DialogServiceHelper>();
         #endregion
     }
- 
+
 }
 
