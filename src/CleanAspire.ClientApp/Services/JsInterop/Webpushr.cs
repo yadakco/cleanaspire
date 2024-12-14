@@ -6,18 +6,10 @@ using Microsoft.JSInterop;
 
 namespace CleanAspire.ClientApp.Services.JsInterop;
 
-public class Webpushr
+public class Webpushr(IJSRuntime jsRuntime)
 {
-    private readonly IJSRuntime _jsRuntime;
-
-    public Webpushr(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
-
     public async Task SetupWebpushrAsync(string key)
     {
-        var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/webpushr.js");
-        await module.InvokeVoidAsync("setupWebpushr", key);
+        await jsRuntime.InvokeVoidAsync("webpushrInterop.setupWebpushr", key);
     }
 }
