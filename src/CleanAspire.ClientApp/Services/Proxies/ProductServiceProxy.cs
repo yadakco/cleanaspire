@@ -14,7 +14,8 @@ public class ProductServiceProxy(ApiClient apiClient, IndexedDbCache indexedDb, 
     public async Task<PaginatedResultOfProductDto> GetProductsAsync(ProductsWithPaginationQuery query)
     {
         var cacheKey = GenerateCacheKey(query);
-        if (await onlineStatus.GetOnlineStatusAsync())
+        var online = await onlineStatus.GetOnlineStatusAsync();
+        if (online)
         {
             var apiResult = await apiClient.Products.Pagination.PostAsync(query);
             if (apiResult != null && offlineMode.Enabled)
