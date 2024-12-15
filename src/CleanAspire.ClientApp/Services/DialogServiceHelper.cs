@@ -1,6 +1,5 @@
 ﻿using CleanAspire.ClientApp.Components;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
 using MudBlazor;
 
 namespace CleanAspire.ClientApp.Services;
