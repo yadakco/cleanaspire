@@ -155,7 +155,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 {
                     return CreateValidationProblem(result);
                 }
-                logger.LogInformation("User signup request received: {@SignupRequest}", request);
+                logger.LogInformation("User signup successful. Email: {Email}, TenantId: {TenantId}", request.Email, request.TenantId);
                 await SendConfirmationEmailAsync(user, userManager, context, request.Email);
                 return TypedResults.Created();
             })
