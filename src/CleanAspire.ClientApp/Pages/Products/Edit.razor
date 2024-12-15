@@ -8,7 +8,7 @@
 
 <PageTitle>@Title</PageTitle>
 
-<Breadcrumbs OnSaveButtonClick="Save" Saving="@(_saving || !_isOnline)" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
+<Breadcrumbs OnSaveButtonClick="Save" Saving="@_saving" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
 <MudPaper Class="pa-5">
     @if (model is not null)
     {
@@ -56,7 +56,7 @@
                     </MudTextField>
                 </MudItem>
                 <MudItem xs="12" md="12" Class="d-flex justify-end">
-                    <MudButton Disabled="@(_saving || !_isOnline)" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
+                    <MudButton Disabled="@_saving" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
                 </MudItem>
             </MudGrid>
         </MudForm>
@@ -80,7 +80,6 @@
     };
     protected override async Task OnInitializedAsync()
     {
-        _isOnline =await OnlineStatusInterop.GetOnlineStatusAsync();
         var result = await ProductServiceProxy.GetProductByIdAsync(Id);
         result.Switch(
             dto =>
@@ -105,6 +104,12 @@
     }
     private async Task Save()
     {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
         editForm?.Validate();
         if (success == true)
         {
