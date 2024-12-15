@@ -155,9 +155,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 {
                     return CreateValidationProblem(result);
                 }
-                var sanitizedEmail = request.Email.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
-                var sanitizedTenantId = request.TenantId.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
-                logger.LogInformation("User signup successful. Email: {Email}, TenantId: {TenantId}", sanitizedEmail, sanitizedTenantId);
+                logger.LogInformation("User signup successful.");
                 await SendConfirmationEmailAsync(user, userManager, context, request.Email);
                 return TypedResults.Created();
             })
