@@ -78,6 +78,7 @@ public class UploadService : IUploadService
         if (!File.Exists(path))
             return path;
 
+        path = path.Replace("{", "{{").Replace("}", "}}");
         if (Path.HasExtension(path))
             return GetNextFilename(path.Insert(path.LastIndexOf(Path.GetExtension(path)), NumberPattern));
 
