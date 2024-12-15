@@ -2,23 +2,29 @@
     // Open the database (creates it if it doesn't exist, or upgrades if needed)
     open: function (dbName = "AppDb") {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(dbName, 2); // Increment version to 2
+            const request = indexedDB.open(dbName, 3); // Increment version to 3
 
-            // Create object store if needed during database upgrade
+            // Handle database upgrades
             request.onupgradeneeded = function (event) {
                 const db = event.target.result;
+
+                let cacheStore;
+
+                // Create 'cache' store if it does not exist
                 if (!db.objectStoreNames.contains('cache')) {
-                    db.createObjectStore('cache', { keyPath: 'key' });
+                    cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
                 } else {
-                    const store = event.currentTarget.transaction.objectStore('cache');
-                    if (!store.indexNames.contains('tags')) {
-                        store.createIndex('tags', 'tags', { multiEntry: true });
-                    }
+                    cacheStore = event.currentTarget.transaction.objectStore('cache');
+                }
+
+                // Ensure 'tags' index exists
+                if (!cacheStore.indexNames.contains('tags')) {
+                    cacheStore.createIndex('tags', 'tags', { multiEntry: true });
                 }
             };
 
             request.onsuccess = function (event) {
-                resolve(event.target.result); // Resolve with the database
+                resolve(event.target.result); // Resolve with the database instance
             };
 
             request.onerror = function (event) {
@@ -47,28 +53,34 @@
     getDataByTags: function (dbName, tags) {
         return this.open(dbName).then(db => {
             return new Promise((resolve, reject) => {
-                const transaction = db.transaction('cache', 'readonly');
-                const store = transaction.objectStore('cache');
-                const index = store.index('tags');
+                const transaction = db.transaction('cache', 'readonly'); // Open a readonly transaction on 'cache'
+                const store = transaction.objectStore('cache');         // Access the 'cache' object store
+                const index = store.index('tags');                     // Access the 'tags' index
 
                 const results = [];
+                // Fetch data for each tag
                 const tagRequests = tags.map(tag => {
                     return new Promise((tagResolve, tagReject) => {
-                        const request = index.getAll(tag);
+                        const request = index.getAll(tag); // Retrieve all entries matching the tag
 
                         request.onsuccess = function (event) {
-                            results.push(...event.target.result);
+                            const entries = event.target.result;
+                            // Push key and deserialized value into the results array
+                            entries.forEach(entry => {
+                                results.push({ key: entry.key, value: entry.value });
+                            });
                             tagResolve();
                         };
 
                         request.onerror = function (event) {
-                            tagReject(event.target.error);
+                            tagReject(event.target.error); // Handle errors
                         };
                     });
                 });
 
+                // Combine results for all tags
                 Promise.all(tagRequests)
-                    .then(() => resolve(results.map(entry => ({ key: entry.key, value: JSON.parse(entry.value) }))))
+                    .then(() => resolve(results)) // Return the list of { key, value }
                     .catch(reject);
             });
         });

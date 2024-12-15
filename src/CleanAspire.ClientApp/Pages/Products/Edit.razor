@@ -3,11 +3,12 @@
 @using CleanAspire.ClientApp.Components.Breadcrumbs
 @using CleanAspire.ClientApp.Services.Proxies
 @inject ProductServiceProxy ProductServiceProxy
-@inherits MudComponentBase
+@inject OnlineStatusInterop OnlineStatusInterop
+
 
 <PageTitle>@Title</PageTitle>
 
-<Breadcrumbs OnSaveButtonClick="Save" Saving="_saving" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
+<Breadcrumbs OnSaveButtonClick="Save" Saving="@(_saving || !_isOnline)" BreadcrumbItems="_breadcrumbItems"></Breadcrumbs>
 <MudPaper Class="pa-5">
     @if (model is not null)
     {
@@ -15,47 +16,47 @@
             <MudGrid>
                 <MudItem xs="12" md="6">
                     <MudTextField @bind-Value="model.Sku" For="@(() => model.Sku)"
-                                  Label="@L["SKU"]" Placeholder="@L["SKU"]"
-                                  Required="true" RequiredError="@L["Sku is required"]">
+                    Label="@L["SKU"]" Placeholder="@L["SKU"]"
+                    Required="true" RequiredError="@L["Sku is required"]">
                     </MudTextField>
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <MudTextField @bind-Value="model.Name" For="@(() => model.Name)"
-                                  Label="@L["Name"]" Placeholder="@L["Name"]"
-                                  Required="true" RequiredError="@L["Name is required"]">
+                    Label="@L["Name"]" Placeholder="@L["Name"]"
+                    Required="true" RequiredError="@L["Name is required"]">
                     </MudTextField>
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <MudEnumSelect TEnum="NullableOfProductCategoryDto?" @bind-Value="model.Category" For="@(() => model.Category)"
-                                   Label="@L["Category"]" Placeholder="@L["Category"]"
-                                   Required="true" RequiredError="@L["Category is required"]">
+                    Label="@L["Category"]" Placeholder="@L["Category"]"
+                    Required="true" RequiredError="@L["Category is required"]">
                     </MudEnumSelect>
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <PicklistAutocomplete T="string" PickList="PicklistType.UOM" @bind-Value="model.Uom" For="@(() => model.Uom)"
-                                          Label="@L["UOM"]" Placeholder="@L["Uom"]"
-                                          Required="false" RequiredError="@L["Uom is required"]">
+                    Label="@L["UOM"]" Placeholder="@L["Uom"]"
+                    Required="false" RequiredError="@L["Uom is required"]">
                     </PicklistAutocomplete>
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <MudNumericField @bind-Value="model.Price" For="@(() => model.Price)"
-                                     Label="@L["Price"]" Placeholder="@L["Price"]"
-                                     Required="true" RequiredError="@L["Price is required"]">
+                    Label="@L["Price"]" Placeholder="@L["Price"]"
+                    Required="true" RequiredError="@L["Price is required"]">
                     </MudNumericField>
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <PicklistAutocomplete T="string" PickList="PicklistType.Currency" @bind-Value="model.Currency" For="@(() => model.Currency)"
-                                          Label="@L["Currency"]" Placeholder="@L["Currency"]"
-                                          Required="true" RequiredError="@L["Currency is required"]">
+                    Label="@L["Currency"]" Placeholder="@L["Currency"]"
+                    Required="true" RequiredError="@L["Currency is required"]">
                     </PicklistAutocomplete>
                 </MudItem>
                 <MudItem xs="12" md="12">
                     <MudTextField @bind-Value="model.Description" For="@(() => model.Description)"
-                                  Label="@L["Description"]" Placeholder="@L["Description"]">
+                    Label="@L["Description"]" Placeholder="@L["Description"]">
                     </MudTextField>
                 </MudItem>
                 <MudItem xs="12" md="12" Class="d-flex justify-end">
-                    <MudButton Disabled="@_saving" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
+                    <MudButton Disabled="@(_saving || !_isOnline)" Color="Color.Primary" OnClick="Save">@L["Save"]</MudButton>
                 </MudItem>
             </MudGrid>
         </MudForm>
@@ -67,6 +68,7 @@
     [Parameter]
     public string? Id { get; set; }
     private bool _saving;
+    private bool _isOnline = true;
     bool success;
     string[] errors = { };
     private UpdateProductCommand? model;
@@ -78,7 +80,7 @@
     };
     protected override async Task OnInitializedAsync()
     {
-        
+        _isOnline =await OnlineStatusInterop.GetOnlineStatusAsync();
         var result = await ProductServiceProxy.GetProductByIdAsync(Id);
         result.Switch(
             dto =>

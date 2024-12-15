@@ -11,76 +11,135 @@ using OneOf;
 
 namespace CleanAspire.ClientApp.Services.Proxies;
 
-public class ProductServiceProxy(ApiClient apiClient, IndexedDbCache indexedDb, OnlineStatusInterop onlineStatus, OfflineModeState offlineMode)
+public class ProductServiceProxy(ApiClient apiClient, IndexedDbCache indexedDbCache, OnlineStatusInterop onlineStatusInterop, OfflineModeState offlineModeState)
 {
-    public async Task<PaginatedResultOfProductDto> GetPaginationDataAsync(ProductsWithPaginationQuery query)
+    private const string OfflineCreateCommandCacheKey = "OfflineCreateCommand:Product";
+    public async Task<PaginatedResultOfProductDto> GetPaginatedProductsAsync(ProductsWithPaginationQuery paginationQuery)
     {
-        var cacheKey = GenerateCacheKey(query);
-        var online = await onlineStatus.GetOnlineStatusAsync();
-        if (online)
+        var cacheKey = GeneratePaginationCacheKey(paginationQuery);
+        var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
+
+        if (isOnline)
         {
-            var apiResult = await apiClient.Products.Pagination.PostAsync(query);
-            if (apiResult != null && offlineMode.Enabled)
+            var paginatedProducts = await apiClient.Products.Pagination.PostAsync(paginationQuery);
+
+            if (paginatedProducts != null && offlineModeState.Enabled)
             {
-                await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME, cacheKey, apiResult, new string[] { "product" });
-                foreach (var dto in apiResult.Items)
+                await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, cacheKey, paginatedProducts, new[] { "products_pagination" });
+
+                foreach (var productDto in paginatedProducts.Items)
                 {
-                    var productCacheKey = GenerateCacheKey(dto.Id);
-                    await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME, productCacheKey, dto, new string[] { "product" });
+                    var productCacheKey = GenerateProductCacheKey(productDto.Id);
+                    await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, productCacheKey, productDto, new[] { "product" });
                 }
             }
-            return apiResult ?? new PaginatedResultOfProductDto();
+
+            return paginatedProducts ?? new PaginatedResultOfProductDto();
         }
         else
         {
-            var cachResult = await indexedDb.GetDataAsync<PaginatedResultOfProductDto>(IndexedDbCache.DATABASENAME, cacheKey);
-            if (cachResult != null)
+            var cachedPaginatedProducts = await indexedDbCache.GetDataAsync<PaginatedResultOfProductDto>(IndexedDbCache.DATABASENAME, cacheKey);
+            if (cachedPaginatedProducts != null)
             {
-                return cachResult;
+                return cachedPaginatedProducts;
             }
         }
+
         return new PaginatedResultOfProductDto();
     }
-    public async Task<OneOf<ProductDto, KeyNotFoundException>> GetProductByIdAsync(string id)
+
+    public async Task<OneOf<ProductDto, KeyNotFoundException>> GetProductByIdAsync(string productId)
     {
-        var productCacheKey = GenerateCacheKey(id);
-        var online = await onlineStatus.GetOnlineStatusAsync();
-        if (online)
+        var productCacheKey = GenerateProductCacheKey(productId);
+        var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
+
+        if (isOnline)
         {
             try
             {
-                var product = await apiClient.Products[id].GetAsync();
-                if (product != null && offlineMode.Enabled)
+                var productDetails = await apiClient.Products[productId].GetAsync();
+                if (productDetails != null && offlineModeState.Enabled)
                 {
-                    await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME, productCacheKey, product, new string[] { "product" });
+                    await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, productCacheKey, productDetails, new[] { "product" });
                 }
-                return product!;
+                return productDetails!;
             }
             catch
             {
-                return new KeyNotFoundException($"Product with ID '{id}' could not be fetched from the API.");
+                return new KeyNotFoundException($"Product with ID '{productId}' could not be fetched from the API.");
             }
         }
         else
         {
-            var cacheProduct = await indexedDb.GetDataAsync<ProductDto>(IndexedDbCache.DATABASENAME, productCacheKey);
-            if (cacheProduct != null)
+            var cachedProductDetails = await indexedDbCache.GetDataAsync<ProductDto>(IndexedDbCache.DATABASENAME, productCacheKey);
+            if (cachedProductDetails != null)
             {
-                return cacheProduct;
+                return cachedProductDetails;
             }
             else
             {
-                return new KeyNotFoundException($"Product with ID '{id}' not found in offline cache.");
+                return new KeyNotFoundException($"Product with ID '{productId}' not found in offline cache.");
             }
         }
     }
-    private string GenerateCacheKey(ProductsWithPaginationQuery query)
+
+    public async Task<OneOf<ProductDto, ApiException>> CreateProductAsync(CreateProductCommand command)
+    {
+        var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
+        if (isOnline)
+        {
+            try
+            {
+                var response = await apiClient.Products.PostAsync(command);
+                return response;
+            }
+            catch (ApiException ex)
+            {
+                return ex;
+            }
+        }
+        else
+        {
+            var cachedCommands = await indexedDbCache.GetDataAsync<List<CreateProductCommand>>(IndexedDbCache.DATABASENAME, OfflineCreateCommandCacheKey)
+                             ?? new List<CreateProductCommand>();
+            cachedCommands.Add(command);
+            await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, OfflineCreateCommandCacheKey, cachedCommands, new[] { "product_commands" });
+            var productDto = new ProductDto()
+            {
+                Id = Guid.CreateVersion7().ToString(),
+                Category = command.Category,
+                Currency = command.Currency,
+                Description = command.Description,
+                Name = command.Name,
+                Price = command.Price,
+                Sku = command.Sku,
+                Uom = command.Uom
+            };
+            var productCacheKey = GenerateProductCacheKey(productDto.Id);
+            await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, productCacheKey, productDto, new[] { "product" });
+            var cachedPaginatedProducts = await indexedDbCache.GetDataByTagsAsync<PaginatedResultOfProductDto>(IndexedDbCache.DATABASENAME, new[] { "products_pagination" });
+            if (cachedPaginatedProducts != null && cachedPaginatedProducts.Any())
+            {
+                foreach (var dic in cachedPaginatedProducts)
+                {
+                    var key = dic.Key;
+                    var paginatedProducts = dic.Value;
+                    paginatedProducts.Items.Insert(0,productDto);
+                    paginatedProducts.TotalItems++;
+                    await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, key, paginatedProducts, new[] { "products_pagination" });
+                }
+            }
+            return productDto;
+
+        }
+    }
+    private string GeneratePaginationCacheKey(ProductsWithPaginationQuery query)
     {
         return $"{nameof(ProductsWithPaginationQuery)}:{query.PageNumber}_{query.PageSize}_{query.Keywords}_{query.OrderBy}_{query.SortDirection}";
     }
-    private string GenerateCacheKey(string id)
+    private string GenerateProductCacheKey(string productId)
     {
-        return $"{nameof(ProductDto)}:{id}";
+        return $"{nameof(ProductDto)}:{productId}";
     }
 }
 

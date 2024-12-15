@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Text.Json;
 using Microsoft.JSInterop;
 
 namespace CleanAspire.ClientApp.Services.JsInterop;
@@ -29,12 +30,23 @@ public sealed class IndexedDbCache
     }
 
     // Get all data by tags (supports array of tags)
-    public async Task<List<T>> GetDataByTagsAsync<T>(string dbName, string[] tags)
+    public async Task<Dictionary<string, T>> GetDataByTagsAsync<T>(string dbName, string[] tags)
     {
-        var results = await _jsRuntime.InvokeAsync<List<dynamic>>("indexedDbStorage.getDataByTags", dbName, tags);
-        return results.Select(result => (T)result.value).ToList();
-    }
+        // Call the JavaScript function and retrieve a list of { key, value }
+        var results = await _jsRuntime.InvokeAsync<List<Dictionary<string, object>>>(
+            "indexedDbStorage.getDataByTags", dbName, tags);
 
+        // Convert the results to a dictionary
+        return results.ToDictionary(
+            result => result["key"].ToString(), // Extract the key as a string
+            result =>
+            {
+                // Handle deserialization of 'value'
+                var jsonElement = result["value"];
+                return JsonSerializer.Deserialize<T>(jsonElement.ToString(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+        );
+    }
     // Delete specific data by key
     public async Task DeleteDataAsync(string dbName, string key)
     {
