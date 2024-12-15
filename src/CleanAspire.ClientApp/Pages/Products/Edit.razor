@@ -1,6 +1,8 @@
 ﻿@page "/products/edit/{Id}"
 @using CleanAspire.ClientApp.Components.Autocompletes
 @using CleanAspire.ClientApp.Components.Breadcrumbs
+@using CleanAspire.ClientApp.Services.Proxies
+@inject ProductServiceProxy ProductServiceProxy
 @inherits MudComponentBase
 
 <PageTitle>@Title</PageTitle>
@@ -31,8 +33,8 @@
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <PicklistAutocomplete T="string" PickList="PicklistType.UOM" @bind-Value="model.Uom" For="@(() => model.Uom)"
-                                  Label="@L["UOM"]" Placeholder="@L["Uom"]"
-                                  Required="false" RequiredError="@L["Uom is required"]">
+                                          Label="@L["UOM"]" Placeholder="@L["Uom"]"
+                                          Required="false" RequiredError="@L["Uom is required"]">
                     </PicklistAutocomplete>
                 </MudItem>
                 <MudItem xs="12" md="6">
@@ -43,8 +45,8 @@
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <PicklistAutocomplete T="string" PickList="PicklistType.Currency" @bind-Value="model.Currency" For="@(() => model.Currency)"
-                                  Label="@L["Currency"]" Placeholder="@L["Currency"]"
-                                  Required="true" RequiredError="@L["Currency is required"]">
+                                          Label="@L["Currency"]" Placeholder="@L["Currency"]"
+                                          Required="true" RequiredError="@L["Currency is required"]">
                     </PicklistAutocomplete>
                 </MudItem>
                 <MudItem xs="12" md="12">
@@ -76,31 +78,25 @@
     };
     protected override async Task OnInitializedAsync()
     {
-        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products[Id].GetAsync());
+        
+        var result = await ProductServiceProxy.GetProductByIdAsync(Id);
         result.Switch(
-            ok =>
+            dto =>
             {
                 model = new()
                     {
-                        Id = ok.Id,
-                        Sku = ok.Sku,
-                        Name = ok.Name,
-                        Category = ok.Category,
-                        Uom = ok.Uom,
-                        Price = ok.Price,
-                        Currency = ok.Currency,
-                        Description = ok.Description
+                        Id = dto.Id,
+                        Sku = dto.Sku,
+                        Name = dto.Name,
+                        Category = dto.Category,
+                        Uom = dto.Uom,
+                        Price = dto.Price,
+                        Currency = dto.Currency,
+                        Description = dto.Description
                     };
                 _breadcrumbItems.Add(new BreadcrumbItem(model.Sku, href: $"/products/edit/{Id}"));
             },
-            invalid =>
-            {
-                Snackbar.Add(invalid.Message, Severity.Error);
-            },
-            error =>
-            {
-                Snackbar.Add(error.Message, Severity.Error);
-            }
+            error => Snackbar.Add(error.Message, Severity.Error)
         );
 
 

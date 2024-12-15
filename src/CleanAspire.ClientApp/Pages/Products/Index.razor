@@ -84,7 +84,7 @@ RowStyleFunc="_rowStyleFunc"
             query.Keywords = _keywords;
             query.OrderBy = state.SortDefinitions.FirstOrDefault()?.SortBy ?? "Id";
             query.SortDirection = state.SortDefinitions.FirstOrDefault()?.Descending ?? true ? SortDirection.Descending.ToString() : SortDirection.Ascending.ToString();
-            var result = await ProductServiceProxy.GetProductsAsync(query);
+            var result = await ProductServiceProxy.GetPaginationDataAsync(query);
             return new GridData<ProductDto> { TotalItems = (int)result.TotalItems, Items = result.Items };
         }
         finally
