@@ -41,7 +41,6 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
         {
             throw new KeyNotFoundException($"Product with Id '{request.Id}' was not found.");
         }
-      
         return product;
     }
 }

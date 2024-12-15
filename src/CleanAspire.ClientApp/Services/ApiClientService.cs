@@ -45,36 +45,6 @@ public class ApiClientService
             return new ApiClientError(ex.Message, ex);
         }
     }
-
-    public async Task<OneOf<bool, ApiClientValidationError, ApiClientError>> ExecuteAsync(Func<Task> apiCall)
-    {
-        try
-        {
-            await apiCall();
-            return true;
-        }
-        catch (HttpValidationProblemDetails ex)
-        {
-
-            _logger.LogError(ex, ex.Message);
-            return new ApiClientValidationError(ex.Detail, ex);
-        }
-        catch (ProblemDetails ex)
-        {
-            _logger.LogError(ex, ex.Message);
-            return new ApiClientError(ex.Detail, ex);
-        }
-        catch (ApiException ex)
-        {
-            _logger.LogError(ex, ex.Message);
-            return new ApiClientError(ex.Message, ex);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
-            return new ApiClientError(ex.Message, ex);
-        }
-    }
 }
 
 public class ApiClientError

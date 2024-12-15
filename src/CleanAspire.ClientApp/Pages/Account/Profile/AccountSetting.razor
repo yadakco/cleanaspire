@@ -27,7 +27,7 @@
     <DialogContent>
         <MudForm @bind-IsValid="@success">
             <MudTextField T="string" Label="@L["New email address"]" Placeholder="Enter your new email address" @bind-Value="@newEmailAddress" Required="true" RequiredError="@L["Email is required!"]"
-                          Validation="@(new EmailAddressAttribute() {ErrorMessage = L["The email address is invalid"]})"></MudTextField>
+            Validation="@(new EmailAddressAttribute() {ErrorMessage = L["The email address is invalid"]})"></MudTextField>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -56,7 +56,7 @@
 
         <MudForm @bind-IsValid="@deleteSuccess">
             <MudTextField T="string" Label="@L["User name"]" Placeholder="Enter your user name" @bind-Value="@confirmUsername" Required="true" RequiredError="@L["User name is required!"]"
-                          Validation="@(new Func<string, string?>(userNameMatch))"></MudTextField>
+            Validation="@(new Func<string, string?>(userNameMatch))"></MudTextField>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -78,10 +78,14 @@
     {
         if (success)
         {
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.UpdateEmail.PostAsync(new UpdateEmailRequest()
+            var result = await ApiClientService.ExecuteAsync(async () =>
+            {
+                await ApiClient.Account.UpdateEmail.PostAsync(new UpdateEmailRequest()
                 {
                     NewEmail = newEmailAddress
-                }));
+                });
+                return true;
+            });
             result.Switch(
             ok =>
             {
@@ -102,10 +106,14 @@
     {
         if (deleteSuccess)
         {
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.DeleteOwnerAccount.DeleteAsync(new DeleteUserRequest()
+            var result = await ApiClientService.ExecuteAsync( async () =>
+            {
+                await ApiClient.Account.DeleteOwnerAccount.DeleteAsync(new DeleteUserRequest()
                 {
                     Username = confirmUsername
-                }));
+                });
+                return true;
+            });
             result.Switch(
             ok =>
             {

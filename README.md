@@ -28,7 +28,7 @@ With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAsp
 
 4. **Blazor WebAssembly and PWA Integration**  
    - Combines the power of Blazor WebAssembly for interactive and lightweight client-side UIs.  
-   - PWA capabilities ensure offline support and a seamless native-like experience.  
+   - PWA capabilities ensure offline support and a seamless native-like experience, allowing users to access the application and data even when offline.  
 
 5. **Streamlined API Client Integration**  
    - Utilizes **Microsoft.Kiota** to automatically generate strongly-typed API clients, reducing development overhead.  
@@ -40,13 +40,20 @@ With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAsp
 7. **Cloud-Ready with Docker**  
    - Preconfigured for Docker, enabling easy deployment to cloud platforms or local environments.  
 
-8. **Real-Time Web Push Notifications**
-   - Integrated **Webpushr** to deliver instant browser notifications.
-   - Keeps users informed and engaged with real-time updates.
-   - Fully customizable notifications with targeted delivery and analytics support.
+8. **Real-Time Web Push Notifications**  
+   - Integrated **Webpushr** to deliver instant browser notifications.  
+   - Keeps users informed and engaged with real-time updates.  
+   - Fully customizable notifications with targeted delivery and analytics support.  
 
 9. **Integrated CI/CD Pipelines**  
    - Includes GitHub Actions workflows for automated building, testing, and deployment.  
+
+10. **Offline Mode Support**  
+    - **Offline mode enabled by default** to provide a seamless experience even without internet access.  
+    - Uses **IndexedDB** to cache data locally, allowing the application to retrieve data and function offline.  
+    - The system detects the online/offline status and fetches data from **IndexedDB** when offline, ensuring uninterrupted access to key features.  
+
+ 
 
 
 ### 🌟 Why Choose CleanAspire?  
@@ -67,7 +74,7 @@ With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAsp
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.47
+    image: blazordevlab/cleanaspire-api:0.0.49
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -88,7 +95,7 @@ services:
 
 
   webfrontend:
-    image: blazordevlab/cleanaspire-clientapp:0.0.47
+    image: blazordevlab/cleanaspire-clientapp:0.0.49
     ports:
       - "8016:80"
       - "8017:443"
