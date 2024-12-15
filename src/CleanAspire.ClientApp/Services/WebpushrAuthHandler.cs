@@ -2,11 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Text.Json;
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.Interfaces;
-using Microsoft.JSInterop;
 
 namespace CleanAspire.ClientApp.Services;
 
