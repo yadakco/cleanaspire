@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CleanAspire.ClientApp;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary;
 using CleanAspire.ClientApp.Services.Identity;
@@ -14,8 +13,8 @@ using Microsoft.Kiota.Serialization.Text;
 using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Multipart;
 using CleanAspire.ClientApp.Services;
-using Microsoft.Extensions.DependencyInjection;
 using CleanAspire.ClientApp.Services.JsInterop;
+using CleanAspire.ClientApp.Services.Proxies;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -26,7 +25,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddTransient<WebpushrAuthHandler>();
 builder.Services.AddSingleton<UserProfileStore>();
-builder.Services.AddSingleton<OnlineStatusService>();
+builder.Services.AddSingleton<OnlineStatusInterop>();
+builder.Services.AddSingleton<OfflineModeState>();
+builder.Services.AddSingleton<IndexedDbCache>();
+builder.Services.AddSingleton<ProductServiceProxy>();
+builder.Services.AddSingleton<OfflineSyncService>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings!);
@@ -82,13 +85,12 @@ builder.Services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStat
 
 // register the account management interface
 builder.Services.AddScoped(
-    sp => (IIdentityManagement)sp.GetRequiredService<AuthenticationStateProvider>());
+    sp => (ISignInManagement)sp.GetRequiredService<AuthenticationStateProvider>());
 
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 var app = builder.Build();
-
 
 
 await app.RunAsync();
