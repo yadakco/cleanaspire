@@ -203,7 +203,7 @@ public class ProductServiceProxy
                 await Task.Delay(500);
             }
             _offlineSyncService.SetSyncStatus(SyncStatus.Completed, $"Sync completed: {processedCount}/{count} processed.", count, processedCount);
-            await Task.Delay(1500);
+            await Task.Delay(1200);
             await _indexedDbCache.DeleteDataAsync(IndexedDbCache.DATABASENAME, OFFLINECREATECOMMANDCACHEKEY);
             _offlineSyncService.SetSyncStatus(SyncStatus.Idle, "", 0, 0);
         }
