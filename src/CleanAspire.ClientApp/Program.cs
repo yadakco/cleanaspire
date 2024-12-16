@@ -29,6 +29,7 @@ builder.Services.AddSingleton<OnlineStatusInterop>();
 builder.Services.AddSingleton<OfflineModeState>();
 builder.Services.AddSingleton<IndexedDbCache>();
 builder.Services.AddSingleton<ProductServiceProxy>();
+builder.Services.AddSingleton<OfflineSyncService>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings!);
