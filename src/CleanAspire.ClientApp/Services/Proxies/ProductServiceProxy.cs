@@ -5,7 +5,9 @@
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.JsInterop;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Kiota.Abstractions;
+using MudBlazor.Charts;
 using OneOf;
 
 
@@ -14,14 +16,18 @@ namespace CleanAspire.ClientApp.Services.Proxies;
 public class ProductServiceProxy
 {
     private const string OFFLINECREATECOMMANDCACHEKEY = "OfflineCreateCommand:Product";
+    private readonly NavigationManager _navigationManager;
+    private readonly WebpushrService _webpushrService;
     private readonly ApiClient _apiClient;
     private readonly IndexedDbCache _indexedDbCache;
     private readonly OnlineStatusInterop _onlineStatusInterop;
     private readonly OfflineModeState _offlineModeState;
     private readonly OfflineSyncService _offlineSyncService;
-
-    public ProductServiceProxy(ApiClient apiClient, IndexedDbCache indexedDbCache, OnlineStatusInterop onlineStatusInterop, OfflineModeState offlineModeState, OfflineSyncService offlineSyncService)
+    private bool _previousOnlineStatus;
+    public ProductServiceProxy(NavigationManager navigationManager, WebpushrService webpushrService, ApiClient apiClient, IndexedDbCache indexedDbCache, OnlineStatusInterop onlineStatusInterop, OfflineModeState offlineModeState, OfflineSyncService offlineSyncService)
     {
+        _navigationManager = navigationManager;
+        _webpushrService = webpushrService;
         _apiClient = apiClient;
         _indexedDbCache = indexedDbCache;
         _onlineStatusInterop = onlineStatusInterop;
@@ -31,13 +37,19 @@ public class ProductServiceProxy
     }
     private void Initialize()
     {
-        _onlineStatusInterop.OnlineStatusChanged += async (isOnline) =>
+        _onlineStatusInterop.OnlineStatusChanged -= OnOnlineStatusChanged;
+        _onlineStatusInterop.OnlineStatusChanged += OnOnlineStatusChanged;
+    }
+
+    private async void OnOnlineStatusChanged(bool isOnline)
+    {
+        if (_previousOnlineStatus == isOnline)
+            return;
+        _previousOnlineStatus = isOnline;
+        if (isOnline)
         {
-            if (isOnline)
-            {
-                await SyncOfflineCachedDataAsync();
-            }
-        };
+            await SyncOfflineCachedDataAsync();
+        }
     }
     public async Task<PaginatedResultOfProductDto> GetPaginatedProductsAsync(ProductsWithPaginationQuery paginationQuery)
     {
@@ -116,6 +128,10 @@ public class ProductServiceProxy
             try
             {
                 var response = await _apiClient.Products.PostAsync(command);
+                var baseUrl = _navigationManager.BaseUri.TrimEnd('/');
+                var productUrl = $"{baseUrl}/products/edit/{response.Id}";
+                await _webpushrService.SendNotificationAsync("New Product Launched!", $"Our new product, {response.Name}, is now available. Click to learn more!", $"{productUrl}");
+
                 return response;
             }
             catch (ApiException ex)
@@ -151,7 +167,7 @@ public class ProductServiceProxy
                     var paginatedProducts = dic.Value;
                     paginatedProducts.Items.Insert(0, productDto);
                     paginatedProducts.TotalItems++;
-                    await indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, key, paginatedProducts, new[] { "products_pagination" });
+                    await _indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, key, paginatedProducts, new[] { "products_pagination" });
                 }
             }
             return productDto;

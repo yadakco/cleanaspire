@@ -1,5 +1,6 @@
 ﻿@using CleanAspire.ClientApp.Components.Autocompletes
 @using CleanAspire.ClientApp.Services.Proxies
+@inject OnlineStatusInterop OnlineStatusInterop
 @inject ProductServiceProxy ProductServiceProxy
 <MudDialog>
     <DialogContent>
@@ -25,8 +26,8 @@
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <PicklistAutocomplete T="string" PickList="PicklistType.UOM" @bind-Value="model.Uom" For="@(() => model.Uom)"
-                                  Label="@L["UOM"]" Placeholder="@L["Uom"]"
-                                  Required="false" RequiredError="@L["Uom is required"]">
+                                          Label="@L["UOM"]" Placeholder="@L["Uom"]"
+                                          Required="false" RequiredError="@L["Uom is required"]">
                     </PicklistAutocomplete>
                 </MudItem>
                 <MudItem xs="12" md="6">
@@ -37,8 +38,8 @@
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <PicklistAutocomplete T="string" PickList="PicklistType.Currency" @bind-Value="model.Currency" For="@(() => model.Currency)"
-                                  Label="@L["Currency"]" Placeholder="@L["Currency"]"
-                                  Required="true" RequiredError="@L["Currency is required"]">
+                                          Label="@L["Currency"]" Placeholder="@L["Currency"]"
+                                          Required="true" RequiredError="@L["Currency is required"]">
                     </PicklistAutocomplete>
                 </MudItem>
                 <MudItem xs="12" md="12">
@@ -70,21 +71,18 @@
         {
             _saving = true;
 
-            var result =await ProductServiceProxy.CreateProductAsync(model);
+            var result = await ProductServiceProxy.CreateProductAsync(model);
             result.Switch(
                async ok =>
                 {
                     Snackbar.Add(L["Product created successfully!"], Severity.Success);
-                    var baseUrl = Navigation.BaseUri.TrimEnd('/');
-                    var productUrl = $"{baseUrl}/products/edit/{ok.Id}";
-                    await WebpushrService.SendNotificationAsync("New Product Launched!", $"Our new product, {ok.Name}, is now available. Click to learn more!", $"{productUrl}");
                     MudDialog.Close(DialogResult.Ok(true));
-                    _saving= false;
+                    _saving = false;
                 },
                 error =>
                 {
                     Snackbar.Add(L["Failed to create product."], Severity.Error);
-                    _saving= false;
+                    _saving = false;
                 }
             );
         }
