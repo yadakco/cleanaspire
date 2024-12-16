@@ -15,13 +15,14 @@
     public LayoutService LayoutService { get; set; } = default!;
     private MudThemeProvider _mudThemeProvider=default!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (LayoutService != null)
         {
             LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccured;
         }
-        base.OnInitialized();
+        OnlineStatusInterop.Initialize();
+        await OfflineModeState.InitializeAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

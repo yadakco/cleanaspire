@@ -1,11 +1,17 @@
-﻿export function getOnlineStatus() {
-    return navigator.onLine;
-}
-export function addOnlineStatusListener(dotNetObjectRef) {
-    window.addEventListener('online', () => {
-        dotNetObjectRef.invokeMethodAsync('UpdateOnlineStatus', true);
-    });
-    window.addEventListener('offline', () => {
-        dotNetObjectRef.invokeMethodAsync('UpdateOnlineStatus', false);
-    });
-}
+﻿
+window.onlineStatusInterop = {
+    getOnlineStatus: function () {
+        return navigator.onLine;
+    },
+    addOnlineStatusListener: function (dotNetObjectRef) {
+        const onlineHandler = () => {
+            dotNetObjectRef.invokeMethodAsync('UpdateOnlineStatus', true);
+        };
+        const offlineHandler = () => {
+            dotNetObjectRef.invokeMethodAsync('UpdateOnlineStatus', false);
+        };
+
+        window.addEventListener('online', onlineHandler);
+        window.addEventListener('offline', offlineHandler);
+    }
+};

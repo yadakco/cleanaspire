@@ -63,6 +63,12 @@
 
     private async Task UploadFiles(IBrowserFile file)
     {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
         try
         {
             var request = new MultipartBody();
@@ -89,6 +95,12 @@
     }
     private async Task OnValidSubmit(EditContext context)
     {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
         var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.Profile.PostAsync(new ProfileRequest()
             {
                 AvatarUrl = model.AvatarUrl,
