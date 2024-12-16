@@ -41,21 +41,21 @@ public class ProblemExceptionHandler : IExceptionHandler
                         g => g.Select(e => e.ErrorMessage).ToArray()
                     )
             },
-            UniqueConstraintException => new ProblemDetails
+            UniqueConstraintException e => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Unique Constraint Violation",
-                Detail = "A unique constraint violation occurred.",
+                Detail = $"Unique constraint {e.ConstraintName} violated. Duplicate value for {e.ConstraintProperties[0]}",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
-            CannotInsertNullException => new ProblemDetails
+            CannotInsertNullException e => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Null Value Error",
                 Detail = "A required field was null.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
-            MaxLengthExceededException => new ProblemDetails
+            MaxLengthExceededException e => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Max Length Exceeded",
@@ -92,8 +92,8 @@ public class ProblemExceptionHandler : IExceptionHandler
             },
             _ => new ProblemDetails
             {
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Unhandled Exception",
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Internal Server Error",
                 Detail = "An unexpected error occurred. Please try again later.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
             }

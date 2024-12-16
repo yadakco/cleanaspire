@@ -1,18 +1,20 @@
 ﻿@page "/products/index"
 @using CleanAspire.ClientApp.Pages.Products.Components
-
+@using CleanAspire.ClientApp.Services.Proxies
+@inject ProductServiceProxy ProductServiceProxy
+@inject OnlineStatusInterop OnlineStatusInterop
 <PageTitle>@Title</PageTitle>
 
 <MudDataGrid T="ProductDto" Dense="true" Hover="true"
-@ref="_table"
-ServerData="@(ServerReload)"
-MultiSelection="true"
-SelectOnRowClick="false"
-RowClick="@(r=>Edit(r.Item))"
-RowStyleFunc="_rowStyleFunc"
-@bind-RowsPerPage="_defaultPageSize"
-@bind-SelectedItems="_selectedItems"
-@bind-SelectedItem="_currentDto">
+             @ref="_table"
+             ServerData="@(ServerReload)"
+             MultiSelection="true"
+             SelectOnRowClick="false"
+             RowClick="@(r=>Edit(r.Item))"
+             RowStyleFunc="_rowStyleFunc"
+             @bind-RowsPerPage="_defaultPageSize"
+             @bind-SelectedItems="_selectedItems"
+             @bind-SelectedItem="_currentDto">
     <ToolBarContent>
         <MudStack Row Spacing="0" Class="flex-grow-1" Justify="Justify.SpaceBetween">
             <MudStack Row AlignItems="AlignItems.Start">
@@ -39,7 +41,7 @@ RowStyleFunc="_rowStyleFunc"
                 </MudStack>
                 <MudStack Row Spacing="1">
                     <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Value="@_keywords" Placeholder="@L["Keywords"]" Adornment="Adornment.End"
-                    AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
                     </MudTextField>
                 </MudStack>
             </MudStack>
@@ -82,7 +84,7 @@ RowStyleFunc="_rowStyleFunc"
             query.Keywords = _keywords;
             query.OrderBy = state.SortDefinitions.FirstOrDefault()?.SortBy ?? "Id";
             query.SortDirection = state.SortDefinitions.FirstOrDefault()?.Descending ?? true ? SortDirection.Descending.ToString() : SortDirection.Ascending.ToString();
-            var result = await ApiClient.Products.Pagination.PostAsync(query);
+            var result = await ProductServiceProxy.GetPaginatedProductsAsync(query);
             return new GridData<ProductDto> { TotalItems = (int)result.TotalItems, Items = result.Items };
         }
         finally
@@ -118,6 +120,12 @@ RowStyleFunc="_rowStyleFunc"
     }
     private async Task Delete()
     {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
         await DialogServiceHelper.ShowConfirmationDialog("delete confirm", L["Are you sure you want to delete the selected items?"], async () =>
         {
             if (_selectedItems.Any())
