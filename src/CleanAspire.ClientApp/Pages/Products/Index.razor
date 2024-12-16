@@ -131,7 +131,7 @@
             if (_selectedItems.Any())
             {
                 var ids = _selectedItems.Select(x => x.Id).ToList();
-                var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.DeleteAsync(new DeleteProductCommand() { Ids = ids }));
+                var result = await ProductServiceProxy.DeleteProductsAsync(ids);
                 result.Switch(
                    async ok =>
                     {
@@ -139,10 +139,6 @@
                         _selectedItems = new();
                         StateHasChanged();
                         Snackbar.Add(L["Selected items have been deleted."], Severity.Success);
-                    },
-                    invalid =>
-                    {
-                        Snackbar.Add(L[invalid.Message ?? "Failed to delete selected items."], Severity.Error);
                     },
                     error =>
                     {

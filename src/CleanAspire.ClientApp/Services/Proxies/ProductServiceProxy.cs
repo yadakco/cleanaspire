@@ -174,7 +174,24 @@ public class ProductServiceProxy
         }
     }
 
-
+    public async Task<OneOf<bool,ApiException>> DeleteProductsAsync(List<string> productIds)
+    {
+        var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
+        if (isOnline)
+        {
+            try
+            {
+                await _apiClient.Products.DeleteAsync(new DeleteProductCommand() { Ids = productIds });
+                await _indexedDbCache.DeleteDataByTagsAsync(IndexedDbCache.DATABASENAME, new[] { "products_pagination","product" });
+                return true;
+            }
+            catch (ApiException ex)
+            {
+                return ex;
+            }
+        }
+        return true;
+    }
     public async Task SyncOfflineCachedDataAsync()
     {
         var cachedCreateProductCommands = await _indexedDbCache.GetDataAsync<List<CreateProductCommand>>(
