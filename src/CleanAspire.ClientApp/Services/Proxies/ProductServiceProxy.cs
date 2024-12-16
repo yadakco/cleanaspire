@@ -184,9 +184,10 @@ public class ProductServiceProxy
         {
             var count = cachedCreateProductCommands.Count;
             var processedCount = 0;
+            _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Starting sync: 0/{count} ...", count, processedCount);
+            await Task.Delay(300);
             foreach (var command in cachedCreateProductCommands)
             {
-                _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Starting sync: 0/{count} ...", count, processedCount);
                 var result = await CreateProductAsync(command);
                 result.Switch(
                     productDto =>
@@ -199,10 +200,12 @@ public class ProductServiceProxy
                         processedCount++;
                         _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Syncing {processedCount}/{count} Failed ({apiException.Message}).", count, processedCount);
                     });
-                processedCount++;
+                await Task.Delay(300);
             }
             _offlineSyncService.SetSyncStatus(SyncStatus.Completed, $"Sync completed: {processedCount}/{count} processed.", count, processedCount);
+            await Task.Delay(500);
             await _indexedDbCache.DeleteDataAsync(IndexedDbCache.DATABASENAME, OFFLINECREATECOMMANDCACHEKEY);
+            _offlineSyncService.SetSyncStatus(SyncStatus.Idle, "", 0, 0);
         }
     }
 
