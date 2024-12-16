@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/CleanAspire.Api/CleanAspire.Api.csproj" Id="ded5e19f-db6b-c4ee-e692-cffe0619c173" />

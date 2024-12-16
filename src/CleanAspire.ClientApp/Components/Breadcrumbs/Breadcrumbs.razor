@@ -46,11 +46,6 @@
     [Parameter]
     public EventCallback OnPrintClick { get; set; }
 
-    private async Task GoBack()
-    {
-        await new HistoryGo(JS).GoBack();
-    }
-
     private async Task Save()
     {
         if (OnSaveButtonClick.HasDelegate)
