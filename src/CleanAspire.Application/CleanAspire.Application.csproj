@@ -14,7 +14,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.0.0-preview-2" />
+      <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.0.0-preview-3" />
     <ProjectReference Include="..\CleanAspire.Domain\CleanAspire.Domain.csproj" />
   </ItemGroup>
 
