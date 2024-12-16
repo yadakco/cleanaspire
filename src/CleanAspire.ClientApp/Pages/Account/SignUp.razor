@@ -45,6 +45,12 @@
     private TenantDto tenantDto = new();
     private async Task OnValidSubmit(EditContext context)
     {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
         waiting = true;
         var result = await ApiClientService.ExecuteAsync(async () =>{
             await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id });
