@@ -16,6 +16,7 @@ namespace CleanAspire.ClientApp.Services.Proxies;
 public class ProductServiceProxy
 {
     private const string OFFLINECREATECOMMANDCACHEKEY = "OfflineCreateCommand:Product";
+    private const string OFFLINEUPDATECOMMANDCACHEKEY = "OfflineUpdateCommand:Product";
     private readonly NavigationManager _navigationManager;
     private readonly WebpushrService _webpushrService;
     private readonly ApiClient _apiClient;
@@ -120,7 +121,7 @@ public class ProductServiceProxy
         }
     }
 
-    public async Task<OneOf<ProductDto, ApiException>> CreateProductAsync(CreateProductCommand command)
+    public async Task<OneOf<ProductDto, ApiClientValidationError, ApiClientError>> CreateProductAsync(CreateProductCommand command)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
         if (isOnline)
@@ -134,9 +135,21 @@ public class ProductServiceProxy
 
                 return response;
             }
+            catch (HttpValidationProblemDetails ex)
+            {
+                return new ApiClientValidationError(ex.Detail, ex);
+            }
+            catch (ProblemDetails ex)
+            {
+                return new ApiClientError(ex.Detail, ex);
+            }
             catch (ApiException ex)
             {
-                return ex;
+                return new ApiClientError(ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                return new ApiClientError(ex.Message, ex);
             }
         }
         else
@@ -173,7 +186,76 @@ public class ProductServiceProxy
             return productDto;
         }
     }
-
+    public async Task<OneOf<bool, ApiClientValidationError, ApiClientError>> UpdateProductAsync(UpdateProductCommand command)
+    {
+        var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
+        if (isOnline)
+        {
+            try
+            {
+                var response = await _apiClient.Products.PutAsync(command);
+                return true;
+            }
+            catch (HttpValidationProblemDetails ex)
+            {
+                return new ApiClientValidationError(ex.Detail, ex);
+            }
+            catch (ProblemDetails ex)
+            {
+                return new ApiClientError(ex.Detail, ex);
+            }
+            catch (ApiException ex)
+            {
+                return new ApiClientError(ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                return new ApiClientError(ex.Message, ex);
+            }
+        }
+        else
+        {
+            var cachedCommands = await _indexedDbCache.GetDataAsync<List<UpdateProductCommand>>(IndexedDbCache.DATABASENAME, OFFLINEUPDATECOMMANDCACHEKEY)
+                             ?? new List<UpdateProductCommand>();
+            cachedCommands.Add(command);
+            await _indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, OFFLINEUPDATECOMMANDCACHEKEY, cachedCommands, new[] { "product_commands" });
+            var productDto = new ProductDto()
+            {
+                Id =command.Id,
+                Category = command.Category,
+                Currency = command.Currency,
+                Description = command.Description,
+                Name = command.Name,
+                Price = command.Price,
+                Sku = command.Sku,
+                Uom = command.Uom
+            };
+            var productCacheKey = GenerateProductCacheKey(productDto.Id);
+            await _indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, productCacheKey, productDto, new[] { "product" });
+            var cachedPaginatedProducts = await _indexedDbCache.GetDataByTagsAsync<PaginatedResultOfProductDto>(IndexedDbCache.DATABASENAME, new[] { "products_pagination" });
+            if (cachedPaginatedProducts != null && cachedPaginatedProducts.Any())
+            {
+                foreach (var dic in cachedPaginatedProducts)
+                {
+                    var key = dic.Key;
+                    var paginatedProducts = dic.Value;
+                    var item = paginatedProducts.Items.FirstOrDefault(x => x.Id == productDto.Id);
+                    if (item != null)
+                    {
+                        item.Category = productDto.Category;
+                        item.Currency = productDto.Currency;
+                        item.Description = productDto.Description;
+                        item.Name = productDto.Name;
+                        item.Price = productDto.Price;
+                        item.Sku = productDto.Sku;
+                        item.Uom = productDto.Uom;
+                    }
+                    await _indexedDbCache.SaveDataAsync(IndexedDbCache.DATABASENAME, key, paginatedProducts, new[] { "products_pagination" });
+                }
+            }
+            return true;
+        }
+    }
     public async Task<OneOf<bool,ApiException>> DeleteProductsAsync(List<string> productIds)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
@@ -212,10 +294,15 @@ public class ProductServiceProxy
                         processedCount++;
                         _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Syncing {processedCount}/{count} Success.", count, processedCount);
                     },
-                    apiException =>
+                    invalid =>
                     {
                         processedCount++;
-                        _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Syncing {processedCount}/{count} Failed ({apiException.Message}).", count, processedCount);
+                        _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Syncing {processedCount}/{count} Failed ({invalid.Message}).", count, processedCount);
+                    },
+                    error =>
+                    {
+                        processedCount++;
+                        _offlineSyncService.SetSyncStatus(SyncStatus.Syncing, $"Syncing {processedCount}/{count} Failed ({error.Message}).", count, processedCount);
                     });
                 await Task.Delay(500);
             }
