@@ -115,12 +115,12 @@
                 },
                 invalid =>
                 {
-                    Snackbar.Add(invalid.Message, Severity.Error);
+                    Snackbar.Add(invalid.Message ?? L["Failed validation"], Severity.Error);
                     return false;
                 },
                 error =>
                 {
-                    Snackbar.Add(error.Message, Severity.Error);
+                    Snackbar.Add(error.Message ?? L["Failed to save."], Severity.Error);
                     return false;
 
                 }
