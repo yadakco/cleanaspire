@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
 
@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CleanAspire.BlazorWebApp\CleanAspire.BlazorWebApp\CleanAspire.WebApp.csproj" />
     <ProjectReference Include="..\CleanAspire.Api\CleanAspire.Api.csproj" />
-    <ProjectReference Include="..\CleanAspire.ClientApp\CleanAspire.ClientApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

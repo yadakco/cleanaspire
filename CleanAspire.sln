@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanAspire.Tests", "tests\CleanAspire.Tests\CleanAspire.Tests.csproj", "{184DD222-E87D-65E3-4E4F-ADC8680E2D81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanAspire.WebApp", "CleanAspire.BlazorWebApp\CleanAspire.BlazorWebApp\CleanAspire.WebApp.csproj", "{E29307F2-485B-47B4-9CA7-A7EA6949134B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{184DD222-E87D-65E3-4E4F-ADC8680E2D81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{184DD222-E87D-65E3-4E4F-ADC8680E2D81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{184DD222-E87D-65E3-4E4F-ADC8680E2D81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E29307F2-485B-47B4-9CA7-A7EA6949134B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E29307F2-485B-47B4-9CA7-A7EA6949134B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E29307F2-485B-47B4-9CA7-A7EA6949134B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E29307F2-485B-47B4-9CA7-A7EA6949134B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{7D6E47CC-90F1-4C19-AF96-1DE7EED7928C} = {C983071D-42D7-4326-A379-CE622E29D307}
 		{67226F2C-5D75-4B76-B5F8-E42A4BC1BBB1} = {C983071D-42D7-4326-A379-CE622E29D307}
 		{184DD222-E87D-65E3-4E4F-ADC8680E2D81} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{E29307F2-485B-47B4-9CA7-A7EA6949134B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C379C278-2AFA-4DD5-96F5-34D17AAE1188}
