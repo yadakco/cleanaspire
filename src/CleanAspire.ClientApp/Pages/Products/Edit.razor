@@ -102,17 +102,11 @@
     }
     private async Task Save()
     {
-        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
-        if (!online)
-        {
-            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
-            return;
-        }
         editForm?.Validate();
         if (success == true)
         {
             _saving = true;
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.Products.PutAsync(model));
+            var result = await ProductServiceProxy.UpdateProductAsync(model);
             _saving = result.Match(
                 ok =>
                 {
@@ -121,12 +115,12 @@
                 },
                 invalid =>
                 {
-                    Snackbar.Add(invalid.Message, Severity.Error);
+                    Snackbar.Add(invalid.Message ?? L["Failed validation"], Severity.Error);
                     return false;
                 },
                 error =>
                 {
-                    Snackbar.Add(error.Message, Severity.Error);
+                    Snackbar.Add(error.Message ?? L["Failed to save."], Severity.Error);
                     return false;
 
                 }

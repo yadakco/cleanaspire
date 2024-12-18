@@ -28,7 +28,7 @@
         <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.16.0" />
         <PackageReference Include="Microsoft.Kiota.Serialization.Multipart" Version="1.16.0" />
         <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="1.16.0" />
-        <PackageReference Include="MudBlazor" Version="8.0.0-preview.5" />
+        <PackageReference Include="MudBlazor" Version="8.0.0-preview.6" />
         <PackageReference Include="OneOf" Version="3.0.271" />
     </ItemGroup>
 

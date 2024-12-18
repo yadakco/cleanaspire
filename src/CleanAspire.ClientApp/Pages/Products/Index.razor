@@ -120,12 +120,6 @@
     }
     private async Task Delete()
     {
-        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
-        if (!online)
-        {
-            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
-            return;
-        }
         await DialogServiceHelper.ShowConfirmationDialog("delete confirm", L["Are you sure you want to delete the selected items?"], async () =>
         {
             if (_selectedItems.Any())
@@ -142,7 +136,7 @@
                     },
                     error =>
                     {
-                        Snackbar.Add(L["Failed to delete selected items."], Severity.Error);
+                        Snackbar.Add(error.Message??L["Failed to delete selected items."], Severity.Error);
                     });
 
             }

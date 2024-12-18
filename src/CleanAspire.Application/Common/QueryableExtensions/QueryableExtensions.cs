@@ -70,7 +70,7 @@ public static class QueryableExtensions
         }
         var count = await query.CountAsync(cancellationToken);
         var data = await query
-            .Skip((pageNumber - 1) * pageSize)
+            .Skip(pageNumber * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
