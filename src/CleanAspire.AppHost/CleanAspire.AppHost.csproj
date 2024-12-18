@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CleanAspire.BlazorWebApp\CleanAspire.BlazorWebApp\CleanAspire.WebApp.csproj" />
+    <ProjectReference Include="..\CleanAspire.WebApp\CleanAspire.WebApp.csproj" />
     <ProjectReference Include="..\CleanAspire.Api\CleanAspire.Api.csproj" />
   </ItemGroup>
 
