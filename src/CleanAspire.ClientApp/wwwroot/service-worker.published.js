@@ -24,6 +24,11 @@ async function onInstall(event) {
         .filter(asset => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))
         .filter(asset => !offlineAssetsExclude.some(pattern => pattern.test(asset.url)))
         .map(asset => new Request(asset.url, { integrity: asset.hash, cache: 'no-cache' }));
+
+    // Also cache the host HTML and blazor.web.js
+    assetsRequests.push(new Request(baseUrl, { cache: 'no-cache' }));
+    assetsRequests.push(new Request(new URL('_framework/blazor.web.js', baseUrl).href, { cache: 'no-cache' }));
+
     await caches.open(cacheName).then(cache => cache.addAll(assetsRequests));
 }
 
@@ -40,13 +45,13 @@ async function onActivate(event) {
 async function onFetch(event) {
     let cachedResponse = null;
     if (event.request.method === 'GET') {
-        // For all navigation requests, try to serve index.html from cache,
+        // For all navigation requests, try to serve the host HTML from cache,
         // unless that request is for an offline resource.
         // If you need some URLs to be server-rendered, edit the following check to exclude those URLs
-        const shouldServeIndexHtml = event.request.mode === 'navigate'
+        const shouldServeHostHtml = event.request.mode === 'navigate'
             && !manifestUrlList.some(url => url === event.request.url);
 
-        const request = shouldServeIndexHtml ? 'index.html' : event.request;
+        const request = shouldServeHostHtml ? baseUrl : event.request;
         const cache = await caches.open(cacheName);
         cachedResponse = await cache.match(request);
     }
