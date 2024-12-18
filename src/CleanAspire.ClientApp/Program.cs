@@ -81,10 +81,10 @@ builder.Services.AddOidcAuthentication(options =>
     builder.Configuration.Bind("Local", options.ProviderOptions);
 });
 // register the custom state provider
-builder.Services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider, CookieAuthenticationStateProvider>();
 
 // register the account management interface
-builder.Services.AddScoped(
+builder.Services.AddSingleton(
     sp => (ISignInManagement)sp.GetRequiredService<AuthenticationStateProvider>());
 
 
