@@ -87,7 +87,7 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.50
+    image: blazordevlab/cleanaspire-api:0.0.51
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -107,11 +107,17 @@ services:
       - "8018:443"
 
 
-  webfrontend:
-    image: blazordevlab/cleanaspire-clientapp:0.0.50
+  blazorweb:
+    image: blazordevlab/cleanaspire-webapp:0.0.51
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - AllowedHosts=*
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
     ports:
-      - "8016:80"
-      - "8017:443"
+      - "8015:80"
+      - "8014:443"
 
 
 
