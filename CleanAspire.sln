@@ -35,7 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanAspire.Tests", "tests\CleanAspire.Tests\CleanAspire.Tests.csproj", "{184DD222-E87D-65E3-4E4F-ADC8680E2D81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanAspire.WebApp", "CleanAspire.BlazorWebApp\CleanAspire.BlazorWebApp\CleanAspire.WebApp.csproj", "{E29307F2-485B-47B4-9CA7-A7EA6949134B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanAspire.WebApp", "src\CleanAspire.WebApp\CleanAspire.WebApp.csproj", "{E29307F2-485B-47B4-9CA7-A7EA6949134B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
