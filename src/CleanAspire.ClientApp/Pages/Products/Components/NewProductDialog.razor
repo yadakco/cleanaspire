@@ -78,9 +78,14 @@
                     MudDialog.Close(DialogResult.Ok(true));
                     _saving = false;
                 },
+                invalid =>
+                {
+                    Snackbar.Add(invalid.Message ?? L["Failed validation"], Severity.Error);
+                    _saving = false;
+                },
                 error =>
                 {
-                    Snackbar.Add(L["Failed to create product."], Severity.Error);
+                    Snackbar.Add(error.Message ?? L["Failed to create product."], Severity.Error);
                     _saving = false;
                 }
             );
