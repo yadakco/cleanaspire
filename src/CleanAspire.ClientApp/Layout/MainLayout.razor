@@ -21,8 +21,8 @@
         {
             LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccured;
         }
-        OnlineStatusInterop.Initialize();
-        await OfflineModeState.InitializeAsync();
+        
+       
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -31,6 +31,8 @@
 
         if (firstRender)
         {
+            OnlineStatusInterop.Initialize();
+            await OfflineModeState.InitializeAsync();
             await ApplyUserPreferences();
             if (_mudThemeProvider != null)
             {

@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <HeadOutlet @rendermode="InteractiveAuto" />
+</head>
+
+<body>
+    <Routes @rendermode="InteractiveAuto" />
+    <script src="_framework/blazor.web.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="js/onlinestatus.js"></script>
+    <script src="js/webpushr.js"></script>
+    <script src="js/indexeddbstorage.js"></script>
+    <script>
+        window.displayModeInterop = {
+            getDisplayMode: function () {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                return 'standalone';
+            }
+            if (window.matchMedia('(display-mode: fullscreen)').matches) {
+                return 'fullscreen';
+            }
+            if (window.matchMedia('(display-mode: minimal-ui)').matches) {
+                return 'minimal-ui';
+            }
+            return 'browser';
+        }};
+    </script>
+</body>
+
+</html>
