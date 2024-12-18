@@ -48,7 +48,7 @@ EXPOSE 80 443
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Enable Service Worker for PWA Installation
-COPY src/CleanAspire.ClientApp/wwwroot/service-worker.published.js wwwroot/service-worker.js
-COPY src/CleanAspire.ClientApp/wwwroot/manifest.json wwwroot/manifest.json
+# COPY src/CleanAspire.ClientApp/wwwroot/service-worker.published.js wwwroot/service-worker.js
+# COPY src/CleanAspire.ClientApp/wwwroot/manifest.json wwwroot/manifest.json
 
 ENTRYPOINT ["dotnet", "CleanAspire.WebApp.dll"]
