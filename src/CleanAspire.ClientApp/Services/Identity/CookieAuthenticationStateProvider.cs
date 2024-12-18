@@ -25,13 +25,13 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         var indexedDb = serviceProvider.GetRequiredService<IndexedDbCache>();
         var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
         var offlineState = serviceProvider.GetRequiredService<OfflineModeState>();
-        bool enableOffline = offlineState.Enabled;
         authenticated = false;
         // default to not authenticated
         var user = unauthenticated;
         ProfileResponse? profileResponse = null;
         try
         {
+            bool enableOffline = offlineState.Enabled;
             var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
             if (isOnline)
             {
@@ -78,9 +78,9 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         var indexedDb = serviceProvider.GetRequiredService<IndexedDbCache>();
         var onlineStatusInterop = serviceProvider.GetRequiredService<OnlineStatusInterop>();
         var offlineState = serviceProvider.GetRequiredService<OfflineModeState>();
-        bool offlineModel = offlineState.Enabled;
         try
         {
+            bool offlineModel = offlineState.Enabled;
             var isOnline = await onlineStatusInterop.GetOnlineStatusAsync();
             if (isOnline)
             {
