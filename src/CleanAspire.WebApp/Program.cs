@@ -21,13 +21,16 @@ using CleanAspire.ClientApp;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
+
+ 
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
 
-
+ 
 // register the cookie handler
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddTransient<WebpushrAuthHandler>();
