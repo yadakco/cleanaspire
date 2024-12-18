@@ -15,12 +15,17 @@ jobs:
       # Install CA certificates to ensure SSL trust
     - name: Install CA Certificates
       run: sudo apt-get update && sudo apt-get install -y ca-certificates
-      
+
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
+        
+      # Trust the ASP.NET Core development certificate
+    - name: Trust ASP.NET Core HTTPS Development Certificate
+      run: dotnet dev-certs https --trust
+
     - name: Restore dependencies
       run: dotnet restore CleanAspire.sln
     - name: Build
