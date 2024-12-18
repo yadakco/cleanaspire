@@ -1,40 +1,47 @@
-﻿using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using CleanAspire.ClientApp;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Kiota.Abstractions.Authentication;
-using Microsoft.Kiota.Http.HttpClientLibrary;
-using CleanAspire.ClientApp.Services.Identity;
-using CleanAspire.ClientApp.Configurations;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using CleanAspire.Api.Client;
-using Microsoft.Kiota.Abstractions;
-using Microsoft.Kiota.Serialization.Json;
-using Microsoft.Kiota.Serialization.Text;
-using Microsoft.Kiota.Serialization.Form;
-using Microsoft.Kiota.Serialization.Multipart;
+using CleanAspire.ClientApp.Configurations;
 using CleanAspire.ClientApp.Services;
+using CleanAspire.ClientApp.Services.Identity;
 using CleanAspire.ClientApp.Services.JsInterop;
 using CleanAspire.ClientApp.Services.Proxies;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Http.HttpClientLibrary;
+using Microsoft.Kiota.Serialization.Form;
+using Microsoft.Kiota.Serialization.Json;
+using Microsoft.Kiota.Serialization.Multipart;
+using Microsoft.Kiota.Serialization.Text;
+using CleanAspire.ClientApp;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-//builder.RootComponents.Add<App>("#app");
-//builder.RootComponents.Add<HeadOutlet>("head::after");
+var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
+// Add services to the container.
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
+
+
 
 // register the cookie handler
 builder.Services.AddTransient<CookieHandler>();
 builder.Services.AddTransient<WebpushrAuthHandler>();
-builder.Services.AddSingleton<UserProfileStore>();
-builder.Services.AddSingleton<OnlineStatusInterop>();
-builder.Services.AddSingleton<OfflineModeState>();
-builder.Services.AddSingleton<IndexedDbCache>();
-builder.Services.AddSingleton<ProductServiceProxy>();
-builder.Services.AddSingleton<OfflineSyncService>();
+builder.Services.AddScoped<UserProfileStore>();
+builder.Services.AddScoped<OnlineStatusInterop>();
+builder.Services.AddScoped<OfflineModeState>();
+builder.Services.AddScoped<IndexedDbCache>();
+builder.Services.AddScoped<ProductServiceProxy>();
+builder.Services.AddScoped<OfflineSyncService>();
 
 var clientAppSettings = builder.Configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
 builder.Services.AddSingleton(clientAppSettings!);
 
-builder.Services.TryAddMudBlazor(builder.Configuration);
+builder.Services.TryAddScopedMudBlazor(builder.Configuration);
 
 var httpClientBuilder = builder.Services.AddHttpClient("apiservice", (sp, options) =>
 {
@@ -43,7 +50,7 @@ var httpClientBuilder = builder.Services.AddHttpClient("apiservice", (sp, option
 
 }).AddHttpMessageHandler<CookieHandler>();
 
-builder.Services.AddSingleton<ApiClient>(sp =>
+builder.Services.AddScoped<ApiClient>(sp =>
 {
     ApiClientBuilder.RegisterDefaultSerializer<JsonSerializationWriterFactory>();
     ApiClientBuilder.RegisterDefaultSerializer<TextSerializationWriterFactory>();
@@ -69,9 +76,9 @@ builder.Services.AddHttpClient("Webpushr", client =>
 {
     client.BaseAddress = new Uri("https://api.webpushr.com");
 }).AddHttpMessageHandler<WebpushrAuthHandler>();
-builder.Services.AddSingleton<WebpushrService>();
+builder.Services.AddScoped<WebpushrService>();
 
-builder.Services.AddSingleton<ApiClientService>();
+builder.Services.AddScoped<ApiClientService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddOidcAuthentication(options =>
@@ -92,6 +99,27 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseWebAssemblyDebugging();
+}
+else
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
-await app.RunAsync();
+app.UseHttpsRedirection();
 
+
+app.UseAntiforgery();
+
+app.MapStaticAssets();
+app.MapRazorComponents<CleanAspire.WebApp.Components.App>()
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(CleanAspire.ClientApp._Imports).Assembly);
+
+app.Run();
