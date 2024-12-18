@@ -2,7 +2,7 @@
 
 var apiService = builder.AddProject<Projects.CleanAspire_Api>("apiservice");
 
-builder.AddProject<Projects.CleanAspire_ClientApp>("webfrontend")
+builder.AddProject<Projects.CleanAspire_WebApp>("blazorweb")
      .WithExternalHttpEndpoints()
     .WithReference(apiService)
     .WaitFor(apiService);
