@@ -20,6 +20,10 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Authentication;
 using Mono.TextTemplating;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
+using System.Threading;
+using Google.Apis.Auth;
+using System.Net.WebSockets;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -64,9 +68,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
 
         routeGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -244,26 +248,155 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
 
 
-        routeGroup.MapGet("/google-login-url", async (
-               HttpContext context,
-               [FromQuery] string state) =>
+        routeGroup.MapGet("/google/loginUrl", ([FromQuery] string state, HttpContext context) =>
         {
+            if (string.IsNullOrEmpty(state))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter is required." } }
+                });
+            }
+
             var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
-            var clientId = configuration["Authentication:Microsoft:ClientId"];
-            var redirect_uri = string.IsNullOrEmpty(configuration["ClientBaseUrl"]) ? $"{context.Request.Scheme}://{context.Request.Host}/external-login" : $"{configuration["ClientBaseUrl"]}/external-login";
+            var clientId = configuration["Authentication:Google:ClientId"];
+            if (string.IsNullOrEmpty(clientId))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "clientId", new[] { "Google Client ID is not configured." } }
+                });
+            }
+
+            var baseRedirectUri = configuration["ClientBaseUrl"];
+            var redirectUri = string.IsNullOrEmpty(baseRedirectUri)
+                ? $"{context.Request.Scheme}://{context.Request.Host}/external-login"
+                : $"{baseRedirectUri}/external-login";
+
+            if (!redirectUri.StartsWith(state))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter does not match the redirect URI." } }
+                });
+            }
+
             var googleAuthUrl =
                 $"https://accounts.google.com/o/oauth2/v2/auth?" +
                 $"response_type=code&" +
-                $"client_id={clientId}&" +
-                $"redirect_uri={redirect_uri}&" +
+                $"client_id={Uri.EscapeDataString(clientId)}&" +
+                $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
                 $"scope=openid%20profile%20email&" +
-                $"state={state}&" +
+                $"state={Uri.EscapeDataString(state)}&" +
                 $"nonce={Guid.NewGuid()}";
 
-            return TypedResults.Ok(googleAuthUrl);
-        }).WithSummary("Generate Google OAuth 2.0 Login URL")
-          .WithDescription("Generates a Google OAuth 2.0 authorization URL for external login, dynamically determining the redirect URI and including the provided state parameter.");
+            return Results.Ok(googleAuthUrl);
+        })
+        .Produces<string>(StatusCodes.Status200OK)
+        .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+        .WithSummary("Generate Google OAuth 2.0 Login URL")
+        .WithDescription("Generates a Google OAuth 2.0 authorization URL for external login, dynamically determining the redirect URI and including the provided state parameter.");
 
+        routeGroup.MapPost("/google/signIn", async (HttpContext context,
+                [FromServices] IHttpClientFactory httpClientFactory,
+                [FromQuery] string state,
+                [FromQuery] string code) =>
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter is required." } }
+                });
+            }
+            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
+            var clientId = configuration["Authentication:Google:ClientId"];
+            var clientSecret = configuration["Authentication:Google:ClientSecret"];
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "clientId", new[] { "Google Client ID is not configured." } }
+                });
+            }
+            var baseRedirectUri = configuration["ClientBaseUrl"];
+            var redirectUri = string.IsNullOrEmpty(baseRedirectUri)
+                ? $"{context.Request.Scheme}://{context.Request.Host}/external-login"
+                : $"{baseRedirectUri}/external-login";
+
+            if (!redirectUri.StartsWith(state))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter does not match the redirect URI." } }
+                });
+            }
+
+            var idTokenRequestContent = new FormUrlEncodedContent
+            ([
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                new KeyValuePair<string, string>("grant_type", "authorization_code")
+            ]);
+            // Exchange the Google authorization code for access token
+            var authorizationCodeExchangeRequest = await httpClientFactory.CreateClient().PostAsync(
+                "https://oauth2.googleapis.com/token", idTokenRequestContent);
+
+            if (!authorizationCodeExchangeRequest.IsSuccessStatusCode)
+            {
+                var responseMessage = await authorizationCodeExchangeRequest.Content.ReadAsStringAsync();
+                return Results.BadRequest($"Authorization code exchange failed. {responseMessage}");
+            }
+
+            var idTokenContent = await authorizationCodeExchangeRequest.Content.ReadFromJsonAsync<GoogleTokenResponse>();
+            if (idTokenContent?.id_token is null)
+            {
+                return Results.BadRequest("id_token not found in the response from the identity provider");
+            }
+            try
+            {
+                var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
+                var signInManager = context.RequestServices.GetRequiredService<SignInManager<TUser>>();
+                var validatedUser = await GoogleJsonWebSignature.ValidateAsync
+                (
+                    validationSettings: new() { Audience = [clientId] },
+                    jwt: idTokenContent?.id_token
+                );
+                var email = validatedUser.Email;
+                var user = await userManager.FindByEmailAsync(email);
+                if (user is not null)
+                {
+                    signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
+                    var loginResult = await signInManager.ExternalLoginSignInAsync("Google", validatedUser.Subject, isPersistent: false);
+                    if (!loginResult.Succeeded)
+                    {
+                        return Results.BadRequest("External login failed.");
+                    }
+                }
+                return TypedResults.Ok(new GoogleAuthResponse
+                (
+                    ProfilePicture: validatedUser.Picture,
+                    ExternalId: validatedUser.Subject,
+                    Username: validatedUser.Name,
+                    Email: validatedUser.Email
+                ));
+            }
+            catch (InvalidJwtException e)
+            {
+                return Results.BadRequest($"The id_token did not pass validation. {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return Results.BadRequest($"The id_token did not pass validation. {e.Message}");
+            }
+
+        }).Produces<GoogleAuthResponse>(StatusCodes.Status200OK)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("")
+          .WithDescription("");
 
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
         {
@@ -572,3 +705,18 @@ public sealed class SignupRequest
 }
 
 
+internal sealed record GoogleTokenResponse
+{
+    public string? access_token { get; set; }
+    public int expires_in { get; set; }
+    public string? id_token { get; set; }
+    public string? scope { get; set; }
+    public string? token_type { get; set; }
+    public string? refresh_token { get; set; }
+}
+internal sealed record GoogleAuthResponse(
+    string ExternalId,
+    string Username,
+    string Email,
+    string? ProfilePicture
+);

@@ -1,0 +1,49 @@
+﻿@page "/external-login"
+<h3>GoogleLoginCallback</h3>
+@AuthorizationCode<br>
+@State
+<br>
+@Email
+<br>
+@ExternalId
+<br />
+@Error
+
+@code {
+    // The authorization code sent by Google after successful authentication
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? AuthorizationCode { get; set; }
+
+    // Optional state included in the redirect URI
+    [SupplyParameterFromQuery(Name = "state")]
+    public string? State { get; set; }
+
+    public string? Email { get; set; }
+    public string? ExternalId { get; set; }
+    public string? Error { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(AuthorizationCode) || string.IsNullOrEmpty(State))
+        {
+            Error = "Invalid or missing token. Please check your verification link.";
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!string.IsNullOrEmpty(AuthorizationCode) && !string.IsNullOrEmpty(State))
+            {
+                var result = await ApiClient.Account.Google.SignIn.PostAsync(x =>
+                {
+                    x.QueryParameters.Code = AuthorizationCode;
+                    x.QueryParameters.State = State;
+                });
+                Email = result.Email;
+                ExternalId = result.ExternalId;
+                StateHasChanged();
+            }
+        }
+    }
+}
