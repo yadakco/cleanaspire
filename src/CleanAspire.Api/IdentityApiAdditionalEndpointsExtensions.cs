@@ -15,6 +15,11 @@ using System.Text.Encodings.Web;
 using System.Text;
 using Microsoft.AspNetCore.Identity.Data;
 using StrongGrid.Resources;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.Authentication;
+using Mono.TextTemplating;
+using Microsoft.Extensions.Hosting;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -238,6 +243,28 @@ public static class IdentityApiAdditionalEndpointsExtensions
           });
 
 
+
+        routeGroup.MapGet("/google-login-url", async (
+               HttpContext context,
+               [FromQuery] string state) =>
+        {
+            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
+            var clientId = configuration["Authentication:Microsoft:ClientId"];
+            var redirect_uri = string.IsNullOrEmpty(configuration["ClientBaseUrl"]) ? $"{context.Request.Scheme}://{context.Request.Host}/external-login" : $"{configuration["ClientBaseUrl"]}/external-login";
+            var googleAuthUrl =
+                $"https://accounts.google.com/o/oauth2/v2/auth?" +
+                $"response_type=code&" +
+                $"client_id={clientId}&" +
+                $"redirect_uri={redirect_uri}&" +
+                $"scope=openid%20profile%20email&" +
+                $"state={state}&" +
+                $"nonce={Guid.NewGuid()}";
+
+            return TypedResults.Ok(googleAuthUrl);
+        }).WithSummary("Generate Google OAuth 2.0 Login URL")
+          .WithDescription("Generates a Google OAuth 2.0 authorization URL for external login, dynamically determining the redirect URI and including the provided state parameter.");
+
+
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
         {
             var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
@@ -252,7 +279,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             var userId = await userManager.GetUserIdAsync(user);
-  
+
             // Construct the client-side URL
             var confirmEmailUrl = isChange
                 ? $"{clientBaseUrl}/account/profile?userId={userId}&code={code}&changedEmail={email}"
