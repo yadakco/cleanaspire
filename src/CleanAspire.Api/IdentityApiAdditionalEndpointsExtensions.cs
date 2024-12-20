@@ -43,7 +43,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
         var routeGroup = endpoints.MapGroup("/account").WithTags("Authentication", "Account Management");
         routeGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
         {
-            await signInManager.SignOutAsync();
+            await signInManager.SignOutAsync().ConfigureAwait(false);
             logger.LogInformation("User has been logged out successfully.");
             return Results.Ok();
         })
@@ -52,9 +52,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.");
 
         routeGroup.MapGet("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, HttpContext context, IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -113,9 +113,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
         routeGroup.MapPost("/updateEmail", async Task<Results<Ok, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, [FromBody] UpdateEmailRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] UpdateEmailRequest request, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -143,9 +143,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
 
         routeGroup.MapPost("/signup", async Task<Results<Created, ValidationProblem>>
-                ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+                ([FromBody] SignupRequest request, HttpContext context) =>
             {
-                var userManager = sp.GetRequiredService<UserManager<TUser>>();
+                var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
                 var user = new TUser();
                 if (!userManager.SupportsUserEmail)
                 {
@@ -174,9 +174,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
             .WithDescription("Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.");
 
         routeGroup.MapDelete("/deleteOwnerAccount", async Task<Results<Ok, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, SignInManager<TUser> signInManager, [FromBody] DeleteUserRequest request, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, SignInManager<TUser> signInManager, HttpContext context,[FromBody] DeleteUserRequest request) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -204,9 +204,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Allows users to delete their own account permanently.");
 
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
-            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
+            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.FindByIdAsync(userId) is not { } user)
             {
                 return TypedResults.Unauthorized();
@@ -422,8 +422,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
         }).Produces(StatusCodes.Status200OK)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .WithSummary("")
-          .WithDescription("");
+           .WithSummary("External Login with Google OAuth")
+            .WithDescription("Handles external login using Google OAuth 2.0. Exchanges an authorization code for tokens, validates the user's identity, and signs the user in.");
 
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
         {
@@ -449,7 +449,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             await emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
         }
         routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
-            (HttpContext context, [FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
+            (HttpContext context, [FromBody] ForgotPasswordRequest resetRequest) =>
         {
             var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
             var clientBaseUrl = configuration["ClientBaseUrl"];
@@ -457,7 +457,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             {
                 throw new InvalidOperationException("Client base URL is not configured.");
             }
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
             if (user is not null && await userManager.IsEmailConfirmedAsync(user))

@@ -33,6 +33,9 @@ namespace CleanAspire.Api.Client.Account.Google.SignIn
         public SignInRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/google/signIn?code={code}&state={state}", rawUrl)
         {
         }
+        /// <summary>
+        /// Handles external login using Google OAuth 2.0. Exchanges an authorization code for tokens, validates the user&apos;s identity, and signs the user in.
+        /// </summary>
         /// <returns>A <see cref="Stream"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -55,6 +58,9 @@ namespace CleanAspire.Api.Client.Account.Google.SignIn
             };
             return await RequestAdapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken).ConfigureAwait(false);
         }
+        /// <summary>
+        /// Handles external login using Google OAuth 2.0. Exchanges an authorization code for tokens, validates the user&apos;s identity, and signs the user in.
+        /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -80,10 +86,11 @@ namespace CleanAspire.Api.Client.Account.Google.SignIn
         {
             return new global::CleanAspire.Api.Client.Account.Google.SignIn.SignInRequestBuilder(rawUrl, RequestAdapter);
         }
+        /// <summary>
+        /// Handles external login using Google OAuth 2.0. Exchanges an authorization code for tokens, validates the user&apos;s identity, and signs the user in.
+        /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        #pragma warning disable CS1591
         public partial class SignInRequestBuilderPostQueryParameters 
-        #pragma warning restore CS1591
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable

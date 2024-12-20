@@ -41,7 +41,7 @@
     public string? State { get; set; }
     public string? Error { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         if (string.IsNullOrEmpty(AuthorizationCode))
         {
@@ -55,21 +55,33 @@
             return;
         }
 
-        try
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            await SignInManagement.LoginWithGoogle(AuthorizationCode, State);
-        }
-        catch (ProblemDetails ex)
-        {
-            // Log and display API-specific problem details
-            Error = $"An error occurred during login: {ex.Detail ?? "Please contact support if the issue persists."}";
-        }
-        catch (Exception ex)
-        {
-            // Catch-all for other exceptions
-            Error = $"Unexpected error: {ex.Message}. Please refresh the page or contact support.";
+            if (!string.IsNullOrEmpty(AuthorizationCode) && !string.IsNullOrEmpty(State))
+            {
+                try
+                {
+                    await SignInManagement.LoginWithGoogle(AuthorizationCode, State);
+                    StateHasChanged();
+                }
+                catch (ProblemDetails ex)
+                {
+                    // Log and display API-specific problem details
+                    Error = $"An error occurred during login: {ex.Detail ?? "Please contact support if the issue persists."}";
+                }
+                catch (Exception ex)
+                {
+                    // Catch-all for other exceptions
+                    Error = $"Unexpected error: {ex.Message}. Please refresh the page or contact support.";
+                }
+            }
         }
     }
+
 }
 
 
