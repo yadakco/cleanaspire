@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -19,6 +19,7 @@
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>-->
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0 " />
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.16.0" />
