@@ -321,9 +321,14 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 });
             }
             var baseRedirectUri = configuration["ClientBaseUrl"];
-            var redirectUri = string.IsNullOrEmpty(baseRedirectUri)
-                ? $"{context.Request.Scheme}://{context.Request.Host}/external-login"
-                : $"{baseRedirectUri}/external-login";
+            if (string.IsNullOrEmpty(baseRedirectUri))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "baseRedirectUri", new[] { "Client base URL is not configured." } }
+                });
+            }
+            var redirectUri = $"{baseRedirectUri}/external-login";
 
             if (!redirectUri.StartsWith(state))
             {
