@@ -40,6 +40,8 @@ namespace CleanAspire.Api.Client.Products.Pagination
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 500 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<global::CleanAspire.Api.Client.Models.PaginatedResultOfProductDto?> PostAsync(global::CleanAspire.Api.Client.Models.ProductsWithPaginationQuery body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -51,7 +53,12 @@ namespace CleanAspire.Api.Client.Products.Pagination
 #endif
             _ = body ?? throw new ArgumentNullException(nameof(body));
             var requestInfo = ToPostRequestInformation(body, requestConfiguration);
-            return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.PaginatedResultOfProductDto>(requestInfo, global::CleanAspire.Api.Client.Models.PaginatedResultOfProductDto.CreateFromDiscriminatorValue, default, cancellationToken).ConfigureAwait(false);
+            var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
+            {
+                { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
+                { "500", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
+            };
+            return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.PaginatedResultOfProductDto>(requestInfo, global::CleanAspire.Api.Client.Models.PaginatedResultOfProductDto.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Returns a paginated list of products based on search keywords, page size, and sorting options.
