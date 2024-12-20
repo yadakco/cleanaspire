@@ -128,5 +128,32 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
+    public async Task LoginWithGoogle(string authorizationCode, string state, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await apiClient.Account.Google.SignIn.PostAsync(q=>
+            {
+                q.QueryParameters.Code = authorizationCode;
+                q.QueryParameters.State = state;
+            }, cancellationToken);
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        }
+        catch(ProblemDetails ex)
+        {
+            // Log and re-throw problem details exception
+            throw;
+        }
+        catch(ApiException ex)
+        {
+            // Log and re-throw API exception
+            throw;
+        }
+        catch(Exception ex)
+        {
+            // Log and re-throw general exception
+            throw;
+        }
+    }
 }
 
