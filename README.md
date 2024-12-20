@@ -96,7 +96,7 @@ services:
       - ASPNETCORE_HTTPS_PORTS=443
       - DatabaseSettings__DBProvider=sqlite
       - DatabaseSettings__ConnectionString=Data Source=CleanAspireDb.db
-      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7123
+      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7114
       - Authentication__Google__ClientId=<your client id>
       - Authentication__Google__ClientSecret=<your client secret>
       - SendGrid__ApiKey=<your API key>
