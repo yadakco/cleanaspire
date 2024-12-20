@@ -8,7 +8,8 @@ namespace CleanAspire.ClientApp.Services.Identity;
 
 public interface ISignInManagement
 {
-    public Task LoginAsync(LoginRequest request,bool remember=true, CancellationToken cancellationToken = default);
-    public Task LogoutAsync(CancellationToken cancellationToken = default);
+    Task LoginAsync(LoginRequest request, bool remember = true, CancellationToken cancellationToken = default);
+    Task LoginWithGoogle(string authorizationCode, string state, CancellationToken cancellationToken = default);
+    Task LogoutAsync(CancellationToken cancellationToken = default);
 }
 

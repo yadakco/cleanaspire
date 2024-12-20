@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Http.Features;
 using CleanAspire.Api.ExceptionHandlers;
 using CleanAspire.Api.Webpushr;
 using System.Net.Http;
-
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +29,16 @@ builder.Services.Configure<WebpushrOptions>(builder.Configuration.GetSection(Web
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+}).AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration.GetValue<string>("Authentication:Google:ClientId") ?? string.Empty;
+    googleOptions.ClientSecret = builder.Configuration.GetValue<string>("Authentication:Google:ClientSecret") ?? string.Empty; ;
+})
+    .AddIdentityCookies();
 builder.Services.AddAuthorizationBuilder();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();
 
