@@ -15,6 +15,16 @@ using System.Text.Encodings.Web;
 using System.Text;
 using Microsoft.AspNetCore.Identity.Data;
 using StrongGrid.Resources;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.Authentication;
+using Mono.TextTemplating;
+using Microsoft.Extensions.Hosting;
+using System.Net.Http;
+using System.Threading;
+using Google.Apis.Auth;
+using System.Net.WebSockets;
+using CleanAspire.Infrastructure.Persistence;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -33,7 +43,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
         var routeGroup = endpoints.MapGroup("/account").WithTags("Authentication", "Account Management");
         routeGroup.MapPost("/logout", async (SignInManager<TUser> signInManager) =>
         {
-            await signInManager.SignOutAsync();
+            await signInManager.SignOutAsync().ConfigureAwait(false);
             logger.LogInformation("User has been logged out successfully.");
             return Results.Ok();
         })
@@ -42,9 +52,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Logs out the currently authenticated user by signing them out of the system. This endpoint requires the user to be authorized before calling, and returns an HTTP 200 OK response upon successful logout.");
 
         routeGroup.MapGet("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, HttpContext context, IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -59,9 +69,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
 
         routeGroup.MapPost("/profile", async Task<Results<Ok<ProfileResponse>, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] ProfileRequest request, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -103,9 +113,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Allows users to update their profile, including username, email, nickname, avatar, time zone, and language code.");
 
         routeGroup.MapPost("/updateEmail", async Task<Results<Ok, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, [FromBody] UpdateEmailRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, [FromBody] UpdateEmailRequest request, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -133,9 +143,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
 
         routeGroup.MapPost("/signup", async Task<Results<Created, ValidationProblem>>
-                ([FromBody] SignupRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+                ([FromBody] SignupRequest request, HttpContext context) =>
             {
-                var userManager = sp.GetRequiredService<UserManager<TUser>>();
+                var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
                 var user = new TUser();
                 if (!userManager.SupportsUserEmail)
                 {
@@ -164,9 +174,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
             .WithDescription("Allows a new user to sign up by providing required details such as email, password, and tenant-specific information. This endpoint creates a new user account and sends a confirmation email for verification.");
 
         routeGroup.MapDelete("/deleteOwnerAccount", async Task<Results<Ok, ValidationProblem, NotFound>>
-            (ClaimsPrincipal claimsPrincipal, SignInManager<TUser> signInManager, [FromBody] DeleteUserRequest request, [FromServices] IServiceProvider sp) =>
+            (ClaimsPrincipal claimsPrincipal, SignInManager<TUser> signInManager, HttpContext context,[FromBody] DeleteUserRequest request) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
@@ -194,9 +204,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Allows users to delete their own account permanently.");
 
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
-            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
+            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, HttpContext context) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             if (await userManager.FindByIdAsync(userId) is not { } user)
             {
                 return TypedResults.Unauthorized();
@@ -238,6 +248,188 @@ public static class IdentityApiAdditionalEndpointsExtensions
           });
 
 
+
+        routeGroup.MapGet("/google/loginUrl", ([FromQuery] string state, HttpContext context) =>
+        {
+            if (string.IsNullOrEmpty(state))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter is required." } }
+                });
+            }
+
+            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
+            var clientId = configuration["Authentication:Google:ClientId"];
+            if (string.IsNullOrEmpty(clientId))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "clientId", new[] { "Google Client ID is not configured." } }
+                });
+            }
+
+            var baseRedirectUri = configuration["ClientBaseUrl"];
+            var redirectUri = string.IsNullOrEmpty(baseRedirectUri)
+                ? $"{context.Request.Scheme}://{context.Request.Host}/external-login"
+                : $"{baseRedirectUri}/external-login";
+
+            if (!redirectUri.StartsWith(state))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter does not match the redirect URI." } }
+                });
+            }
+
+            var googleAuthUrl =
+                $"https://accounts.google.com/o/oauth2/v2/auth?" +
+                $"response_type=code&" +
+                $"client_id={Uri.EscapeDataString(clientId)}&" +
+                $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
+                $"scope=openid%20profile%20email&" +
+                $"state={Uri.EscapeDataString(state)}&" +
+                $"nonce={Guid.NewGuid()}";
+
+            return Results.Ok(googleAuthUrl);
+        })
+        .Produces<string>(StatusCodes.Status200OK)
+        .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+        .WithSummary("Generate Google OAuth 2.0 Login URL")
+        .WithDescription("Generates a Google OAuth 2.0 authorization URL for external login, dynamically determining the redirect URI and including the provided state parameter.");
+
+        routeGroup.MapPost("/google/signIn", async (HttpContext context,
+                [FromServices] IHttpClientFactory httpClientFactory,
+                [FromQuery] string state,
+                [FromQuery] string code) =>
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter is required." } }
+                });
+            }
+            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
+            var clientId = configuration["Authentication:Google:ClientId"];
+            var clientSecret = configuration["Authentication:Google:ClientSecret"];
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "clientId", new[] { "Google Client ID is not configured." } }
+                });
+            }
+            var baseRedirectUri = configuration["ClientBaseUrl"];
+            if (string.IsNullOrEmpty(baseRedirectUri))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "baseRedirectUri", new[] { "Client base URL is not configured." } }
+                });
+            }
+            var redirectUri = $"{baseRedirectUri}/external-login";
+
+            if (!redirectUri.StartsWith(state))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    { "state", new[] { "The state parameter does not match the redirect URI." } }
+                });
+            }
+
+            var idTokenRequestContent = new FormUrlEncodedContent
+            ([
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                new KeyValuePair<string, string>("grant_type", "authorization_code")
+            ]);
+            // Exchange the Google authorization code for access token
+            var authorizationCodeExchangeRequest = await httpClientFactory.CreateClient().PostAsync(
+                "https://oauth2.googleapis.com/token", idTokenRequestContent);
+
+            if (!authorizationCodeExchangeRequest.IsSuccessStatusCode)
+            {
+                var responseMessage = await authorizationCodeExchangeRequest.Content.ReadAsStringAsync();
+                return Results.BadRequest($"Authorization code exchange failed. {responseMessage}");
+            }
+
+            var idTokenContent = await authorizationCodeExchangeRequest.Content.ReadFromJsonAsync<GoogleTokenResponse>();
+            if (idTokenContent?.id_token is null)
+            {
+                return Results.BadRequest("id_token not found in the response from the identity provider");
+            }
+            try
+            {
+                var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
+                var dbcontext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var signInManager = context.RequestServices.GetRequiredService<SignInManager<TUser>>();
+                var validatedUser = await GoogleJsonWebSignature.ValidateAsync
+                (
+                    validationSettings: new() { Audience = [clientId] },
+                    jwt: idTokenContent?.id_token
+                );
+                var email = validatedUser.Email;
+                var user = await userManager.FindByEmailAsync(email);
+                if (user is null)
+                {
+                    user = new TUser();
+                    if (!userManager.SupportsUserEmail)
+                    {
+                        throw new NotSupportedException($"{nameof(MapIdentityApiAdditionalEndpoints)} requires a user store with email support.");
+                    }
+                    if (user is not ApplicationUser appUser)
+                        throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
+
+                    var tenantId = dbcontext.Tenants.FirstOrDefault()?.Id;
+                    appUser.TenantId = tenantId;
+                    appUser.Email = email;
+                    appUser.UserName = email;
+                    appUser.Nickname = validatedUser.Name;
+                    appUser.Provider = "Google";
+                    appUser.AvatarUrl = validatedUser.Picture;
+                    appUser.LanguageCode = "en-US";
+                    appUser.TimeZoneId = "UTC";
+                    appUser.EmailConfirmed = true;
+                    appUser.RefreshToken = idTokenContent!.refresh_token;
+                    appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddSeconds(idTokenContent.expires_in);
+
+                    var createResult = await userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
+                    {
+                        return Results.BadRequest("Failed to create a new user.");
+                    }
+
+                    // Associate external login with the new user
+                    await userManager.AddLoginAsync(user, new UserLoginInfo("Google", validatedUser.Subject, "Google"));
+                }
+
+                signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
+                var loginResult = await signInManager.ExternalLoginSignInAsync("Google", validatedUser.Subject, isPersistent: false);
+                if (!loginResult.Succeeded)
+                {
+                    return Results.BadRequest("External login failed.");
+                }
+
+                return TypedResults.Ok();
+            }
+            catch (InvalidJwtException e)
+            {
+                return Results.BadRequest($"The id_token did not pass validation. {e.Message}");
+            }
+            catch (Exception e)
+            {
+                return Results.BadRequest($"The id_token did not pass validation. {e.Message}");
+            }
+
+        }).Produces(StatusCodes.Status200OK)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+           .WithSummary("External Login with Google OAuth")
+            .WithDescription("Handles external login using Google OAuth 2.0. Exchanges an authorization code for tokens, validates the user's identity, and signs the user in.");
+
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
         {
             var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
@@ -252,7 +444,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             var userId = await userManager.GetUserIdAsync(user);
-  
+
             // Construct the client-side URL
             var confirmEmailUrl = isChange
                 ? $"{clientBaseUrl}/account/profile?userId={userId}&code={code}&changedEmail={email}"
@@ -262,7 +454,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             await emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
         }
         routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
-            (HttpContext context, [FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
+            (HttpContext context, [FromBody] ForgotPasswordRequest resetRequest) =>
         {
             var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
             var clientBaseUrl = configuration["ClientBaseUrl"];
@@ -270,7 +462,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             {
                 throw new InvalidOperationException("Client base URL is not configured.");
             }
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
             if (user is not null && await userManager.IsEmailConfirmedAsync(user))
@@ -545,3 +737,18 @@ public sealed class SignupRequest
 }
 
 
+internal sealed record GoogleTokenResponse
+{
+    public string? access_token { get; set; }
+    public int expires_in { get; set; }
+    public string? id_token { get; set; }
+    public string? scope { get; set; }
+    public string? token_type { get; set; }
+    public string? refresh_token { get; set; }
+}
+internal sealed record GoogleAuthResponse(
+    string ExternalId,
+    string Username,
+    string Email,
+    string? ProfilePicture
+);

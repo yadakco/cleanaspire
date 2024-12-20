@@ -184,7 +184,7 @@ public class Theme
                 {
                     FontSize = "1.5rem",
                     FontWeight = "500",
-                    LineHeight = "2",
+                    LineHeight = "2.2",
                     LetterSpacing = ".00735em"
                 },
                 H5 = new H5Typography
@@ -198,7 +198,7 @@ public class Theme
                 {
                     FontSize = "1rem",
                     FontWeight = "500",
-                    LineHeight = "1.5",
+                    LineHeight = "1.6",
                     LetterSpacing = ".0075em"
                 },
                 Button = new ButtonTypography

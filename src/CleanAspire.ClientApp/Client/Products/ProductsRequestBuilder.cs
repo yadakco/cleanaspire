@@ -62,6 +62,7 @@ namespace CleanAspire.Api.Client.Products
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 404 status code</exception>
         /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 422 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 500 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<global::CleanAspire.Api.Client.Models.Unit?> DeleteAsync(global::CleanAspire.Api.Client.Models.DeleteProductCommand body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -78,6 +79,7 @@ namespace CleanAspire.Api.Client.Products
                 { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
                 { "404", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
                 { "422", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
+                { "500", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
             };
             return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.Unit>(requestInfo, global::CleanAspire.Api.Client.Models.Unit.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
@@ -88,6 +90,7 @@ namespace CleanAspire.Api.Client.Products
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 500 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<List<global::CleanAspire.Api.Client.Models.ProductDto>?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -101,6 +104,7 @@ namespace CleanAspire.Api.Client.Products
             var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
             {
                 { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
+                { "500", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
             };
             var collectionResult = await RequestAdapter.SendCollectionAsync<global::CleanAspire.Api.Client.Models.ProductDto>(requestInfo, global::CleanAspire.Api.Client.Models.ProductDto.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
             return collectionResult?.AsList();
@@ -114,6 +118,7 @@ namespace CleanAspire.Api.Client.Products
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
         /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 422 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 500 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<global::CleanAspire.Api.Client.Models.ProductDto?> PostAsync(global::CleanAspire.Api.Client.Models.CreateProductCommand body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -129,6 +134,7 @@ namespace CleanAspire.Api.Client.Products
             {
                 { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
                 { "422", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
+                { "500", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
             };
             return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.ProductDto>(requestInfo, global::CleanAspire.Api.Client.Models.ProductDto.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
@@ -142,6 +148,7 @@ namespace CleanAspire.Api.Client.Products
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 404 status code</exception>
         /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 422 status code</exception>
+        /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 500 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public async Task<global::CleanAspire.Api.Client.Models.Unit?> PutAsync(global::CleanAspire.Api.Client.Models.UpdateProductCommand body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
@@ -158,6 +165,7 @@ namespace CleanAspire.Api.Client.Products
                 { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
                 { "404", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
                 { "422", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
+                { "500", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
             };
             return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.Unit>(requestInfo, global::CleanAspire.Api.Client.Models.Unit.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
