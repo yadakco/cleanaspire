@@ -87,7 +87,7 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.51
+    image: blazordevlab/cleanaspire-api:0.0.52
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -96,7 +96,9 @@ services:
       - ASPNETCORE_HTTPS_PORTS=443
       - DatabaseSettings__DBProvider=sqlite
       - DatabaseSettings__ConnectionString=Data Source=CleanAspireDb.db
-      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7123
+      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7114
+      - Authentication__Google__ClientId=<your client id>
+      - Authentication__Google__ClientSecret=<your client secret>
       - SendGrid__ApiKey=<your API key>
       - SendGrid__DefaultFromEmail=<your email>
       - Webpushr__Token=<your-webpushr-token>
@@ -108,7 +110,7 @@ services:
 
 
   blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.51
+    image: blazordevlab/cleanaspire-webapp:0.0.52
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*

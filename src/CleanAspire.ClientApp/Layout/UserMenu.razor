@@ -17,11 +17,11 @@
                     }
                     @if (string.IsNullOrEmpty(userModel?.AvatarUrl))
                     {
-                        <MudAvatar Style="width:40px;height:40px" >@userModel?.Username?.FirstOrDefault()</MudAvatar>
+                        <MudAvatar Style="width:35px;height:35px">@userModel?.Username?.FirstOrDefault()</MudAvatar>
                     }
                     else
                     {
-                        <MudAvatar Style="width:40px;height:40px">
+                        <MudAvatar Style="width:35px;height:35px">
                             <MudImage Src="@userModel.AvatarUrl"></MudImage>
                         </MudAvatar>
                     }
