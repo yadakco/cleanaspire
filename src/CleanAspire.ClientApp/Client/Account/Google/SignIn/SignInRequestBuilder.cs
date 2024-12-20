@@ -33,18 +33,18 @@ namespace CleanAspire.Api.Client.Account.Google.SignIn
         public SignInRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/account/google/signIn?code={code}&state={state}", rawUrl)
         {
         }
-        /// <returns>A <see cref="global::CleanAspire.Api.Client.Models.GoogleAuthResponse"/></returns>
+        /// <returns>A <see cref="Stream"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::CleanAspire.Api.Client.Models.ProblemDetails">When receiving a 400 status code</exception>
         /// <exception cref="global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::CleanAspire.Api.Client.Models.GoogleAuthResponse?> PostAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Account.Google.SignIn.SignInRequestBuilder.SignInRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<Stream?> PostAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Account.Google.SignIn.SignInRequestBuilder.SignInRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::CleanAspire.Api.Client.Models.GoogleAuthResponse> PostAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Account.Google.SignIn.SignInRequestBuilder.SignInRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<Stream> PostAsync(Action<RequestConfiguration<global::CleanAspire.Api.Client.Account.Google.SignIn.SignInRequestBuilder.SignInRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -53,7 +53,7 @@ namespace CleanAspire.Api.Client.Account.Google.SignIn
                 { "400", global::CleanAspire.Api.Client.Models.ProblemDetails.CreateFromDiscriminatorValue },
                 { "422", global::CleanAspire.Api.Client.Models.HttpValidationProblemDetails.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<global::CleanAspire.Api.Client.Models.GoogleAuthResponse>(requestInfo, global::CleanAspire.Api.Client.Models.GoogleAuthResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendPrimitiveAsync<Stream>(requestInfo, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -68,7 +68,7 @@ namespace CleanAspire.Api.Client.Account.Google.SignIn
 #endif
             var requestInfo = new RequestInformation(Method.POST, UrlTemplate, PathParameters);
             requestInfo.Configure(requestConfiguration);
-            requestInfo.Headers.TryAdd("Accept", "application/json");
+            requestInfo.Headers.TryAdd("Accept", "application/problem+json");
             return requestInfo;
         }
         /// <summary>

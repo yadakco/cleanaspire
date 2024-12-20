@@ -24,6 +24,7 @@ using System.Net.Http;
 using System.Threading;
 using Google.Apis.Auth;
 using System.Net.WebSockets;
+using CleanAspire.Infrastructure.Persistence;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -358,6 +359,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             try
             {
                 var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
+                var dbcontext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                 var signInManager = context.RequestServices.GetRequiredService<SignInManager<TUser>>();
                 var validatedUser = await GoogleJsonWebSignature.ValidateAsync
                 (
@@ -366,22 +368,47 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 );
                 var email = validatedUser.Email;
                 var user = await userManager.FindByEmailAsync(email);
-                if (user is not null)
+                if (user is null)
                 {
-                    signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
-                    var loginResult = await signInManager.ExternalLoginSignInAsync("Google", validatedUser.Subject, isPersistent: false);
-                    if (!loginResult.Succeeded)
+                    user = new TUser();
+                    if (!userManager.SupportsUserEmail)
                     {
-                        return Results.BadRequest("External login failed.");
+                        throw new NotSupportedException($"{nameof(MapIdentityApiAdditionalEndpoints)} requires a user store with email support.");
                     }
+                    if (user is not ApplicationUser appUser)
+                        throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
+
+                    var tenantId = dbcontext.Tenants.FirstOrDefault()?.Id;
+                    appUser.TenantId = tenantId;
+                    appUser.Email = email;
+                    appUser.UserName = email;
+                    appUser.Nickname = validatedUser.Name;
+                    appUser.Provider = "Google";
+                    appUser.AvatarUrl = validatedUser.Picture;
+                    appUser.LanguageCode = "en-US";
+                    appUser.TimeZoneId = "UTC";
+                    appUser.EmailConfirmed = true;
+                    appUser.RefreshToken = idTokenContent!.refresh_token;
+                    appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddSeconds(idTokenContent.expires_in);
+
+                    var createResult = await userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
+                    {
+                        return Results.BadRequest("Failed to create a new user.");
+                    }
+
+                    // Associate external login with the new user
+                    await userManager.AddLoginAsync(user, new UserLoginInfo("Google", validatedUser.Subject, "Google"));
                 }
-                return TypedResults.Ok(new GoogleAuthResponse
-                (
-                    ProfilePicture: validatedUser.Picture,
-                    ExternalId: validatedUser.Subject,
-                    Username: validatedUser.Name,
-                    Email: validatedUser.Email
-                ));
+
+                signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
+                var loginResult = await signInManager.ExternalLoginSignInAsync("Google", validatedUser.Subject, isPersistent: false);
+                if (!loginResult.Succeeded)
+                {
+                    return Results.BadRequest("External login failed.");
+                }
+
+                return TypedResults.Ok();
             }
             catch (InvalidJwtException e)
             {
@@ -392,7 +419,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 return Results.BadRequest($"The id_token did not pass validation. {e.Message}");
             }
 
-        }).Produces<GoogleAuthResponse>(StatusCodes.Status200OK)
+        }).Produces(StatusCodes.Status200OK)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("")
