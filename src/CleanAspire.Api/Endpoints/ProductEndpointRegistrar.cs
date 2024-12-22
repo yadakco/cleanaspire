@@ -15,7 +15,7 @@ public class ProductEndpointRegistrar : IEndpointRegistrar
 {
     public void RegisterRoutes(IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/products").WithTags("products").AllowAnonymous();
+        var group = routes.MapGroup("/products").WithTags("products").RequireAuthorization();
 
         // Get all products
         group.MapGet("/", async ([FromServices] IMediator mediator) =>
