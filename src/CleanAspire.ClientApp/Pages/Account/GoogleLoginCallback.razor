@@ -41,7 +41,7 @@
     public string? State { get; set; }
     public string? Error { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (string.IsNullOrEmpty(AuthorizationCode))
         {
@@ -54,34 +54,23 @@
             Error = "Invalid request: Missing state parameter. Please try logging in again.";
             return;
         }
-
-
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        try
         {
-            if (!string.IsNullOrEmpty(AuthorizationCode) && !string.IsNullOrEmpty(State))
-            {
-                try
-                {
-                    await SignInManagement.LoginWithGoogle(AuthorizationCode, State);
-                    StateHasChanged();
-                }
-                catch (ProblemDetails ex)
-                {
-                    // Log and display API-specific problem details
-                    Error = $"An error occurred during login: {ex.Detail ?? "Please contact support if the issue persists."}";
-                }
-                catch (Exception ex)
-                {
-                    // Catch-all for other exceptions
-                    Error = $"Unexpected error: {ex.Message}. Please refresh the page or contact support.";
-                }
-            }
+            await SignInManagement.LoginWithGoogle(AuthorizationCode, State);
+            StateHasChanged();
         }
-    }
+        catch (ProblemDetails ex)
+        {
+            // Log and display API-specific problem details
+            Error = $"An error occurred during login: {ex.Detail ?? "Please contact support if the issue persists."}";
+        }
+        catch (Exception ex)
+        {
+            // Catch-all for other exceptions
+            Error = $"Unexpected error: {ex.Message}. Please refresh the page or contact support.";
+        }
 
+    }
 }
 
 

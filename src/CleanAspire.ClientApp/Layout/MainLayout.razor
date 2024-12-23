@@ -21,26 +21,17 @@
         {
             LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccured;
         }
-        
+        OnlineStatusInterop.Initialize();
+        await OfflineModeState.InitializeAsync();
+        await ApplyUserPreferences();
+        if (_mudThemeProvider != null)
+        {
+            await _mudThemeProvider.WatchSystemPreference(OnSystemPreferenceChanged);
+        }
        
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            OnlineStatusInterop.Initialize();
-            await OfflineModeState.InitializeAsync();
-            await ApplyUserPreferences();
-            if (_mudThemeProvider != null)
-            {
-                await _mudThemeProvider.WatchSystemPreference(OnSystemPreferenceChanged);
-            }
-            StateHasChanged();
-        }
-    }
+     
 
     private async Task ApplyUserPreferences()
     {
