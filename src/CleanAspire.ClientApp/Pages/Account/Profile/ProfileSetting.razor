@@ -71,16 +71,18 @@
         }
         try
         {
+            var antiforgeryToken = await ApiClient.FileManagement.AntiforgeryToken.GetAsync();
             var request = new MultipartBody();
             request.AddOrReplacePart("overwrite", "text/plain", "false");
             request.AddOrReplacePart("folder", "text/plain", $"{model.Id}");
             request.AddOrReplacePart("cropSize_width", "text/plain", $"{150}");
             request.AddOrReplacePart("cropSize_height", "text/plain", $"{150}");
+            request.AddOrReplacePart($"__{antiforgeryToken.HeaderName}", "text/plain", $"{antiforgeryToken.RequestToken}");
             var filename = file.Name;
             var stream = new MemoryStream();
             await file.OpenReadStream(int.MaxValue).CopyToAsync(stream);
             request.AddOrReplacePart($"files[0]", "application/octet-stream", stream, filename);
-            var response = await ApiClient.File.Image.PostAsync(request);
+            var response = await ApiClient.FileManagement.Image.PostAsync(request);
             if (response is not null && response.Any())
             {
                 model.AvatarUrl = response.FirstOrDefault().Url;

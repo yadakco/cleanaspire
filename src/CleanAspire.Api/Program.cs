@@ -15,8 +15,6 @@ using CleanAspire.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http.Features;
 using CleanAspire.Api.ExceptionHandlers;
 using CleanAspire.Api.Webpushr;
-using System.Net.Http;
-using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +61,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
-
+builder.Services.AddAntiforgery();
 // add a CORS policy for the client
 var allowedCorsOrigins = builder.Configuration.GetValue<string>("AllowedCorsOrigins")?
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -110,6 +108,7 @@ await app.InitializeDatabaseAsync();
 app.UseExceptionHandler();
 app.MapEndpointDefinitions();
 app.UseCors("wasm");
+app.UseAntiforgery();
 app.Use(async (context, next) =>
 {
     var currentUserContextSetter = context.RequestServices.GetRequiredService<ICurrentUserContextSetter>();

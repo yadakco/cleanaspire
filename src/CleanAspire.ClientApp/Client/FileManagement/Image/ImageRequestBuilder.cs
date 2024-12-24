@@ -9,28 +9,28 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace CleanAspire.Api.Client.FileNamespace.Image
+namespace CleanAspire.Api.Client.FileManagement.Image
 {
     /// <summary>
-    /// Builds and executes requests for operations under \file\image
+    /// Builds and executes requests for operations under \fileManagement\image
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class ImageRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileNamespace.Image.ImageRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileManagement.Image.ImageRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ImageRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/file/image", pathParameters)
+        public ImageRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/fileManagement/image", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileNamespace.Image.ImageRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileManagement.Image.ImageRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ImageRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/file/image", rawUrl)
+        public ImageRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/fileManagement/image", rawUrl)
         {
         }
         /// <summary>
@@ -79,11 +79,11 @@ namespace CleanAspire.Api.Client.FileNamespace.Image
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::CleanAspire.Api.Client.FileNamespace.Image.ImageRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.FileManagement.Image.ImageRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::CleanAspire.Api.Client.FileNamespace.Image.ImageRequestBuilder WithUrl(string rawUrl)
+        public global::CleanAspire.Api.Client.FileManagement.Image.ImageRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::CleanAspire.Api.Client.FileNamespace.Image.ImageRequestBuilder(rawUrl, RequestAdapter);
+            return new global::CleanAspire.Api.Client.FileManagement.Image.ImageRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.

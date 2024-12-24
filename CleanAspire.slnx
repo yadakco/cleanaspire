@@ -4,18 +4,19 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/CleanAspire.Api/CleanAspire.Api.csproj" Id="ded5e19f-db6b-c4ee-e692-cffe0619c173" />
+    <Project Path="src/CleanAspire.Api/CleanAspire.Api.csproj" />
     <Project Path="src/CleanAspire.AppHost/CleanAspire.AppHost.csproj" />
-    <Project Path="src/CleanAspire.Application/CleanAspire.Application.csproj" Id="06710e4a-8503-48b5-b25b-d1056a7414eb" />
+    <Project Path="src/CleanAspire.Application/CleanAspire.Application.csproj" />
     <Project Path="src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj" />
-    <Project Path="src/CleanAspire.Domain/CleanAspire.Domain.csproj" Id="dfaf6933-e1d7-4eac-b854-fe12bc19d9ef" />
-    <Project Path="src/CleanAspire.Infrastructure/CleanAspire.Infrastructure.csproj" Id="abe1716e-889c-48b6-8aa0-51d688f3c480" />
+    <Project Path="src/CleanAspire.Domain/CleanAspire.Domain.csproj" />
+    <Project Path="src/CleanAspire.Infrastructure/CleanAspire.Infrastructure.csproj" />
     <Project Path="src/CleanAspire.ServiceDefaults/CleanAspire.ServiceDefaults.csproj" />
+    <Project Path="src/CleanAspire.WebApp/CleanAspire.WebApp.csproj" />
   </Folder>
-  <Folder Name="/src/Migrators/" Id="c983071d-42d7-4326-a379-ce622e29d307">
-    <Project Path="src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj" Id="2e671cbd-fcc7-4be8-b3aa-71c296ac5317" />
-    <Project Path="src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj" Id="7d6e47cc-90f1-4c19-af96-1de7eed7928c" />
-    <Project Path="src/Migrators/Migrators.SQLite/Migrators.SQLite.csproj" Id="67226f2c-5d75-4b76-b5f8-e42a4bc1bbb1" />
+  <Folder Name="/src/Migrators/">
+    <Project Path="src/Migrators/Migrators.MSSQL/Migrators.MSSQL.csproj" />
+    <Project Path="src/Migrators/Migrators.PostgreSQL/Migrators.PostgreSQL.csproj" />
+    <Project Path="src/Migrators/Migrators.SQLite/Migrators.SQLite.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CleanAspire.Tests/CleanAspire.Tests.csproj" />

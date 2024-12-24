@@ -327,9 +327,11 @@
     public List<FileUploadResponse> fileUploadResponses = new List<FileUploadResponse>();
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
+        var antiforgeryToken = await ApiClient.FileManagement.AntiforgeryToken.GetAsync();
         var request = new MultipartBody();
         request.AddOrReplacePart("overwrite", "text/plain", "false");
         request.AddOrReplacePart("folder", "text/plain", $"{DateTime.UtcNow.ToString("yyyyMMdd")}");
+        request.AddOrReplacePart($"__{antiforgeryToken.HeaderName}", "text/plain", $"{antiforgeryToken.RequestToken}");
         var i = 0;
         foreach (var file in files)
         {
@@ -338,7 +340,7 @@
             await file.OpenReadStream(int.MaxValue).CopyToAsync(stream);
             request.AddOrReplacePart($"files[{i++}]", "application/octet-stream", stream, filename);
         }
-        var response = await ApiClient.File.Upload.PostAsync(request);
+        var response = await ApiClient.FileManagement.Upload.PostAsync(request);
         if (response is not null && response.Any())
         {
             fileUploadResponses.AddRange(response);
@@ -352,7 +354,7 @@
     }
     private async Task DeleteFile(FileUploadResponse item)
     {
-        await ApiClient.File.DeleteAsync(request => request.QueryParameters.Path = item.Path);
+        await ApiClient.FileManagement.DeleteAsync(request => request.QueryParameters.Path = item.Path);
         fileUploadResponses.Remove(item);
     }
 }

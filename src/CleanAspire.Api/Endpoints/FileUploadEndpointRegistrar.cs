@@ -12,6 +12,7 @@ using SixLabors.ImageSharp;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Antiforgery;
 
 namespace CleanAspire.Api.Endpoints;
 
@@ -19,12 +20,21 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
 {
     public void RegisterRoutes(IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/file").WithTags("File Upload").RequireAuthorization();
+        var group = routes.MapGroup("/fileManagement").WithTags("File Upload").RequireAuthorization();
 
-        group.MapPost("/upload", async ([FromForm] FileUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+        group.MapGet("/antiforgeryToken", (HttpContext context, [FromServices] IAntiforgery antiforgery) =>
+        {
+            var tokens = antiforgery.GetAndStoreTokens(context);
+            return TypedResults.Ok(new AntiforgeryTokenResponse(tokens.CookieToken, tokens.RequestToken, tokens.HeaderName));
+        }).Produces<AntiforgeryTokenResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .WithSummary("Get Antiforgery Token")
+        .WithDescription("Retrieves a new antiforgery token to be used for validating subsequent requests.");
+
+        group.MapPost("/upload", async ([FromForm] FileUploadRequest request, HttpContext context) =>
         {
             var response = new List<FileUploadResponse>();
-            var uploadService = sp.GetRequiredService<IUploadService>();
+            var uploadService = context.RequestServices.GetRequiredService<IUploadService>();
             // Construct the URL to access the file
             var requestScheme = context.Request.Scheme; // 'http' or 'https'
             var requestHost = context.Request.Host.Value; // 'host:port'
@@ -49,7 +59,6 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
             }
             return TypedResults.Ok(response);
         }).Accepts<FileUploadRequest>("multipart/form-data")
-        .DisableAntiforgery()
         .Produces<IEnumerable<FileUploadResponse>>()
         .WithMetadata(new ConsumesAttribute("multipart/form-data"))
         .WithSummary("Upload files to the server")
@@ -68,7 +77,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                 var imgstream = new MemoryStream();
                 await filestream.CopyToAsync(imgstream);
                 imgstream.Position = 0;
-                if (request.CropSize_Width != null && request.CropSize_Height!=null)
+                if (request.CropSize_Width != null && request.CropSize_Height != null)
                 {
                     using (var outStream = new MemoryStream())
                     {
@@ -108,7 +117,6 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
 
             return TypedResults.Ok(response);
         }).Accepts<ImageUploadRequest>("multipart/form-data")
-        .DisableAntiforgery()
         .Produces<IEnumerable<FileUploadResponse>>()
         .WithMetadata(new ConsumesAttribute("multipart/form-data"))
         .WithSummary("Upload images to the server with cropping options")
@@ -116,8 +124,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
 
         group.MapGet("/", async Task<Results<FileStreamHttpResult, ValidationProblem, NotFound<string>>> (
             [FromQuery] string path,
-            HttpContext context,
-            [FromServices] IServiceProvider sp) =>
+            HttpContext context) =>
         {
             if (path.Contains("..") || path.StartsWith("/") || path.StartsWith("\\"))
             {
@@ -164,8 +171,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
 
         group.MapDelete("/", async Task<Results<NoContent, ValidationProblem, NotFound<string>>> (
             [FromQuery] string path,
-            HttpContext context,
-            [FromServices] IServiceProvider sp) =>
+            HttpContext context) =>
         {
             if (path.Contains("..") || path.StartsWith("/") || path.StartsWith("\\"))
             {
@@ -278,7 +284,7 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         [Description("The desired crop size for height the uploaded image.")]
         public int? CropSize_Height { get; set; }
     }
-
+    public record AntiforgeryTokenResponse(string? CookieToken, string? RequestToken, string? HeaderName);
     public class CropSize
     {
         /// <summary>

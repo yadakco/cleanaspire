@@ -14,16 +14,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
 using Microsoft.AspNetCore.Identity.Data;
-using StrongGrid.Resources;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Primitives;
-using Microsoft.AspNetCore.Authentication;
-using Mono.TextTemplating;
-using Microsoft.Extensions.Hosting;
-using System.Net.Http;
-using System.Threading;
 using Google.Apis.Auth;
-using System.Net.WebSockets;
 using CleanAspire.Infrastructure.Persistence;
 namespace CleanAspire.Api;
 

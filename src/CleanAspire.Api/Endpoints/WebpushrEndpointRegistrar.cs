@@ -3,14 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using CleanAspire.Api.Webpushr;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 
 
 namespace CleanAspire.Api.Endpoints;

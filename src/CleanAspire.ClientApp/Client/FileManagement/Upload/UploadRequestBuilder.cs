@@ -9,28 +9,28 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace CleanAspire.Api.Client.FileNamespace.Upload
+namespace CleanAspire.Api.Client.FileManagement.Upload
 {
     /// <summary>
-    /// Builds and executes requests for operations under \file\upload
+    /// Builds and executes requests for operations under \fileManagement\upload
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class UploadRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileNamespace.Upload.UploadRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileManagement.Upload.UploadRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public UploadRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/file/upload", pathParameters)
+        public UploadRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/fileManagement/upload", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileNamespace.Upload.UploadRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::CleanAspire.Api.Client.FileManagement.Upload.UploadRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public UploadRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/file/upload", rawUrl)
+        public UploadRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/fileManagement/upload", rawUrl)
         {
         }
         /// <summary>
@@ -79,11 +79,11 @@ namespace CleanAspire.Api.Client.FileNamespace.Upload
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::CleanAspire.Api.Client.FileNamespace.Upload.UploadRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::CleanAspire.Api.Client.FileManagement.Upload.UploadRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::CleanAspire.Api.Client.FileNamespace.Upload.UploadRequestBuilder WithUrl(string rawUrl)
+        public global::CleanAspire.Api.Client.FileManagement.Upload.UploadRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::CleanAspire.Api.Client.FileNamespace.Upload.UploadRequestBuilder(rawUrl, RequestAdapter);
+            return new global::CleanAspire.Api.Client.FileManagement.Upload.UploadRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
