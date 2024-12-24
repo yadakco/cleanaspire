@@ -79,19 +79,12 @@ public class ProductEndpointRegistrar(ILogger<ProductEndpointRegistrar> logger) 
         // Export products to CSV
         group.MapGet("/export", async ([FromQuery] string keywords, [FromServices] IMediator mediator) =>
         {
-            try
-            {
-                var result = await mediator.Send(new ExportProductsQuery(keywords));
-                result.Position = 0;
-                return Results.File(result, "text/csv", "exported-products.csv");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Error exporting products: {ex.Message}");
-                return Results.Problem("An error occurred while exporting products. Please try again later.");
-            }
+            var result = await mediator.Send(new ExportProductsQuery(keywords));
+            result.Position = 0;
+            return Results.File(result, "text/csv", "exported-products.csv");
         })
         .Produces(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("Export Products to CSV")
         .WithDescription("Exports the product data to a CSV file based on the provided keywords. The CSV file includes product details such as ID, name, description, price, SKU, and category.");
@@ -99,43 +92,36 @@ public class ProductEndpointRegistrar(ILogger<ProductEndpointRegistrar> logger) 
         // Import products from CSV
         group.MapPost("/import", async ([FromForm] FileUploadRequest request, HttpContext context, [FromServices] IMediator mediator) =>
         {
-            try
+            var response = new List<FileUploadResponse>();
+            foreach (var file in request.Files)
             {
-                var response = new List<FileUploadResponse>();
-                foreach (var file in request.Files)
+                // Validate file type
+                if (Path.GetExtension(file.FileName).ToLower() != ".csv")
                 {
-                    // Validate file type
-                    if (Path.GetExtension(file.FileName).ToLower() != ".csv")
-                    {
-                        logger.LogWarning($"Invalid file type: {file.FileName}");
-                        return Results.BadRequest("Only CSV files are supported.");
-                    }
-                    var fileName = file.FileName;
-                    // Copy file to memory stream
-                    var filestream = file.OpenReadStream();
-                    var stream = new MemoryStream();
-                    await filestream.CopyToAsync(stream);
-                    stream.Position = 0;
-                    var fileSize = stream.Length;
-                    // Send the file stream to ImportProductsCommand
-                    var importCommand = new ImportProductsCommand(stream);
-                    await mediator.Send(importCommand);
-
-                    response.Add(new FileUploadResponse
-                    {
-                        Path = file.FileName,
-                        Url = $"Imported {fileName}",
-                        Size = fileSize
-                    });
+                    logger.LogWarning($"Invalid file type: {file.FileName}");
+                    return Results.BadRequest("Only CSV files are supported.");
                 }
+                var fileName = file.FileName;
+                // Copy file to memory stream
+                var filestream = file.OpenReadStream();
+                var stream = new MemoryStream();
+                await filestream.CopyToAsync(stream);
+                stream.Position = 0;
+                var fileSize = stream.Length;
+                // Send the file stream to ImportProductsCommand
+                var importCommand = new ImportProductsCommand(stream);
+                await mediator.Send(importCommand);
 
-                return TypedResults.Ok(response);
+                response.Add(new FileUploadResponse
+                {
+                    Path = file.FileName,
+                    Url = $"Imported {fileName}",
+                    Size = fileSize
+                });
             }
-            catch (Exception ex)
-            {
-                logger.LogError($"Error importing products: {ex.Message}");
-                return Results.Problem("An error occurred while importing products. Please try again later.");
-            }
+
+            return TypedResults.Ok(response);
+
         }).DisableAntiforgery()
           .Accepts<FileUploadRequest>("multipart/form-data")
           .Produces<IEnumerable<FileUploadResponse>>()
