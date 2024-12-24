@@ -64,10 +64,10 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
         .WithSummary("Upload files to the server")
         .WithDescription("Allows uploading multiple files to a specific folder on the server.");
 
-        group.MapPost("/image", async ([FromForm] ImageUploadRequest request, HttpContext context, [FromServices] IServiceProvider sp) =>
+        group.MapPost("/image", async ([FromForm] ImageUploadRequest request, HttpContext context) =>
         {
             var response = new List<FileUploadResponse>();
-            var uploadService = sp.GetRequiredService<IUploadService>();
+            var uploadService = context.RequestServices.GetRequiredService<IUploadService>();
             // Construct the URL to access the file
             var requestScheme = context.Request.Scheme; // 'http' or 'https'
             var requestHost = context.Request.Host.Value; // 'host:port'
