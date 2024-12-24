@@ -6,15 +6,15 @@
 <PageTitle>@Title</PageTitle>
 
 <MudDataGrid T="ProductDto" Dense="true" Hover="true"
-             @ref="_table"
-             ServerData="@(ServerReload)"
-             MultiSelection="true"
-             SelectOnRowClick="false"
-             RowClick="@(r=>Edit(r.Item))"
-             RowStyleFunc="_rowStyleFunc"
-             @bind-RowsPerPage="_defaultPageSize"
-             @bind-SelectedItems="_selectedItems"
-             @bind-SelectedItem="_currentDto">
+@ref="_table"
+ServerData="@(ServerReload)"
+MultiSelection="true"
+SelectOnRowClick="false"
+RowClick="@(r=>Edit(r.Item))"
+RowStyleFunc="_rowStyleFunc"
+@bind-RowsPerPage="_defaultPageSize"
+@bind-SelectedItems="_selectedItems"
+@bind-SelectedItem="_currentDto">
     <ToolBarContent>
         <MudStack Row Spacing="0" Class="flex-grow-1" Justify="Justify.SpaceBetween">
             <MudStack Row AlignItems="AlignItems.Start">
@@ -38,10 +38,25 @@
                         <MudIcon Icon="@Icons.Material.Outlined.Delete" />
                         <MudText>@L["Delete"]</MudText>
                     </MudButton>
+                    <MudMenu TransformOrigin="Origin.BottomRight" AnchorOrigin="Origin.BottomRight" EndIcon="@Icons.Material.Filled.MoreVert" Label="@L["More"]">
+                        <MudMenuItem OnClick="OnExport">
+                            @L["Export"]
+                        </MudMenuItem>
+                        <MudMenuItem>
+                            <MudFileUpload T="IBrowserFile" FilesChanged="OnImportData" Accept=".csv">
+                                <ActivatorContent>
+                                    <MudButton Class="pa-0 ma-0" Style="font-weight:400;text-transform:none;"
+                                    Variant="Variant.Text">
+                                        @L["Import"]
+                                    </MudButton>
+                                </ActivatorContent>
+                            </MudFileUpload>
+                        </MudMenuItem>
+                    </MudMenu>
                 </MudStack>
                 <MudStack Row Spacing="1">
                     <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Value="@_keywords" Placeholder="@L["Keywords"]" Adornment="Adornment.End"
-                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
+                    AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small">
                     </MudTextField>
                 </MudStack>
             </MudStack>
@@ -136,7 +151,7 @@
                     },
                     error =>
                     {
-                        Snackbar.Add(error.Message??L["Failed to delete selected items."], Severity.Error);
+                        Snackbar.Add(error.Message ?? L["Failed to delete selected items."], Severity.Error);
                     });
 
             }
@@ -146,5 +161,69 @@
     private void Edit(ProductDto dto)
     {
         Navigation.NavigateTo($"/products/edit/{dto.Id}");
+    }
+
+    private async Task OnExport()
+    {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
+        try
+        {
+            var stream = await ApiClient.Products.Export.GetAsync(q => q.QueryParameters.Keywords = _keywords);
+            var fileName = $"products_{DateTime.Now:yyyyMMddHHmmss}.csv";
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+            using var streamRef = new DotNetStreamReference(stream: memoryStream);
+            await new DownloadFileInterop(JS).DownloadFileFromStream(fileName, streamRef);
+            Snackbar.Add(L["export successfully."], Severity.Success);
+        }
+        catch (ProblemDetails ex)
+        {
+            Snackbar.Add($"{ex.Detail}", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"{ex.Message}", Severity.Error);
+        }
+    }
+    private async Task OnImportData(IBrowserFile file)
+    {
+        var online = await OnlineStatusInterop.GetOnlineStatusAsync();
+        if (!online)
+        {
+            Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
+            return;
+        }
+        try
+        {
+            var antiforgeryToken = await ApiClient.FileManagement.AntiforgeryToken.GetAsync();
+            var request = new MultipartBody();
+            request.AddOrReplacePart("overwrite", "text/plain", "false");
+            request.AddOrReplacePart("folder", "text/plain", $"{DateTime.UtcNow.ToString("yyyyMMdd")}");
+            request.AddOrReplacePart($"__{antiforgeryToken.HeaderName}", "text/plain", $"{antiforgeryToken.RequestToken}");
+            var filename = file.Name;
+            var stream = new MemoryStream();
+            await file.OpenReadStream(int.MaxValue).CopyToAsync(stream);
+            request.AddOrReplacePart($"files[0]", "application/octet-stream", stream, filename);
+            var response = await ApiClient.Products.Import.PostAsync(request);
+            if (response is not null && response.Any())
+            {
+                Snackbar.Add(L["Data imported successfully."], Severity.Success);
+                await _table.ReloadServerData();
+            }
+        }
+        catch (ProblemDetails ex)
+        {
+            Snackbar.Add($"{ex.Detail}", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"{ex.Message}", Severity.Error);
+        }
     }
 }
