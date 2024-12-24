@@ -87,7 +87,7 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.55
+    image: blazordevlab/cleanaspire-api:0.0.56
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -110,7 +110,7 @@ services:
 
 
   blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.55
+    image: blazordevlab/cleanaspire-webapp:0.0.56
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
