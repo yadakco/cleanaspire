@@ -45,7 +45,11 @@ public class ProblemExceptionHandler : IExceptionHandler
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Unique Constraint Violation",
-                Detail = $"Unique constraint {e.ConstraintName} violated. Duplicate value for {e.ConstraintProperties[0]}",
+                Detail = e.ConstraintName != null && e.ConstraintProperties != null && e.ConstraintProperties.Any()
+                        ? $"Unique constraint {e.ConstraintName} violated. Duplicate value for {e.ConstraintProperties[0]}."
+                        : e.ConstraintName != null
+                        ? $"Unique constraint {e.ConstraintName} violated."
+                        : "A unique constraint violation occurred.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
             CannotInsertNullException e => new ProblemDetails
