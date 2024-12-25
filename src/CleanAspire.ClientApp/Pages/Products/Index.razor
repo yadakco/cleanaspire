@@ -39,15 +39,16 @@ RowStyleFunc="_rowStyleFunc"
                         <MudText>@L["Delete"]</MudText>
                     </MudButton>
                     <MudMenu TransformOrigin="Origin.BottomRight" AnchorOrigin="Origin.BottomRight" EndIcon="@Icons.Material.Filled.MoreVert" Label="@L["More"]">
-                        <MudMenuItem OnClick="OnExport">
-                            @L["Export"]
+                        <MudMenuItem >
+                            <MudButton OnClick="OnExport">
+                                <MudText>@L["Export"]</MudText>
+                            </MudButton>
                         </MudMenuItem>
                         <MudMenuItem>
                             <MudFileUpload T="IBrowserFile" FilesChanged="OnImportData" Accept=".csv">
                                 <ActivatorContent>
-                                    <MudButton Class="pa-0 ma-0" Style="font-weight:400;text-transform:none;"
-                                    Variant="Variant.Text">
-                                        @L["Import"]
+                                    <MudButton>
+                                        <MudText>@L["Import"]</MudText>
                                     </MudButton>
                                 </ActivatorContent>
                             </MudFileUpload>
