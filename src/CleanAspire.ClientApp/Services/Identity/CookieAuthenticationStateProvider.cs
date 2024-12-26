@@ -85,7 +85,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
             if (isOnline)
             {
                 // Online login
-                var response = await apiClient.Login.PostAsync(request, options =>
+                var response = await apiClient.Account.Login2fa.PostAsync(request, options =>
                 {
                     options.QueryParameters.UseCookies = remember;
                     options.QueryParameters.UseSessionCookies = !remember;
@@ -108,12 +108,16 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
             // Refresh authentication state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
-        catch (ApiException ex)
+        catch (ProblemDetails)
+        {
+            throw;
+        }
+        catch (ApiException)
         {
             // Log and re-throw API exception
             throw;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Log and re-throw general exception
             throw;
