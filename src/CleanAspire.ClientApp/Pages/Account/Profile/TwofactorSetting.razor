@@ -105,9 +105,9 @@
     }
     private async Task AuthenticatorAppValueChanged(bool value)
     {
-        if (Navigation.BaseUri == "https://cleanaspire.blazorserver.com/")
+        if (Navigation.BaseUri == "https://cleanaspire.blazorserver.com/" && UserProfileStore.Profile.Username == "Administrator")
         {
-            Snackbar.Add(L["Two-factor authentication cannot be enabled in the demo environment."], Severity.Info);
+            Snackbar.Add(L["Test accounts cannot enable two-factor authentication in the demo environment. Please use your own account for testing."], Severity.Info);
             return;
         }
         if (value)

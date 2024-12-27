@@ -13,7 +13,7 @@
         {
             <div class="d-flex flex-row gap-1">
                 <MudText>@L["Don't have an account?"]</MudText> <MudLink Href="/account/signup">@L["Signup"]</MudLink>
-        </div>
+            </div>
         }
         <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
             <DataAnnotationsValidator />
@@ -22,8 +22,8 @@
                 {
                     <MudText>Your login is protected with an authenticator app. Enter your authenticator code below.</MudText>
                     <MudTextField @bind-Value="model.TwoFactorCode" For="@(() => model.TwoFactorCode)"
-                                  Label="@L["Authenticator code"]" Placeholder="@L[""]"
-                                  Required="true" RequiredError="@L["Authenticator code is required"]">
+                    Label="@L["Authenticator code"]" Placeholder="@L[""]"
+                    Required="true" RequiredError="@L["Authenticator code is required"]">
                     </MudTextField>
                 }
                 else
@@ -35,11 +35,11 @@
                     <MudTextField InputType="@PasswordInput" @bind-Value="model.Password" For="@(() => model.Password)" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonPasswordClick" AdornmentAriaLabel="Show Password"></MudTextField>
                     <div class="d-flex flex-row align-center justify-space-between">
                         <!-- Remember me -->
-                    <MudCheckBox T="bool" @bind-Value="model.RememberMe" Color="Color.Default">
-                        @L["Remember me"]
-                    </MudCheckBox>
-                    <MudLink Href="/account/forgetpassword">@L["Forget password?"]</MudLink>
-                </div>
+                        <MudCheckBox T="bool" @bind-Value="model.RememberMe" Color="Color.Default">
+                            @L["Remember me"]
+                        </MudCheckBox>
+                        <MudLink Href="/account/forgetpassword">@L["Forget password?"]</MudLink>
+                    </div>
                 }
                 <MudButton ButtonType="ButtonType.Submit" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary">@L["Sign In"]</MudButton>
                 @if (!RequiresTwoFactor){
@@ -77,6 +77,10 @@
             if (e.Detail == "RequiresTwoFactor")
             {
                 RequiresTwoFactor = true;
+            }
+            else if (RequiresTwoFactor && e.Detail == "Failed")
+            {
+                Snackbar.Add(L["Invalid verification code."], Severity.Error);
             }
             else
             {
