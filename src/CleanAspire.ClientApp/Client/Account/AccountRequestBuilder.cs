@@ -6,6 +6,7 @@ using CleanAspire.Api.Client.Account.Disable2fa;
 using CleanAspire.Api.Client.Account.Enable2fa;
 using CleanAspire.Api.Client.Account.ForgotPassword;
 using CleanAspire.Api.Client.Account.GenerateAuthenticator;
+using CleanAspire.Api.Client.Account.GenerateRecoveryCodes;
 using CleanAspire.Api.Client.Account.Google;
 using CleanAspire.Api.Client.Account.Login2fa;
 using CleanAspire.Api.Client.Account.Logout;
@@ -55,6 +56,11 @@ namespace CleanAspire.Api.Client.Account
         public global::CleanAspire.Api.Client.Account.GenerateAuthenticator.GenerateAuthenticatorRequestBuilder GenerateAuthenticator
         {
             get => new global::CleanAspire.Api.Client.Account.GenerateAuthenticator.GenerateAuthenticatorRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The generateRecoveryCodes property</summary>
+        public global::CleanAspire.Api.Client.Account.GenerateRecoveryCodes.GenerateRecoveryCodesRequestBuilder GenerateRecoveryCodes
+        {
+            get => new global::CleanAspire.Api.Client.Account.GenerateRecoveryCodes.GenerateRecoveryCodesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The google property</summary>
         public global::CleanAspire.Api.Client.Account.Google.GoogleRequestBuilder Google

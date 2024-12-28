@@ -33,7 +33,49 @@
                         <MudSwitch T="bool" Value="@(UserProfileStore.Profile?.IsTwoFactorEnabled??false)" ReadOnly="@(UserProfileStore.Profile?.IsTwoFactorEnabled??false)" ValueChanged="AuthenticatorAppValueChanged" Color="Color.Primary" />
                     </div>
                 </MudListItem>
+                <MudListItem>
+                    <div class="d-flex flex-row justify-space-between align-content-center">
+                        <div>
+                            <div class="d-flex flex-row gap-2">
+                                <MudIcon Icon="@Icons.Material.Filled.Security"></MudIcon>
+                                <MudText Color="Color.Primary">@L["Recovery codes"]</MudText>
+                            </div>
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                @L["Generate recovery codes to regain access if you lose your two-factor authentication device."]
+                            </MudText>
 
+                            @if (recoveryCodes != null && recoveryCodes.Any())
+                            {
+                                <MudAlert Severity="Severity.Info">
+                                    @L["Important: Recovery codes are shown only once and will not be stored on the server. Please save them securely."]
+                                </MudAlert>
+                                <div class="d-flex flex-column gap-2 align-content-center align-center">
+                                    <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                        @L["Recovery codes generated. Save them securely as they will not be shown again."]
+                                    </MudText>
+                                    <div class="grid-2-columns">
+                                        @foreach (var recoveryCode in recoveryCodes)
+                                        {
+                                            <MudChip Size="Size.Small" Color="Color.Dark">@recoveryCode</MudChip>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            <div class="d-flex flex-row gap-2">
+                                <MudButton Color="Color.Primary" Disabled="@(!UserProfileStore.Profile?.IsTwoFactorEnabled??false)" OnClick="GenerateRecoveryCodes">
+                                    <MudText>@L["Generate Codes"]</MudText>
+                                </MudButton>
+                                @if (recoveryCodes != null && recoveryCodes.Any())
+                                {
+                                    <MudButton Color="Color.Secondary" OnClick="@CopyToClipboard">
+                                        <MudText>@L["Copy Codes to Clipboard"]</MudText>
+                                    </MudButton>
+                                }
+                            </div>
+                          
+                        </div>
+                    </div>
+                </MudListItem>
             </MudList>
         </MudCardContent>
     </MudCard>
@@ -83,6 +125,7 @@
     private string? verificationCode;
     private string sharedKey = "123456";
     private string authenticatorUri = "otpauth://totp/CleanAspire?secret";
+    private List<string>? recoveryCodes;
     public async Task Disable2fa()
     {
         try
@@ -144,5 +187,31 @@
             Snackbar.Add(L["Invalid verification code"], Severity.Error);
         }
        
+    }
+    private async Task GenerateRecoveryCodes()
+    {
+        try
+        {
+            var response = await ApiClient.Account.GenerateRecoveryCodes.GetAsync();
+            recoveryCodes = response.Codes;
+            Snackbar.Add(L["Recovery codes have been generated successfully. Please save them in a safe place."], Severity.Success);
+        }
+        catch (ApiException e)
+        {
+            Snackbar.Add(L["Failed to generate recovery codes"], Severity.Error);
+        }
+    }
+    private async Task CopyToClipboard()
+    {
+        if (recoveryCodes != null && recoveryCodes.Any())
+        {
+            var codes = string.Join(Environment.NewLine, recoveryCodes);
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", codes);
+            Snackbar.Add(@L["Recovery codes copied to clipboard!"], Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(@L["No recovery codes to copy."], Severity.Warning);
+        }
     }
 }

@@ -32,7 +32,7 @@
                     Label="@L["User name"]" Placeholder="@L["User name"]"
                     Required="true" RequiredError="@L["user name is required"]">
                     </MudTextField>
-                    <MudTextField InputType="@PasswordInput" @bind-Value="model.Password" For="@(() => model.Password)" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonPasswordClick" AdornmentAriaLabel="Show Password"></MudTextField>
+                    <PasswordInput Field="@(() => model.Password)" @bind-Value="@model.Password" Label="@L["Password"]" Placeholder="@L["Password"]" RequiredError="@L["Password is required"]" />
                     <div class="d-flex flex-row align-center justify-space-between">
                         <!-- Remember me -->
                         <MudCheckBox T="bool" @bind-Value="model.RememberMe" Color="Color.Default">
@@ -60,9 +60,7 @@
             Password = "P@ssw0rd!"
         };
 
-    bool isShow;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+  
     private bool RequiresTwoFactor = false;
 
     private async Task OnValidSubmit(EditContext context)
@@ -77,6 +75,10 @@
             if (e.Detail == "RequiresTwoFactor")
             {
                 RequiresTwoFactor = true;
+            }
+            else if (e.Detail == "NotAllowed")
+            {
+                Snackbar.Add(L["Your account is not activated. Please check your email for the activation link or contact support."], Severity.Error);
             }
             else if (RequiresTwoFactor && e.Detail == "Failed")
             {
@@ -119,21 +121,7 @@
         }
     }
 
-    void ButtonPasswordClick()
-    {
-        if (isShow)
-        {
-            isShow = false;
-            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-            PasswordInput = InputType.Password;
-        }
-        else
-        {
-            isShow = true;
-            PasswordInputIcon = Icons.Material.Filled.Visibility;
-            PasswordInput = InputType.Text;
-        }
-    }
+     
 
 
     public class SignInModel

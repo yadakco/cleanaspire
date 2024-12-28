@@ -16,9 +16,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.Data;
 using Google.Apis.Auth;
 using CleanAspire.Infrastructure.Persistence;
-using Mono.TextTemplating;
 using System.Globalization;
-using System.Net.WebSockets;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -502,7 +500,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
           .WithSummary("Enable Authenticator for the user")
           .WithDescription("This endpoint enables Two-Factor Authentication (TOTP) for a logged-in user. The user must first scan the provided QR code using an authenticator app, and then verify the generated code to complete the process.");
 
-        routeGroup.MapGet("/disable2fa", async Task<Results<Ok, NotFound, BadRequest<string>>>
+        routeGroup.MapGet("/disable2fa", async Task<Results<Ok, NotFound, BadRequest>>
         (ClaimsPrincipal claimsPrincipal, HttpContext context) =>
         {
             var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
@@ -515,13 +513,13 @@ public static class IdentityApiAdditionalEndpointsExtensions
             var isTwoFactorEnabled = await userManager.GetTwoFactorEnabledAsync(user);
             if (!isTwoFactorEnabled)
             {
-                return TypedResults.BadRequest("Two-Factor Authentication is not enabled for this user.");
+                return TypedResults.BadRequest();
             }
             var result = await userManager.SetTwoFactorEnabledAsync(user, false);
             if (!result.Succeeded)
             {
                 logger.LogError("Failed to disable 2FA");
-                return TypedResults.BadRequest("Failed to disable Two-Factor Authentication.");
+                return TypedResults.BadRequest();
             }
 
             logger.LogInformation("User has disabled 2FA.");
@@ -577,6 +575,33 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Login with optional two-factor authentication")
         .WithDescription("This endpoint allows users to log in with their email and password. If two-factor authentication is enabled, the user must provide a valid two-factor code or recovery code. Supports persistent cookies or bearer tokens.");
+
+
+        routeGroup.MapGet("generateRecoveryCodes", async Task<Results<Ok<RecoveryCodesResponse>, NotFound, BadRequest>>
+        (ClaimsPrincipal claimsPrincipal, HttpContext context) =>
+        {
+            var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
+            var logger = context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Disable2FA");
+            var user = await userManager.GetUserAsync(claimsPrincipal);
+            if (user is null)
+            {
+                return TypedResults.NotFound();
+            }
+            var isTwoFactorEnabled = await userManager.GetTwoFactorEnabledAsync(user);
+            if (!isTwoFactorEnabled)
+            {
+                return TypedResults.BadRequest();
+            }
+            int codeCount = 8;
+            var recoveryCodes = await userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, codeCount);
+            return TypedResults.Ok(new RecoveryCodesResponse(recoveryCodes));
+        }).RequireAuthorization()
+          .Produces<RecoveryCodesResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Generate recovery codes for two-factor authentication.")
+        .WithDescription("Generates new recovery codes if two-factor authentication is enabled. "
+                + "Returns 404 if the user is not found or 400 if 2FA is not enabled.");
 
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
         {
@@ -650,7 +675,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             SuperiorId = appUser.SuperiorId,
             TimeZoneId = appUser.TimeZoneId,
             AvatarUrl = appUser.AvatarUrl,
-            IsTwoFactorEnabled= isTwoFactorEnabled
+            IsTwoFactorEnabled = isTwoFactorEnabled
         };
     }
 
@@ -931,4 +956,7 @@ internal sealed record AuthenticatorResponse(
 internal sealed record Enable2faRequest(
     string? AppName,
     string VerificationCode
+    );
+internal sealed record RecoveryCodesResponse(
+    IEnumerable<string> Codes
     );

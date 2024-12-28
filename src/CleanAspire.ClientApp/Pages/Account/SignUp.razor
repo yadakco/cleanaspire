@@ -26,8 +26,8 @@
                 </MultiTenantAutocomplete>
                 <MudTextField @bind-Value="model.Email" For="@(() => model.Email)" Label="@L["Email"]" Placeholder="@L["Email"]" Required="true" RequiredError="@L["Email is required"]"></MudTextField>
                 <MudTextField @bind-Value="model.Nickname" For="@(() => model.Nickname)" Label="@L["Nickname"]" Placeholder="Nickname"></MudTextField>
-                <MudTextField @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" Label="@L["Password"]" Placeholder="@L["Password"]" Required="true" RequiredError="@L["Password is required"]"></MudTextField>
-                <MudTextField @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" T="string" Label="@L["Confirm password"]" Placeholder="@L["Confirm password"]" Required="true" RequiredError="@L["Confirm password is required"]"></MudTextField>
+                <PasswordInput Field="@(() => model.Password)" @bind-Value="@model.Password"  Label="@L["Password"]" Placeholder="@L["Password"]" RequiredError="@L["Password is required"]" />
+                <PasswordInput Field="@(() => model.ConfirmPassword)" @bind-Value="@model.ConfirmPassword" Label="@L["Confirm password"]" Placeholder="@L["Confirm password"]" RequiredError="@L["Confirm password is required"]" />
                 <TimeZoneAutocomplete T="string" For="@(() => model.TimeZoneId)" @bind-Value="model.TimeZoneId" Label="@L["Time Zone"]" Placeholder="@L["Time Zone"]"></TimeZoneAutocomplete>
                 <LanguageAutocomplete T="string" For="@(() => model.LanguageCode)" @bind-Value="model.LanguageCode" Label="@L["Language"]" Placeholder="@L["Language"]"></LanguageAutocomplete>
                 <div class="d-flex flex-row align-center justify-space-between">
@@ -74,6 +74,7 @@
                 waiting = false;
             });
     }
+ 
     public class SignupModel
     {
         [Required]
