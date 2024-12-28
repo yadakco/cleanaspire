@@ -1,6 +1,7 @@
 ﻿@page "/products/index"
 @using CleanAspire.ClientApp.Pages.Products.Components
 @using CleanAspire.ClientApp.Services.Proxies
+@using System.Globalization
 @inject ProductServiceProxy ProductServiceProxy
 
 <PageTitle>@Title</PageTitle>
@@ -69,7 +70,7 @@ RowStyleFunc="_rowStyleFunc"
         <PropertyColumn Title="@L["Name"]" Property="x => x.Name" />
         <PropertyColumn Title="@L["Category"]" Property="x => x.Category" />
         <PropertyColumn Title="@L["UOM"]" Property="x => x.Uom" />
-        <PropertyColumn Title="@L["Price"]" Property="x => x.Price" Sortable="false">
+        <PropertyColumn Title="@L["Price"]" Property="x => x.Price" Sortable="false" AggregateDefinition="_priceAggregation">
             <CellTemplate>
                 @($"{context.Item.Price?.ToString("#,#")} {context.Item.Currency}")
             </CellTemplate>
@@ -88,7 +89,12 @@ RowStyleFunc="_rowStyleFunc"
     private int _defaultPageSize = 10;
     private string _keywords = string.Empty;
     private bool _loading = false;
-
+    AggregateDefinition<ProductDto> _priceAggregation = new AggregateDefinition<ProductDto>
+        {
+            Type = AggregateType.Sum,
+            NumberFormat = "#,#",
+            DisplayFormat = "Total amount is {value}"
+        };
     private async Task<GridData<ProductDto>> ServerReload(GridState<ProductDto> state)
     {
         try
