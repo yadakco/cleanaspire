@@ -32,6 +32,8 @@ namespace CleanAspire.Api.Client.Models
 #endif
         /// <summary>The isEmailConfirmed property</summary>
         public bool? IsEmailConfirmed { get; set; }
+        /// <summary>The isTwoFactorEnabled property</summary>
+        public bool? IsTwoFactorEnabled { get; set; }
         /// <summary>The languageCode property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -124,6 +126,7 @@ namespace CleanAspire.Api.Client.Models
                 { "avatarUrl", n => { AvatarUrl = n.GetStringValue(); } },
                 { "email", n => { Email = n.GetStringValue(); } },
                 { "isEmailConfirmed", n => { IsEmailConfirmed = n.GetBoolValue(); } },
+                { "isTwoFactorEnabled", n => { IsTwoFactorEnabled = n.GetBoolValue(); } },
                 { "languageCode", n => { LanguageCode = n.GetStringValue(); } },
                 { "nickname", n => { Nickname = n.GetStringValue(); } },
                 { "provider", n => { Provider = n.GetStringValue(); } },
@@ -144,6 +147,7 @@ namespace CleanAspire.Api.Client.Models
             writer.WriteStringValue("avatarUrl", AvatarUrl);
             writer.WriteStringValue("email", Email);
             writer.WriteBoolValue("isEmailConfirmed", IsEmailConfirmed);
+            writer.WriteBoolValue("isTwoFactorEnabled", IsTwoFactorEnabled);
             writer.WriteStringValue("languageCode", LanguageCode);
             writer.WriteStringValue("nickname", Nickname);
             writer.WriteStringValue("provider", Provider);

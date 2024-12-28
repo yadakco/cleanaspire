@@ -7,7 +7,6 @@ using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.JsInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Kiota.Abstractions;
-using MudBlazor.Charts;
 using OneOf;
 
 
