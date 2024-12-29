@@ -18,6 +18,8 @@ using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Json;
 using Microsoft.Kiota.Serialization.Multipart;
 using Microsoft.Kiota.Serialization.Text;
+using CleanAspire.ClientApp.Services.PushNotifications;
+using CleanAspire.ClientApp.Services.Products;
 
 namespace CleanAspire.ClientApp;
 
@@ -61,9 +63,10 @@ public static class DependencyInjection
         services.AddScoped<OnlineStatusInterop>();
         services.AddScoped<OfflineModeState>();
         services.AddScoped<IndexedDbCache>();
+        services.AddScoped<ProductCacheService>();
         services.AddScoped<ProductServiceProxy>();
         services.AddScoped<OfflineSyncService>();
-        services.AddScoped<WebpushrService>();
+        services.AddScoped<IWebpushrService, WebpushrService>();
 
         // Configuration
         var clientAppSettings = configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
