@@ -5,14 +5,13 @@
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.JsInterop;
-using CleanAspire.ClientApp.Services.Products;
 using CleanAspire.ClientApp.Services.PushNotifications;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Kiota.Abstractions;
 using OneOf;
 
 
-namespace CleanAspire.ClientApp.Services.Proxies;
+namespace CleanAspire.ClientApp.Services.Products;
 
 public class ProductServiceProxy
 {
@@ -313,7 +312,7 @@ public class ProductServiceProxy
             _offlineSyncService.SetSyncStatus(SyncStatus.Completed, $"Sync completed: {processedCount}/{totalCount} processed.", totalCount, processedCount);
             await Task.Delay(1200);
         }
-
+        await _productCacheService.ClearCommands();
         _offlineSyncService.SetSyncStatus(SyncStatus.Idle, "", 0, 0);
     }
 }
