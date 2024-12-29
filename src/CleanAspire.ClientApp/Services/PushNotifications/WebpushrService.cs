@@ -7,9 +7,9 @@ using System.Text;
 using CleanAspire.Api.Client;
 using CleanAspire.ClientApp.Services.Interfaces;
 
-namespace CleanAspire.ClientApp.Services;
+namespace CleanAspire.ClientApp.Services.PushNotifications;
 
-public class WebpushrService
+public class WebpushrService: IWebpushrService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ApiClient _apiClient;
@@ -37,7 +37,7 @@ public class WebpushrService
                     publicKey = res.PublicKey;
                 }
             }
-            return publicKey??string.Empty;
+            return publicKey ?? string.Empty;
         }
         catch (Exception ex)
         {
@@ -49,7 +49,7 @@ public class WebpushrService
         var client = _httpClientFactory.CreateClient("Webpushr");
         try
         {
-            string payload = $@"{{
+            var payload = $@"{{
                 ""title"": ""{title}"",
                 ""message"": ""{message}"",
                 ""target_url"": ""{targetUrl}"",
@@ -60,7 +60,7 @@ public class WebpushrService
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             var url = sid == null ? "/v1/notification/send/all" : $"/v1/notification/send/sid/{sid}";
             var httpResponseMessage = await client.PostAsync(url, httpContent).ConfigureAwait(false);
-            string responseContent = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseContent = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!httpResponseMessage.IsSuccessStatusCode)
             {
