@@ -1,7 +1,16 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
 @using CleanAspire.Api.Client
+@using CleanAspire.Api.Client.Models
+@using CleanAspire.ClientApp
+@using CleanAspire.ClientApp.Components
+@using CleanAspire.ClientApp.Configurations
+@using CleanAspire.ClientApp.Layout
+@using CleanAspire.ClientApp.Services
 @using CleanAspire.ClientApp.Services.Identity
+@using CleanAspire.ClientApp.Services.Interfaces
+@using CleanAspire.ClientApp.Services.JsInterop
+@using CleanAspire.ClientApp.Services.PushNotifications
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -11,14 +20,6 @@
 @using Microsoft.Extensions.Localization
 @using Microsoft.JSInterop
 @using Microsoft.Kiota.Abstractions
-@using CleanAspire.ClientApp
-@using CleanAspire.ClientApp.Configurations
-@using CleanAspire.ClientApp.Layout
-@using CleanAspire.ClientApp.Components
-@using CleanAspire.ClientApp.Services
-@using CleanAspire.ClientApp.Services.Interfaces
-@using CleanAspire.ClientApp.Services.JsInterop
-@using CleanAspire.Api.Client.Models
 @using MudBlazor
 
 @inject IJSRuntime JS
@@ -32,6 +33,6 @@
 @inject ApiClient ApiClient
 @inject ApiClientService ApiClientService
 @inject UserProfileStore UserProfileStore
-@inject WebpushrService WebpushrService
+@inject IWebpushrService WebpushrService
 @inject OnlineStatusInterop OnlineStatusInterop
 @inject OfflineModeState OfflineModeState

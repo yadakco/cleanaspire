@@ -8,7 +8,6 @@ using CleanAspire.ClientApp.Services;
 using CleanAspire.ClientApp.Configurations;
 using CleanAspire.ClientApp.Services.Identity;
 using CleanAspire.ClientApp.Services.JsInterop;
-using CleanAspire.ClientApp.Services.Proxies;
 using CleanAspire.Api.Client;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Kiota.Abstractions.Authentication;
@@ -18,6 +17,8 @@ using Microsoft.Kiota.Serialization.Form;
 using Microsoft.Kiota.Serialization.Json;
 using Microsoft.Kiota.Serialization.Multipart;
 using Microsoft.Kiota.Serialization.Text;
+using CleanAspire.ClientApp.Services.PushNotifications;
+using CleanAspire.ClientApp.Services.Products;
 
 namespace CleanAspire.ClientApp;
 
@@ -52,18 +53,21 @@ public static class DependencyInjection
 
     public static void AddCoreServices(this IServiceCollection services, IConfiguration configuration)
     {
+        
         // Cookie and Authentication Handlers
         services.AddTransient<CookieHandler>();
         services.AddTransient<WebpushrAuthHandler>();
 
-        // Singleton Services
+        // Scoped Services
+        services.AddScoped<WebpushrOptionsCache>();
         services.AddScoped<UserProfileStore>();
         services.AddScoped<OnlineStatusInterop>();
         services.AddScoped<OfflineModeState>();
         services.AddScoped<IndexedDbCache>();
+        services.AddScoped<ProductCacheService>();
         services.AddScoped<ProductServiceProxy>();
         services.AddScoped<OfflineSyncService>();
-        services.AddScoped<WebpushrService>();
+        services.AddScoped<IWebpushrService, WebpushrService>();
 
         // Configuration
         var clientAppSettings = configuration.GetSection(ClientAppSettings.KEY).Get<ClientAppSettings>();
