@@ -59,7 +59,7 @@ public static class DependencyInjection
         services.AddTransient<WebpushrAuthHandler>();
 
         // Scoped Services
-        services.AddScoped<WebpushrOptionsCache>();
+        services.AddSingleton<WebpushrOptionsCache>();
         services.AddScoped<UserProfileStore>();
         services.AddScoped<OnlineStatusInterop>();
         services.AddScoped<OfflineModeState>();
