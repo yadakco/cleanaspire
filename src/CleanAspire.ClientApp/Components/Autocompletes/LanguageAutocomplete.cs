@@ -17,7 +17,7 @@ public class LanguageAutocomplete<T> : MudAutocomplete<string>
         };
     }
 
-    private List<LanguageCode> Languages { get; set; } = Localization.SupportedLanguages.ToList();
+    private List<LanguageCode> Languages { get; set; } = SupportedLocalization.SupportedLanguages.ToList();
 
     private Task<IEnumerable<string>> SearchFunc_(string value, CancellationToken cancellation = default)
     {

@@ -49,7 +49,7 @@
                 <MudListItem>
                     <div class="d-flex flex-row justify-space-between align-content-center gap-3">
                         <MudText Style="min-width:120px">@L["Language"]</MudText>
-                        <MudText Style="min-width:200px">@Localization.SupportedLanguages.FirstOrDefault(x => x.Code == userModel?.LanguageCode)?.DisplayName</MudText>
+                        <MudText Style="min-width:200px">@SupportedLocalization.SupportedLanguages.FirstOrDefault(x => x.Code == userModel?.LanguageCode)?.DisplayName</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight"></MudIcon>
                     </div>
                 </MudListItem>

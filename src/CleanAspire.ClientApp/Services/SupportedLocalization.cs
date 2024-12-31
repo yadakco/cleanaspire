@@ -3,7 +3,7 @@
 
 namespace CleanAspire.ClientApp.Services;
 
-public static class Localization
+public static class SupportedLocalization
 {
     public const string ResourcesPath = "Resources";
 
@@ -36,16 +36,6 @@ public static class Localization
         },
         new()
         {
-            Code = "km-KH",
-            DisplayName = "ខ្មែរ (កម្ពុជា)"
-        },
-        new()
-        {
-            Code = "ca-ES",
-            DisplayName = "català (Espanya)"
-        },
-        new()
-        {
             Code = "es-ES",
             DisplayName = "español (España)"
         },
@@ -56,13 +46,13 @@ public static class Localization
         },
         new()
         {
-            Code = "ar-iq",
-            DisplayName = "Arabic"
+            Code = "ko-kr",
+            DisplayName = "한국어(대한민국)"
         },
         new()
         {
-            Code = "ko-kr",
-            DisplayName = "한국어(대한민국)"
+            Code = "pt-BR",
+            DisplayName = "português (Brasil)"
         }
     };
 }
