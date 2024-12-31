@@ -1,0 +1,38 @@
+﻿@using System.Globalization
+
+<MudTooltip Text="@CurrentLanguage">
+    <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Class="mx-1" Icon="@Icons.Material.Outlined.Translate" Color="Color.Default" Dense="true">
+
+        @foreach (var language in SupportedLocalization.SupportedLanguages)
+        {
+            if (language.Code == CurrentLanguage)
+            {
+                <MudMenuItem Icon="@Icons.Material.Filled.Check">@language.DisplayName</MudMenuItem>
+            }
+            else
+            {
+                <MudMenuItem OnClick="() => ChangeLanguageAsync(language.Code)">@language.DisplayName</MudMenuItem>
+            }
+        }
+
+    </MudMenu>
+</MudTooltip>
+
+@code
+{
+    override protected void OnInitialized()
+    {
+        CurrentLanguage = CultureInfo.CurrentCulture.Name;
+    }
+    public string? CurrentLanguage { get; set; } = "en-US";
+    private Task ChangeLanguageAsync(string languageCode)
+    {
+        CurrentLanguage = languageCode;
+        var culture = new CultureInfo(languageCode);
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        StateHasChanged();
+        return Task.CompletedTask;
+
+    }
+}

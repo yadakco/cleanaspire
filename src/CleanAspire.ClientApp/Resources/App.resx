@@ -510,9 +510,6 @@
   <data name="Thank you for signing up. To complete your registration, please activate your account by clicking the activation link sent to your email address. If you do not receive the email within a few minutes, please check your spam or junk folder." xml:space="preserve">
     <value>Thank you for signing up. To complete your registration, please activate your account by clicking the activation link sent to your email address. If you do not receive the email within a few minutes, please check your spam or junk folder.</value>
   </data>
-  <data name="Time Zone" xml:space="preserve">
-    <value>Time Zone</value>
-  </data>
   <data name="Time zone" xml:space="preserve">
     <value>Time zone</value>
   </data>
@@ -536,9 +533,6 @@
   </data>
   <data name="UOM" xml:space="preserve">
     <value>UOM</value>
-  </data>
-  <data name="Uom" xml:space="preserve">
-    <value>Uom</value>
   </data>
   <data name="Uom is required" xml:space="preserve">
     <value>Uom is required</value>

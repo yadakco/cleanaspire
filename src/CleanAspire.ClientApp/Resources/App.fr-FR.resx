@@ -510,9 +510,6 @@
   <data name="Thank you for signing up. To complete your registration, please activate your account by clicking the activation link sent to your email address. If you do not receive the email within a few minutes, please check your spam or junk folder." xml:space="preserve">
     <value>Merci pour votre inscription. Pour compléter votre enregistrement, veuillez activer votre compte en cliquant sur le lien d'activation envoyé à votre adresse e-mail. Si vous ne recevez pas l'e-mail dans quelques minutes, vérifiez votre dossier spam ou courrier indésirable.</value>
   </data>
-  <data name="Time Zone" xml:space="preserve">
-    <value>Fuseau horaire</value>
-  </data>
   <data name="Time zone" xml:space="preserve">
     <value>Fuseau horaire</value>
   </data>
@@ -535,9 +532,6 @@
     <value>Tapez votre mot de passe pour confirmer le changement de votre adresse e-mail à</value>
   </data>
   <data name="UOM" xml:space="preserve">
-    <value>Unité</value>
-  </data>
-  <data name="Uom" xml:space="preserve">
     <value>Unité</value>
   </data>
   <data name="Uom is required" xml:space="preserve">

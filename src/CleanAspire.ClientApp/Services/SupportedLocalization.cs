@@ -16,13 +16,13 @@ public static class SupportedLocalization
         },
         new()
         {
-            Code = "de-DE",
-            DisplayName = "Deutsch (Deutschland)"
+            Code = "zh-CN",
+            DisplayName = "中文（简体，中国）"
         },
         new()
         {
-            Code = "ru-RU",
-            DisplayName = "русский (Россия)"
+            Code = "de-DE",
+            DisplayName = "Deutsch (Deutschland)"
         },
         new()
         {
@@ -38,11 +38,6 @@ public static class SupportedLocalization
         {
             Code = "es-ES",
             DisplayName = "español (España)"
-        },
-        new()
-        {
-            Code = "zh-CN",
-            DisplayName = "中文（简体，中国）"
         },
         new()
         {

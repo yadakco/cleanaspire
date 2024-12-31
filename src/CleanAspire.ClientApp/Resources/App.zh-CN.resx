@@ -510,9 +510,6 @@
   <data name="Thank you for signing up. To complete your registration, please activate your account by clicking the activation link sent to your email address. If you do not receive the email within a few minutes, please check your spam or junk folder." xml:space="preserve">
     <value>感谢您的注册。要完成注册，请通过点击发送到您电子邮件地址的激活链接激活您的账户。如果您在几分钟内没有收到电子邮件，请检查您的垃圾邮件或垃圾文件夹。</value>
   </data>
-  <data name="Time Zone" xml:space="preserve">
-    <value>时区</value>
-  </data>
   <data name="Time zone" xml:space="preserve">
     <value>时区</value>
   </data>
@@ -535,9 +532,6 @@
     <value>输入您的密码以确认更改电子邮件地址为</value>
   </data>
   <data name="UOM" xml:space="preserve">
-    <value>单位</value>
-  </data>
-  <data name="Uom" xml:space="preserve">
     <value>单位</value>
   </data>
   <data name="Uom is required" xml:space="preserve">
