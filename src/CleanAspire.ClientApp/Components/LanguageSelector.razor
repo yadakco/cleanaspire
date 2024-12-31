@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
-
+@inject LanguageService LanguageService
+@inject IStorageService StorageService
 <MudTooltip Text="@CurrentLanguage">
     <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Class="mx-1" Icon="@Icons.Material.Outlined.Translate" Color="Color.Default" Dense="true">
 
@@ -23,16 +24,22 @@
     override protected void OnInitialized()
     {
         CurrentLanguage = CultureInfo.CurrentCulture.Name;
+        LanguageService.OnLanguageChanged += UpdateLanguage;
+    }
+    public void Dispose()
+    {
+        LanguageService.OnLanguageChanged -= UpdateLanguage;
+    }
+    private void UpdateLanguage()
+    {
+        InvokeAsync(StateHasChanged);
     }
     public string? CurrentLanguage { get; set; } = "en-US";
-    private Task ChangeLanguageAsync(string languageCode)
+    private async Task ChangeLanguageAsync(string languageCode)
     {
+        LanguageService.SetLanguage(languageCode);
+        await StorageService.SetItemAsync("_Culture", languageCode);
         CurrentLanguage = languageCode;
-        var culture = new CultureInfo(languageCode);
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
-        StateHasChanged();
-        return Task.CompletedTask;
-
+        Navigation.NavigateTo(Navigation.BaseUri + "?culture=" + languageCode, true);
     }
 }
