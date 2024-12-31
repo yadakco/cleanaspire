@@ -19,6 +19,8 @@ using Microsoft.Kiota.Serialization.Multipart;
 using Microsoft.Kiota.Serialization.Text;
 using CleanAspire.ClientApp.Services.PushNotifications;
 using CleanAspire.ClientApp.Services.Products;
+using System.Globalization;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace CleanAspire.ClientApp;
 
@@ -59,6 +61,7 @@ public static class DependencyInjection
         services.AddTransient<WebpushrAuthHandler>();
 
         // Scoped Services
+        services.AddSingleton<LanguageService>();
         services.AddSingleton<WebpushrOptionsCache>();
         services.AddScoped<UserProfileStore>();
         services.AddScoped<OnlineStatusInterop>();
@@ -135,6 +138,15 @@ public static class DependencyInjection
 
         // Localization
         services.AddLocalization(options => options.ResourcesPath = "Resources");
+    }
+
+    public static async Task InitializeCultureAsync(this WebAssemblyHost app, string storageKey = "_Culture")
+    {
+        var storageService = app.Services.GetRequiredService<IStorageService>();
+        var languageCode = await storageService.GetItemAsync<string>(storageKey);
+        var culture = new CultureInfo(languageCode ?? CultureInfo.CurrentCulture.Name);
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
 }
 

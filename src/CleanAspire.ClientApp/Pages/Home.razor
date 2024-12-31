@@ -4,7 +4,7 @@
 
 @using Microsoft.Kiota.Abstractions
 @inject IHttpClientFactory HttpClientFactory
-<PageTitle>Home</PageTitle>
+<PageTitle>@L["Home"]</PageTitle>
 
 <MudPaper Class="pa-4 mb-3">
     <style>
@@ -93,7 +93,7 @@
     </style>
     <div class="d-flex flex-row gap-3">
         <div class="d-flex flex-column">
-            <div class="text-muted text-nowrap small">Invoiced amount</div>
+            <div class="text-muted text-nowrap small">@L["Invoiced amount"]</div>
             <div class="fs-5 fw-bold text-nowrap">1,167,986 EUR</div>
         </div>
         <div class="d-flex flex-column flex-grow-1 gap-3">
@@ -158,13 +158,13 @@
 </MudPaper>
 
 <MudPaper Class="pa-4 mb-3">
-    <MudText Typo="Typo.h5">Orders List</MudText>
+    <MudText Typo="Typo.h5">@L["Orders List"]</MudText>
 
     <MudDataGrid T="Order" Items="Orders" Dense="true" Hover="true">
         <Columns>
-            <PropertyColumn Title="Order Number" Property="x => x.OrderNumber" />
-            <PropertyColumn Title="Product" Property="x => x.Product" />
-            <PropertyColumn Title="Amount" Property="x => x.Amount" CellStyle="text-align:right" HeaderStyle="text-align:right">
+            <PropertyColumn Title="@L["Order Number"]" Property="x => x.OrderNumber" />
+            <PropertyColumn Title="@L["Product"]" Property="x => x.Product" />
+            <PropertyColumn Title="@L["Amount"]" Property="x => x.Amount" CellStyle="text-align:right" HeaderStyle="text-align:right">
                 <CellTemplate>
                     @context.Item.Amount.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")).Replace("€", "EUR ")
                 </CellTemplate>
@@ -172,9 +172,9 @@
                     <MudText Typo="Typo.subtitle1"> @($"Total: {Orders.Sum(x => x.Amount).ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")).Replace("€", "EUR ")}")</MudText>
                 </FooterTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="Status" Property="x => x.Status" />
-            <PropertyColumn Title="Customer Name" Property="x => x.CustomerName" />
-            <PropertyColumn Title="Order Date" Property="x => x.OrderDate" Format="yyyy-MM-dd" />
+            <PropertyColumn Title="@L["Status"]" Property="x => x.Status" />
+            <PropertyColumn Title="@L["Customer Name"]" Property="x => x.CustomerName" />
+            <PropertyColumn Title="@L["Order Date"]" Property="x => x.OrderDate" Format="yyyy-MM-dd" />
 
         </Columns>
         <PagerContent>
@@ -226,16 +226,16 @@
 
 </MudPaper>
 <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 pa-2" Elevation="0">
-    <MudButton Variant="Variant.Filled">Subscribe</MudButton>
-    <MudButton Variant="Variant.Filled" OnClick="Send" Color="Color.Primary">Send Notifications</MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Info">Info</MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Error">Error</MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Secondary">Secondary</MudButton>
-    <MudButton Variant="Variant.Filled" Disabled="true">Disabled</MudButton>
+    <MudButton Variant="Variant.Filled">@L["Default"]</MudButton>
+    <MudButton Variant="Variant.Filled" OnClick="Send" Color="Color.Primary">@L["Send Notifications"]</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info">@L["Info"]</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Error">@L["Error"]</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary">@L["Secondary"]</MudButton>
+    <MudButton Variant="Variant.Filled" Disabled="true">@L["Disabled"]</MudButton>
 </MudPaper>
 <MudPaper Class="d-flex flex-column flex-grow-1 gap-0 pa-2" Elevation="0">
-    <MudText Typo="Typo.h1">H1 Title</MudText>
-    <MudText Typo="Typo.h2">H2 Title</MudText>
+    <MudText Typo="Typo.h1">@L["H1 Title"]</MudText>
+    <MudText Typo="Typo.h2">@L["H2 Title"]</MudText>
     <MudText Typo="Typo.h3">H3 Title</MudText>
     <MudText Typo="Typo.h4">H4 Title</MudText>
     <MudText Typo="Typo.h5">H5 Title</MudText>
@@ -243,7 +243,7 @@
 
     <MudText Typo="Typo.subtitle1"> Subtitle1 Blazor</MudText>
     <MudText Typo="Typo.subtitle2"> Subtitle2 Blazor</MudText>
-    <MudText Typo="Typo.button"> Button Text</MudText>
+    <MudText Typo="Typo.button"> @L["Button Text"]</MudText>
 
     <MudText Typo="Typo.body1"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
     <MudText Typo="Typo.body2"> Here we add each class to the divs to change the background color, text color and both background and text color with one class only. </MudText>
