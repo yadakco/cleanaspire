@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
         <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+        <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
         <RootNamespace>CleanAspire.ClientApp</RootNamespace>
         <AssemblyName>CleanAspire.ClientApp</AssemblyName>
@@ -38,6 +39,10 @@
 
     <ItemGroup>
         <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     </ItemGroup>
 
 </Project>
