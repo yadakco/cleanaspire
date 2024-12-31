@@ -145,7 +145,6 @@ public static class DependencyInjection
         var storageService = app.Services.GetRequiredService<IStorageService>();
         var languageCode = await storageService.GetItemAsync<string>(storageKey);
         var culture = new CultureInfo(languageCode ?? CultureInfo.CurrentCulture.Name);
-
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
