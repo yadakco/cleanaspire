@@ -41,7 +41,7 @@ public static class SupportedLocalization
         },
         new()
         {
-            Code = "ko-kr",
+            Code = "ko-KR",
             DisplayName = "한국어(대한민국)"
         },
         new()

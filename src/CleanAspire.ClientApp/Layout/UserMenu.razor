@@ -8,13 +8,16 @@
         <MudStack Row="true" AlignItems="AlignItems.Center">
             <MudTooltip Text="@statusTooltip" Delay="300">
                 <div class="avatar-container">
-                    @if (_isOnline == false)
+                    @if (RendererInfo.Name == "WebAssembly")
                     {
-                        <div class="rotating-border @(LayoutService.IsDarkMode ? "dark-mode" : "light-mode")"></div>
-                    }
-                    else
-                    {
-                        <div class="online-border @(LayoutService.IsDarkMode ? "dark-mode" : "light-mode")"></div>
+                        @if (_isOnline == false)
+                        {
+                            <div class="rotating-border @(LayoutService.IsDarkMode ? "dark-mode" : "light-mode")"></div>
+                        }
+                        else
+                        {
+                            <div class="online-border @(LayoutService.IsDarkMode ? "dark-mode" : "light-mode")"></div>
+                        }
                     }
                     @if (string.IsNullOrEmpty(userModel?.AvatarUrl))
                     {
@@ -29,7 +32,7 @@
                 </div>
             </MudTooltip>
             <MudStack Justify="Justify.Center" Spacing="0">
-                <MudText Typo="Typo.body2">@userModel?.Username</MudText>
+                <MudText Typo="Typo.body2">@(userModel?.Nickname ?? userModel?.Username)</MudText>
                 <MudText Typo="Typo.body2" Class="mud-text-secondary">@userModel?.Email</MudText>
             </MudStack>
         </MudStack>
@@ -38,21 +41,21 @@
         <MudMenuItem Href="/account/profile">
             <div class="d-flex align-center">
                 <MudIcon Class="mr-1" Size="Size.Small"
-                Icon="@Icons.Material.Filled.Person" />
+                         Icon="@Icons.Material.Filled.Person" />
                 <MudText Align="Align.Center">@L["Profile"]</MudText>
             </div>
         </MudMenuItem>
         <MudMenuItem Href="/profile/setting">
             <div class="d-flex align-center">
                 <MudIcon Class="mr-1" Size="Size.Small"
-                Icon="@Icons.Material.Filled.Settings" />
+                         Icon="@Icons.Material.Filled.Settings" />
                 <MudText Align="Align.Center">@L["Settings"]</MudText>
             </div>
         </MudMenuItem>
         <MudMenuItem OnClick="OnSignOut">
             <div class="d-flex align-center">
                 <MudIcon Class="mr-1" Size="Size.Small"
-                Icon="@Icons.Material.Filled.Logout" />
+                         Icon="@Icons.Material.Filled.Logout" />
                 <MudText Align="Align.Center">@L["Logout"]</MudText>
             </div>
         </MudMenuItem>
@@ -79,7 +82,7 @@
         bool isOnline = await OnlineStatusInterop.GetOnlineStatusAsync();
         UpdateStatus(isOnline);
         OnlineStatusInterop.OnlineStatusChanged += UpdateStatus;
-      
+
     }
     private void UpdateStatus(bool isOnline)
     {

@@ -645,4 +645,7 @@
   <data name="Visit our GitHub repository." xml:space="preserve">
     <value>Besuchen Sie unser GitHub-Repository.</value>
   </data>
+  <data name="Blazor Aspire" xml:space="preserve">
+    <value>Blazor Aspire</value>
+  </data>
 </root>
