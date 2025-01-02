@@ -215,7 +215,7 @@ public class ProductServiceProxy
                 return new ProblemDetails
                 {
                     Title = ex.Message,
-                    Detail = ex.Message
+                    Detail = ex.InnerException?.Message?? ex.Message
                 };
             }
             catch (Exception ex)
