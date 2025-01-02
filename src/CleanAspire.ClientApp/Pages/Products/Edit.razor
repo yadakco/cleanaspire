@@ -115,7 +115,7 @@
                 },
                 invalid =>
                 {
-                    Snackbar.Add(invalid.Message ?? L["Failed validation"], Severity.Error);
+                    Snackbar.Add(@L[invalid.Detail], Severity.Error);
                     return false;
                 },
                 error =>

@@ -66,7 +66,7 @@
             },
             invalid =>
             {
-                Snackbar.Add(invalid.Message, Severity.Error);
+                Snackbar.Add(L[invalid.Detail ?? "Failed validation"], Severity.Error);
                 waiting = false;
             },
             error =>
