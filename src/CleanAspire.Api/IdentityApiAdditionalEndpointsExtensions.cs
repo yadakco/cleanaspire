@@ -373,7 +373,9 @@ public static class IdentityApiAdditionalEndpointsExtensions
                         throw new NotSupportedException($"{nameof(MapIdentityApiAdditionalEndpoints)} requires a user store with email support.");
                     }
                     if (user is not ApplicationUser appUser)
+                    {
                         throw new InvalidCastException($"The provided user must be of type {nameof(ApplicationUser)}.");
+                    }
 
                     var tenantId = dbcontext.Tenants.FirstOrDefault()?.Id;
                     appUser.TenantId = tenantId;
@@ -383,7 +385,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                     appUser.Provider = "Google";
                     appUser.AvatarUrl = validatedUser.Picture;
                     appUser.LanguageCode = "en-US";
-                    appUser.TimeZoneId = "UTC";
+                    appUser.TimeZoneId = TimeZoneInfo.Local.Id;
                     appUser.EmailConfirmed = true;
                     appUser.RefreshToken = idTokenContent!.refresh_token;
                     appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddSeconds(idTokenContent.expires_in);
