@@ -457,7 +457,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
         .WithDescription("Generates a shared key and an Authenticator URI for a logged-in user. This endpoint is typically used to configure a TOTP authenticator app, such as Microsoft Authenticator or Google Authenticator.");
 
 
-        routeGroup.MapPost("/enable2fa", async Task<Results<Ok, ValidationProblem, NotFound, BadRequest<string>>>
+        routeGroup.MapPost("/enable2fa", async Task<Results<Ok, ValidationProblem, NotFound, BadRequest>>
          (ClaimsPrincipal claimsPrincipal, HttpContext context, [FromBody] Enable2faRequest request) =>
         {
             var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
@@ -491,7 +491,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
             else
             {
-                return TypedResults.BadRequest("Invalid verification code");
+                return TypedResults.BadRequest();
             }
         }).RequireAuthorization()
           .Produces(StatusCodes.Status200OK)
