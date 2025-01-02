@@ -16,7 +16,7 @@ public class ApiClientService
     {
         _logger = logger;
     }
-    public async Task<OneOf<TResponse, ApiClientValidationError, ApiClientError>> ExecuteAsync<TResponse>(Func<Task<TResponse>> apiCall)
+    public async Task<OneOf<TResponse, HttpValidationProblemDetails, ProblemDetails>> ExecuteAsync<TResponse>(Func<Task<TResponse>> apiCall)
     {
         try
         {
@@ -27,45 +27,32 @@ public class ApiClientService
         {
 
             _logger.LogError(ex, ex.Message);
-            return new ApiClientValidationError(ex.Detail, ex);
+            return ex;
         }
         catch (ProblemDetails ex)
         {
             _logger.LogError(ex, ex.Message);
-            return new ApiClientError(ex.Detail, ex);
+            return ex;
         }
         catch (ApiException ex)
         {
             _logger.LogError(ex, ex.Message);
-            return new ApiClientError(ex.Message, ex);
+            return new ProblemDetails
+            {
+                Title = ex.Message,
+                Detail = ex.InnerException?.Message ?? ex.Message,
+            };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            return new ApiClientError(ex.Message, ex);
+            return new ProblemDetails
+            {
+                Title = ex.Message,
+                Detail = ex.InnerException?.Message ?? ex.Message,
+            };
         }
     }
 }
 
-public class ApiClientError
-{
-    public string? Message { get; }
-    public Exception Exception { get; }
 
-    public ApiClientError(string? message, Exception exception)
-    {
-        Message = message;
-        Exception = exception;
-    }
-}
-public class ApiClientValidationError
-{
-    public string? Message { get; }
-    public HttpValidationProblemDetails Errors { get; }
-
-    public ApiClientValidationError(string? message, HttpValidationProblemDetails details)
-    {
-        Message = message;
-        Errors = details;
-    }
-}

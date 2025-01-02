@@ -73,7 +73,7 @@
                                     </MudButton>
                                 }
                             </div>
-                          
+
                         </div>
                     </div>
                 </MudListItem>
@@ -185,7 +185,14 @@
         }
         catch(ApiException e)
         {
-            Snackbar.Add(L["Invalid verification code"], Severity.Error);
+            if (e.ResponseStatusCode == 404)
+            {
+                Snackbar.Add(L["User not found."], Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add(L["Invalid verification code"], Severity.Error);
+            }
         }
        
     }

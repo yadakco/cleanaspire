@@ -107,7 +107,7 @@ public class ProductServiceProxy
         }
     }
 
-    public async Task<OneOf<ProductDto, ApiClientValidationError, ApiClientError>> CreateProductAsync(CreateProductCommand command)
+    public async Task<OneOf<ProductDto, HttpValidationProblemDetails, ProblemDetails>> CreateProductAsync(CreateProductCommand command)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
         if (isOnline)
@@ -127,15 +127,27 @@ public class ProductServiceProxy
             }
             catch (HttpValidationProblemDetails ex)
             {
-                return new ApiClientValidationError(ex.Detail, ex);
+                return ex;
             }
             catch (ProblemDetails ex)
             {
-                return new ApiClientError(ex.Detail, ex);
+                return ex;
+            }
+            catch (ApiException ex)
+            {
+                return new ProblemDetails
+                {
+                    Title = ex.Message,
+                    Detail = ex.Message
+                };
             }
             catch (Exception ex)
             {
-                return new ApiClientError(ex.Message, ex);
+                return new ProblemDetails
+                {
+                    Title = ex.Message,
+                    Detail = ex.Message
+                };
             }
         }
         else
@@ -172,11 +184,15 @@ public class ProductServiceProxy
             }
             else
             {
-                return new ApiClientError("Offline mode is disabled. Please enable offline mode to create products in offline mode.", new Exception("Offline mode is disabled."));
+                return new ProblemDetails
+                {
+                    Title = "Offline mode is disabled.",
+                    Detail = "Offline mode is disabled. Please enable offline mode to create products in offline mode."
+                };
             }
         }
     }
-    public async Task<OneOf<bool, ApiClientValidationError, ApiClientError>> UpdateProductAsync(UpdateProductCommand command)
+    public async Task<OneOf<bool, HttpValidationProblemDetails, ProblemDetails>> UpdateProductAsync(UpdateProductCommand command)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
         if (isOnline)
@@ -188,19 +204,27 @@ public class ProductServiceProxy
             }
             catch (HttpValidationProblemDetails ex)
             {
-                return new ApiClientValidationError(ex.Detail, ex);
+                return ex;
             }
             catch (ProblemDetails ex)
             {
-                return new ApiClientError(ex.Detail, ex);
+                return ex;
             }
             catch (ApiException ex)
             {
-                return new ApiClientError(ex.Message, ex);
+                return new ProblemDetails
+                {
+                    Title = ex.Message,
+                    Detail = ex.Message
+                };
             }
             catch (Exception ex)
             {
-                return new ApiClientError(ex.Message, ex);
+                return new ProblemDetails
+                {
+                    Title = ex.Message,
+                    Detail = ex.Message
+                };
             }
         }
         else if (_offlineModeState.Enabled)
@@ -243,9 +267,13 @@ public class ProductServiceProxy
             }
             return true;
         }
-        return new ApiClientError("Offline mode is disabled. Please enable offline mode to update products in offline mode.", new Exception("Offline mode is disabled."));
+        return new ProblemDetails
+        {
+            Title = "Offline mode is disabled.",
+            Detail = "Offline mode is disabled. Please enable offline mode to update products in offline mode."
+        };
     }
-    public async Task<OneOf<bool, ApiClientError>> DeleteProductsAsync(List<string> productIds)
+    public async Task<OneOf<bool, ProblemDetails>> DeleteProductsAsync(List<string> productIds)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
         if (isOnline)
@@ -256,13 +284,25 @@ public class ProductServiceProxy
                 await _productCacheService.UpdateDeletedProductsAsync(productIds);
                 return true;
             }
-            catch (ProblemDetails ex)
+            catch(ProblemDetails ex)
             {
-                return new ApiClientError(ex.Detail, ex);
+                return ex;
             }
             catch (ApiException ex)
             {
-                return new ApiClientError(ex.Message, ex);
+                return new ProblemDetails
+                {
+                    Title = ex.Message,
+                    Detail = ex.Message
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ProblemDetails
+                {
+                    Title = ex.Message,
+                    Detail = ex.Message
+                };
             }
         }
         else if (_offlineModeState.Enabled)
@@ -272,7 +312,11 @@ public class ProductServiceProxy
             await _productCacheService.UpdateDeletedProductsAsync(productIds);
             return true;
         }
-        return new ApiClientError("Offline mode is disabled. Please enable offline mode to delete products in offline mode.", new Exception("Offline mode is disabled."));
+        return new ProblemDetails
+        {
+            Title = "Offline mode is disabled.",
+            Detail = "Offline mode is disabled. Please enable offline mode to delete products in offline mode."
+        };
     }
     public async Task SyncOfflineCachedDataAsync()
     {
