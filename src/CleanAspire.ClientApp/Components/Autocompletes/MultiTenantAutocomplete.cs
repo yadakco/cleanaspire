@@ -2,6 +2,7 @@
 
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
+using CleanAspire.ClientApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -19,12 +20,13 @@ public class MultiTenantAutocomplete<T> : MudAutocomplete<TenantDto>
     }
     public List<TenantDto>? Tenants { get; set; } = new();
     [Inject] private ApiClient ApiClient { get; set; } = default!;
+    [Inject] private ApiClientServiceProxy ApiClientServiceProxy { get; set; } = default!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            Tenants = await ApiClient.Tenants.GetAsync();
+            Tenants = await ApiClientServiceProxy.Query("multitenant", () => ApiClient.Tenants.GetAsync(), tags: new[] { "multitenant" }, TimeSpan.FromMinutes(60));
             StateHasChanged(); // Trigger a re-render after the tenants are loaded
         }
     }
