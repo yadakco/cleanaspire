@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Bogus;
+using CleanAspire.Application.Features.Products.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -62,10 +63,10 @@ public static class OpenApiTransformersExtensions
     {
         private static readonly Faker _faker = new();
         private static readonly Dictionary<Type, IOpenApiAny> _examples = [];
-  
+
         public ExampleChemaTransformer()
         {
-            _examples[typeof(LoginRequest)]=new OpenApiObject
+            _examples[typeof(LoginRequest)] = new OpenApiObject
             {
                 ["email"] = new OpenApiString("administrator"),
                 ["password"] = new OpenApiString("P@ssw0rd!")
@@ -82,8 +83,29 @@ public static class OpenApiTransformersExtensions
                 ["Nickname"] = new OpenApiString("exampleNickname"),
                 ["Provider"] = new OpenApiString("Local"),
                 ["TenantId"] = new OpenApiString("123e4567-e89b-47d3-a456-426614174000"),
-                ["TimeZoneId"] = new OpenApiString("America/New_York"),
+                ["TimeZoneId"] = new OpenApiString(TimeZoneInfo.Local.Id),
                 ["LanguageCode"] = new OpenApiString("en-US")
+            };
+            _examples[typeof(CreateProductCommand)] = new OpenApiObject
+            {
+                ["SKU"] = new OpenApiString("ABC123"),
+                ["Name"] = new OpenApiString("Sample Product"),
+                ["Category"] = new OpenApiString("Electronics"),
+                ["Description"] = new OpenApiString("This is a sample product description."),
+                ["Price"] = new OpenApiInteger(199),
+                ["Currency"] = new OpenApiString("USD"),
+                ["UOM"] = new OpenApiString("PCS")
+            };
+            _examples[typeof(UpdateProductCommand)] = new OpenApiObject
+            {
+                ["Id"] = new OpenApiString(Guid.CreateVersion7().ToString()),
+                ["SKU"] = new OpenApiString("ABC123"),
+                ["Name"] = new OpenApiString("Sample Product"),
+                ["Category"] = new OpenApiString("Electronics"),
+                ["Description"] = new OpenApiString("This is a sample product description."),
+                ["Price"] = new OpenApiInteger(199),
+                ["Currency"] = new OpenApiString("USD"),
+                ["UOM"] = new OpenApiString("PCS")
             };
 
         }

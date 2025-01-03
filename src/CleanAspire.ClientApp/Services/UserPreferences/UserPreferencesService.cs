@@ -31,7 +31,7 @@ public interface IUserPreferencesService
 public class UserPreferencesService : IUserPreferencesService
 {
     private readonly IStorageService _localStorage;
-    private const string Key = "userPreferences";
+    private const string Key = "_userPreferences";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserPreferencesService"/> class.

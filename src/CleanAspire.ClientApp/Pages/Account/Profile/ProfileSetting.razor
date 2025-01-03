@@ -104,7 +104,7 @@
             Snackbar.Add(L["You are offline. Please check your internet connection."], Severity.Error);
             return;
         }
-        var result = await ApiClientService.ExecuteAsync(() => ApiClient.Account.Profile.PostAsync(new ProfileRequest()
+        var result = await ApiClientServiceProxy.ExecuteAsync(() => ApiClient.Account.Profile.PostAsync(new ProfileRequest()
             {
                 AvatarUrl = model.AvatarUrl,
                 Email = model.Email,
@@ -124,7 +124,7 @@
             },
             invalid =>
             {
-                Snackbar.Add(invalid.Message, Severity.Error);
+                Snackbar.Add(L[invalid.Detail ?? "Failed validation"], Severity.Error);
             },
             error =>
             {

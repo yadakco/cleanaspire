@@ -77,7 +77,7 @@
     {
         if (!string.IsNullOrEmpty(Code) && !string.IsNullOrEmpty(UserId) && !string.IsNullOrEmpty(ChangedEmail))
         {
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.ConfirmEmail.GetAsync(requestConfiguration =>
+            var result = await ApiClientServiceProxy.ExecuteAsync(() => ApiClient.ConfirmEmail.GetAsync(requestConfiguration =>
             {
                 requestConfiguration.QueryParameters.Code = Code;
                 requestConfiguration.QueryParameters.UserId = UserId;
@@ -95,7 +95,7 @@
                 },
                 invalid =>
                 {
-                    Snackbar.Add(invalid.Message, Severity.Error);
+                    Snackbar.Add(L[invalid.Detail ?? "Failed validation"], Severity.Error);
                 },
                 error =>
                 {

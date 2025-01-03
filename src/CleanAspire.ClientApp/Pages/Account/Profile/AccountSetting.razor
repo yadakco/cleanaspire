@@ -85,7 +85,7 @@
         }
         if (success)
         {
-            var result = await ApiClientService.ExecuteAsync(async () =>
+            var result = await ApiClientServiceProxy.ExecuteAsync(async () =>
             {
                 await ApiClient.Account.UpdateEmail.PostAsync(new UpdateEmailRequest()
                 {
@@ -101,7 +101,7 @@
             },
             invalid =>
             {
-                Snackbar.Add(invalid.Message, Severity.Error);
+                Snackbar.Add(L[invalid.Detail ?? "Failed validation"], Severity.Error);
             },
             error =>
             {
@@ -119,7 +119,7 @@
         }
         if (deleteSuccess)
         {
-            var result = await ApiClientService.ExecuteAsync( async () =>
+            var result = await ApiClientServiceProxy.ExecuteAsync(async () =>
             {
                 await ApiClient.Account.DeleteOwnerAccount.DeleteAsync(new DeleteUserRequest()
                 {
@@ -136,7 +136,7 @@
             },
             invalid =>
             {
-                Snackbar.Add(invalid.Message, Severity.Error);
+                Snackbar.Add(L[invalid.Detail ?? "Failed validation"], Severity.Error);
             },
             error =>
             {

@@ -34,14 +34,19 @@
     },
 
     // Save data to the cache store (with JSON serialization and optional tags)
-    saveData: function (dbName, key, value, tags = []) {
+    saveData: function (dbName, key, value, tags = [], expiration = null) {
         return this.open(dbName).then(db => {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction('cache', 'readwrite');
                 const store = transaction.objectStore('cache');
                 const serializedValue = JSON.stringify(value); // Serialize the value
 
-                const request = store.put({ key: key, value: serializedValue, tags: tags }); // Include tags
+                const request = store.put({
+                    key: key,
+                    value: serializedValue,
+                    tags: tags,
+                    expiration: expiration ? new Date(Date.now() + expiration).toISOString() : null // Add expiration
+                }); // Include tags
 
                 request.onsuccess = () => resolve();
                 request.onerror = () => reject(request.error);
@@ -58,6 +63,7 @@
                 const index = store.index('tags');                     // Access the 'tags' index
 
                 const results = [];
+                const deletePromises = [];
                 // Fetch data for each tag
                 const tagRequests = tags.map(tag => {
                     return new Promise((tagResolve, tagReject) => {
@@ -67,7 +73,13 @@
                             const entries = event.target.result;
                             // Push key and deserialized value into the results array
                             entries.forEach(entry => {
-                                results.push({ key: entry.key, value: entry.value });
+                                // Check expiration
+                                if (!entry.expiration || new Date(entry.expiration) >= new Date()) {
+                                    results.push({ key: entry.key, value: JSON.parse(entry.value) });
+                                } else {
+                                    // Add deletion of expired data
+                                    deletePromises.push(this.deleteData(dbName, entry.key));
+                                }
                             });
                             tagResolve();
                         };
@@ -80,6 +92,7 @@
 
                 // Combine results for all tags
                 Promise.all(tagRequests)
+                    .then(() => Promise.all(deletePromises)) // Ensure expired data is deleted
                     .then(() => resolve(results)) // Return the list of { key, value }
                     .catch(reject);
             });
@@ -137,10 +150,16 @@
                 request.onsuccess = function (event) {
                     const result = event.target.result;
                     if (result) {
-                        try {
-                            resolve(JSON.parse(result.value)); // Deserialize the value
-                        } catch (e) {
-                            reject("Error parsing JSON");
+                        // Check expiration
+                        if (result.expiration && new Date(result.expiration) < new Date()) {
+                            window.indexedDbStorage.deleteData(dbName, key).then(() => resolve(null)) // Delete expired data
+                                .catch(reject);
+                        } else {
+                            try {
+                                resolve(JSON.parse(result.value)); // Deserialize the value
+                            } catch (e) {
+                                reject("Error parsing JSON");
+                            }
                         }
                     } else {
                         resolve(null); // No data found

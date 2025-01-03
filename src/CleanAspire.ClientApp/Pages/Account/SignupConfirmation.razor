@@ -35,7 +35,7 @@
         else
         {
 
-            var result = await ApiClientService.ExecuteAsync(() => ApiClient.ConfirmEmail.GetAsync(requestConfiguration =>
+            var result = await ApiClientServiceProxy.ExecuteAsync(() => ApiClient.ConfirmEmail.GetAsync(requestConfiguration =>
             {
                 requestConfiguration.QueryParameters.Code = Code;
                 requestConfiguration.QueryParameters.UserId = UserId;
@@ -50,7 +50,7 @@
                 },
                 invalid =>
                 {
-                    message = invalid.Message;
+                    message = L[invalid.Detail ?? "Failed validation"];
                 },
                 error =>
                 {
