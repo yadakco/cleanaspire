@@ -73,11 +73,15 @@ public class ProblemExceptionHandler : IExceptionHandler
                 Detail = "A numeric value caused an overflow.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
-            ReferenceConstraintException => new ProblemDetails
+            ReferenceConstraintException e => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Reference Constraint Violation",
-                Detail = "A foreign key reference constraint was violated.",
+                Detail = e.ConstraintName != null && e.ConstraintProperties != null && e.ConstraintProperties.Any()
+                     ? $"Foreign key reference constraint {e.ConstraintName} violated. Involved columns: {string.Join(", ", e.ConstraintProperties)}."
+                     : e.ConstraintName != null
+                     ? $"Foreign key reference constraint {e.ConstraintName} violated."
+                     : "A reference constraint violation occurred.",
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}",
             },
             DbUpdateException => new ProblemDetails
