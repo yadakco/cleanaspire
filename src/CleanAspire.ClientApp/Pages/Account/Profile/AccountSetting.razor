@@ -85,7 +85,7 @@
         }
         if (success)
         {
-            var result = await ApiClientService.ExecuteAsync(async () =>
+            var result = await ApiClientServiceProxy.ExecuteAsync(async () =>
             {
                 await ApiClient.Account.UpdateEmail.PostAsync(new UpdateEmailRequest()
                 {
@@ -119,7 +119,7 @@
         }
         if (deleteSuccess)
         {
-            var result = await ApiClientService.ExecuteAsync( async () =>
+            var result = await ApiClientServiceProxy.ExecuteAsync(async () =>
             {
                 await ApiClient.Account.DeleteOwnerAccount.DeleteAsync(new DeleteUserRequest()
                 {

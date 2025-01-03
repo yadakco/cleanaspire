@@ -53,7 +53,8 @@
             return;
         }
         waiting = true;
-        var result = await ApiClientService.ExecuteAsync(async () =>{
+        var result = await ApiClientServiceProxy.ExecuteAsync(async () =>
+        {
             await ApiClient.Account.Signup.PostAsync(new SignupRequest() { Email = model.Email, Password = model.Password, LanguageCode = model.LanguageCode, Nickname = model.Nickname, Provider = model.Provider, TimeZoneId = model.TimeZoneId, TenantId = model.Tenant?.Id });
             return true;
             });

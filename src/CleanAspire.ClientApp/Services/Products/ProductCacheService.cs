@@ -18,6 +18,7 @@ public class ProductCacheService
     private const string OFFLINE_DELETE_COMMAND_CACHE_KEY = "OfflineDeleteCommand:product";
     private const string OFFLINE_PAGINATION_CACHE_TAG = "OfflinePagination:";
     private const string PAGINATION_TAG = "products_pagination";
+    private const string PAGINATION_CACHE_TAG = "products_pagination_cache";
     private const string COMMANDS_TAG = "product_commands";
     private const string OBJECT_TAG = "product";
 
@@ -38,20 +39,21 @@ public class ProductCacheService
         return await _cache.GetDataAsync<ProductDto>(DATABASENAME, productCacheKey);
     }
 
-    public async Task SaveOrUpdatePaginatedProductsAsync(ProductsWithPaginationQuery query, PaginatedResultOfProductDto data)
-    {
-        var cacheKey = GeneratePaginationCacheKey(query);
-        await _cache.SaveDataAsync(DATABASENAME, cacheKey, data, new[] { PAGINATION_TAG });
-    }
     public async Task SaveOrUpdatePaginatedProductsAsync(string cacheKey, PaginatedResultOfProductDto data)
     {
         await _cache.SaveDataAsync(DATABASENAME, cacheKey, data, new[] { PAGINATION_TAG });
     }
-    public async Task<PaginatedResultOfProductDto?> GetPaginatedProductsAsync(ProductsWithPaginationQuery query)
+    public async Task<PaginatedResultOfProductDto?> GetPaginatedProductsAsync(string cacheKey)
     {
-        var cacheKey = GeneratePaginationCacheKey(query);
         return await _cache.GetDataAsync<PaginatedResultOfProductDto>(DATABASENAME, cacheKey);
     }
+
+    public async Task<PaginatedResultOfProductDto?> GetOrSetAsync(string cacheKey, Func<Task<PaginatedResultOfProductDto?>> factory, TimeSpan? expiration = null)
+    {
+        cacheKey = $"{PAGINATION_CACHE_TAG}{cacheKey}";
+        return await _cache.GetOrSetAsync(DATABASENAME, cacheKey, factory, new[] { PAGINATION_CACHE_TAG }, expiration);
+    }
+
     public async Task<Dictionary<string, PaginatedResultOfProductDto>> GetAllCachedPaginatedResultsAsync()
     {
         var cachedData = await _cache.GetDataByTagsAsync<PaginatedResultOfProductDto>(
@@ -102,7 +104,7 @@ public class ProductCacheService
         ) ?? new List<CreateProductCommand>();
 
         cached.Add(command);
-        await _cache.SaveDataAsync(DATABASENAME, OFFLINE_CREATE_COMMAND_CACHE_KEY, cached, new[] {  COMMANDS_TAG });
+        await _cache.SaveDataAsync(DATABASENAME, OFFLINE_CREATE_COMMAND_CACHE_KEY, cached, new[] { COMMANDS_TAG });
     }
 
     public async Task StoreOfflineUpdateCommandAsync(UpdateProductCommand command)
@@ -153,11 +155,15 @@ public class ProductCacheService
         await _cache.DeleteDataAsync(DATABASENAME, OFFLINE_UPDATE_COMMAND_CACHE_KEY);
         await _cache.DeleteDataAsync(DATABASENAME, OFFLINE_DELETE_COMMAND_CACHE_KEY);
     }
+    public async Task ClearPaginatedCache()
+    {
+        await _cache.DeleteDataByTagsAsync(DATABASENAME, new[] { PAGINATION_CACHE_TAG });
+    }
     private string GenerateProductCacheKey(string productId)
     {
         return $"{nameof(ProductDto)}:{productId}";
     }
-    private string GeneratePaginationCacheKey(ProductsWithPaginationQuery query)
+    public string GeneratePaginationCacheKey(ProductsWithPaginationQuery query)
     {
         return $"{nameof(ProductsWithPaginationQuery)}:{query.PageNumber}_{query.PageSize}_{query.Keywords}_{query.OrderBy}_{query.SortDirection}";
     }
