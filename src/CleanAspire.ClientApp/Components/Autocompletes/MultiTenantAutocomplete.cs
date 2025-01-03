@@ -26,7 +26,7 @@ public class MultiTenantAutocomplete<T> : MudAutocomplete<TenantDto>
     {
         if (firstRender)
         {
-            Tenants = await ApiClientServiceProxy.Query("multitenant", () => ApiClient.Tenants.GetAsync(), tags: new[] { "multitenant" }, TimeSpan.FromMinutes(60));
+            Tenants = await ApiClientServiceProxy.QueryAsync("multitenant", () => ApiClient.Tenants.GetAsync(), tags: null, TimeSpan.FromMinutes(60));
             StateHasChanged(); // Trigger a re-render after the tenants are loaded
         }
     }

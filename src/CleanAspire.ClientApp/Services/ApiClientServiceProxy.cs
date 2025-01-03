@@ -11,7 +11,7 @@ namespace CleanAspire.ClientApp.Services;
 
 public class ApiClientServiceProxy(ILogger<ApiClientServiceProxy> logger, IndexedDbCache cache)
 {
-    public async Task<TResponse?> Query<TResponse>(string cacheKey, Func<Task<TResponse?>> factory, string[]? tags = null, TimeSpan? expiration = null)
+    public async Task<TResponse?> QueryAsync<TResponse>(string cacheKey, Func<Task<TResponse?>> factory, string[]? tags = null, TimeSpan? expiration = null)
     {
         cacheKey = $"{cacheKey}";
         return await cache.GetOrSetAsync(IndexedDbCache.DATABASENAME, cacheKey, factory, tags, expiration);
