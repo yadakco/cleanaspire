@@ -19,20 +19,23 @@ public class ProductServiceProxy
     private readonly NavigationManager _navigationManager;
     private readonly ProductCacheService _productCacheService;
     private readonly IWebpushrService _webpushrService;
+    private readonly ApiClientServiceProxy _apiClientServiceProxy;
     private readonly ApiClient _apiClient;
 
     private readonly OnlineStatusInterop _onlineStatusInterop;
     private readonly OfflineModeState _offlineModeState;
     private readonly OfflineSyncService _offlineSyncService;
+    private readonly string[] _cacheTags = new[] { "caching" };
     private bool _previousOnlineStatus;
 
     private readonly TimeSpan _cacheExpiration = TimeSpan.FromSeconds(15);
 
-    public ProductServiceProxy(NavigationManager navigationManager, ProductCacheService productCacheService, IWebpushrService webpushrService, ApiClient apiClient, OnlineStatusInterop onlineStatusInterop, OfflineModeState offlineModeState, OfflineSyncService offlineSyncService)
+    public ProductServiceProxy(NavigationManager navigationManager, ProductCacheService productCacheService, IWebpushrService webpushrService, ApiClientServiceProxy apiClientServiceProxy, ApiClient apiClient, OnlineStatusInterop onlineStatusInterop, OfflineModeState offlineModeState, OfflineSyncService offlineSyncService)
     {
         _navigationManager = navigationManager;
         _productCacheService = productCacheService;
         _webpushrService = webpushrService;
+        _apiClientServiceProxy = apiClientServiceProxy;
         _apiClient = apiClient;
         _onlineStatusInterop = onlineStatusInterop;
         _offlineModeState = offlineModeState;
@@ -66,7 +69,7 @@ public class ProductServiceProxy
         }
         try
         {
-            var paginatedProducts = await _productCacheService.GetOrSetAsync(cacheKey, () => _apiClient.Products.Pagination.PostAsync(paginationQuery), _cacheExpiration);
+            var paginatedProducts = await _apiClientServiceProxy.QueryAsync($"_{cacheKey}", () => _apiClient.Products.Pagination.PostAsync(paginationQuery), tags: _cacheTags, expiration: _cacheExpiration);
             if (paginatedProducts != null && _offlineModeState.Enabled)
             {
                 await _productCacheService.SaveOrUpdatePaginatedProductsAsync(cacheKey, paginatedProducts);
@@ -97,7 +100,7 @@ public class ProductServiceProxy
         }
         try
         {
-            var product = await _apiClient.Products[productId].GetAsync();
+            var product = await _apiClientServiceProxy.QueryAsync($"_{productId}", () => _apiClient.Products[productId].GetAsync(), tags: _cacheTags, expiration: _cacheExpiration);
             if (product != null && _offlineModeState.Enabled)
             {
                 await _productCacheService.SaveOrUpdateProductAsync(product);
@@ -125,7 +128,7 @@ public class ProductServiceProxy
                     $"Our new product, {response.Name}, is now available. Click to learn more!",
                     productUrl
                 );
-                await _productCacheService.ClearPaginatedCache();
+                await _apiClientServiceProxy.ClearCache(_cacheTags);
                 return response;
             }
             catch (HttpValidationProblemDetails ex)
@@ -203,7 +206,7 @@ public class ProductServiceProxy
             try
             {
                 var response = await _apiClient.Products.PutAsync(command);
-                await _productCacheService.ClearPaginatedCache();
+                await _apiClientServiceProxy.ClearCache(_cacheTags);
                 return true;
             }
             catch (HttpValidationProblemDetails ex)
@@ -219,7 +222,7 @@ public class ProductServiceProxy
                 return new ProblemDetails
                 {
                     Title = ex.Message,
-                    Detail = ex.InnerException?.Message?? ex.Message
+                    Detail = ex.InnerException?.Message ?? ex.Message
                 };
             }
             catch (Exception ex)
@@ -286,10 +289,10 @@ public class ProductServiceProxy
             {
                 await _apiClient.Products.DeleteAsync(new DeleteProductCommand() { Ids = productIds });
                 await _productCacheService.UpdateDeletedProductsAsync(productIds);
-                await _productCacheService.ClearPaginatedCache();
+                await _apiClientServiceProxy.ClearCache(_cacheTags);
                 return true;
             }
-            catch(ProblemDetails ex)
+            catch (ProblemDetails ex)
             {
                 return ex;
             }
@@ -362,7 +365,7 @@ public class ProductServiceProxy
             await Task.Delay(1200);
         }
         await _productCacheService.ClearCommands();
-        await _productCacheService.ClearPaginatedCache();
+        await _apiClientServiceProxy.ClearCache(_cacheTags);
         _offlineSyncService.SetSyncStatus(SyncStatus.Idle, "", 0, 0);
     }
 }

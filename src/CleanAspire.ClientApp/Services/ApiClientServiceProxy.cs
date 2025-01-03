@@ -16,6 +16,10 @@ public class ApiClientServiceProxy(ILogger<ApiClientServiceProxy> logger, Indexe
         cacheKey = $"{cacheKey}";
         return await cache.GetOrSetAsync(IndexedDbCache.DATABASENAME, cacheKey, factory, tags, expiration);
     }
+    public async Task ClearCache(string[] tags)
+    {
+        await cache.DeleteDataByTagsAsync(IndexedDbCache.DATABASENAME, tags);
+    }
     public async Task<OneOf<TResponse, HttpValidationProblemDetails, ProblemDetails>> ExecuteAsync<TResponse>(Func<Task<TResponse>> apiCall)
     {
         try

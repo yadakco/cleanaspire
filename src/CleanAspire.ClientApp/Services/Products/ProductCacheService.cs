@@ -47,13 +47,6 @@ public class ProductCacheService
     {
         return await _cache.GetDataAsync<PaginatedResultOfProductDto>(DATABASENAME, cacheKey);
     }
-
-    public async Task<PaginatedResultOfProductDto?> GetOrSetAsync(string cacheKey, Func<Task<PaginatedResultOfProductDto?>> factory, TimeSpan? expiration = null)
-    {
-        cacheKey = $"{PAGINATION_CACHE_TAG}{cacheKey}";
-        return await _cache.GetOrSetAsync(DATABASENAME, cacheKey, factory, new[] { PAGINATION_CACHE_TAG }, expiration);
-    }
-
     public async Task<Dictionary<string, PaginatedResultOfProductDto>> GetAllCachedPaginatedResultsAsync()
     {
         var cachedData = await _cache.GetDataByTagsAsync<PaginatedResultOfProductDto>(
@@ -155,10 +148,7 @@ public class ProductCacheService
         await _cache.DeleteDataAsync(DATABASENAME, OFFLINE_UPDATE_COMMAND_CACHE_KEY);
         await _cache.DeleteDataAsync(DATABASENAME, OFFLINE_DELETE_COMMAND_CACHE_KEY);
     }
-    public async Task ClearPaginatedCache()
-    {
-        await _cache.DeleteDataByTagsAsync(DATABASENAME, new[] { PAGINATION_CACHE_TAG });
-    }
+
     private string GenerateProductCacheKey(string productId)
     {
         return $"{nameof(ProductDto)}:{productId}";

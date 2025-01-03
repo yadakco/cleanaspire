@@ -1,5 +1,4 @@
-﻿
-@using Net.Codecrete.QrCodeGenerator
+﻿@using Net.Codecrete.QrCodeGenerator
 <div class="d-flex flex-column gap-2">
     <MudText Typo="Typo.h4">@L["Two-factor authentication"]</MudText>
     <MudDivider />
@@ -22,10 +21,10 @@
                                 <MudIcon Icon="@Icons.Material.Filled.Phone"></MudIcon>  <MudText Color="Color.Primary">@L["Authenticator app"]</MudText>
                             </div>
                             <MudText Typo="Typo.body2" Class="mud-text-secondary">@L["Use an authentication app or browser extension to get two-factor authentication codes when prompted."]</MudText>
-                            @if (UserProfileStore.Profile?.IsTwoFactorEnabled??false)
+                            @if (UserProfileStore.Profile?.IsTwoFactorEnabled ?? false)
                             {
                                 <div class="d-flex flex-row gap-2 align-content-center align-center">
-                                    <MudIcon Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle"> </MudIcon> 
+                                    <MudIcon Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle"> </MudIcon>
                                     <MudText Typo="Typo.body2" Class="mud-text-secondary">  @L["To disable, click here."] </MudText>
                                     <MudButton Color="Color.Primary" OnClick="Disable2fa"><MudText>@L["Disable"]</MudText></MudButton>
                                 </div>
@@ -137,7 +136,7 @@
             UserProfileStore.Set(profile);
             Snackbar.Add(L["Two-factor authentication has been disabled successfully"], Severity.Success);
         }
-        catch(ProblemDetails e)
+        catch (ProblemDetails e)
         {
             Snackbar.Add(e.Detail, Severity.Error);
         }
@@ -156,7 +155,7 @@
         }
         if (value)
         {
-            var response = await ApiClient.Account.GenerateAuthenticator.GetAsync(q=>q.QueryParameters.AppName= AppSettings.AppName);
+            var response = await ApiClient.Account.GenerateAuthenticator.GetAsync(q => q.QueryParameters.AppName = AppSettings.AppName);
             if (response is not null)
             {
                 _showConfigureAuthenticatorAppDialog = true;
@@ -167,7 +166,7 @@
             }
         }
     }
-    public  Task Close()
+    public Task Close()
     {
         _showConfigureAuthenticatorAppDialog = false;
         return Task.CompletedTask;
@@ -183,7 +182,7 @@
             _showConfigureAuthenticatorAppDialog = false;
             Snackbar.Add(L["Two-factor authentication has been enabled successfully"], Severity.Success);
         }
-        catch(ApiException e)
+        catch (ApiException e)
         {
             if (e.ResponseStatusCode == 404)
             {
@@ -194,7 +193,7 @@
                 Snackbar.Add(L["Invalid verification code"], Severity.Error);
             }
         }
-       
+
     }
     private async Task GenerateRecoveryCodes()
     {
