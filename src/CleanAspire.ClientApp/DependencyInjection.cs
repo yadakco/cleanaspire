@@ -121,7 +121,7 @@ public static class DependencyInjection
         });
 
         // ApiClient Service
-        services.AddScoped<ApiClientService>();
+        services.AddScoped<ApiClientServiceProxy>();
     }
 
     public static void AddAuthenticationAndLocalization(this IServiceCollection services, IConfiguration configuration)

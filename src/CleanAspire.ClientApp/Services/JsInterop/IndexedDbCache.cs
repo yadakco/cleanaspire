@@ -18,9 +18,23 @@ public sealed class IndexedDbCache
     }
 
     // Save data to IndexedDB with optional tags
-    public async Task SaveDataAsync<T>(string dbName, string key, T value, string[] tags = null)
+    public async Task SaveDataAsync<T>(string dbName, string key, T value, string[]? tags = null, TimeSpan? expiration = null)
     {
-        await _jsRuntime.InvokeVoidAsync("indexedDbStorage.saveData", dbName, key, value, tags ?? Array.Empty<string>());
+        var expirationMs = expiration.HasValue ? (int)expiration.Value.TotalMilliseconds : (int?)null;
+        await _jsRuntime.InvokeVoidAsync("indexedDbStorage.saveData", dbName, key, value, tags ?? Array.Empty<string>(), expirationMs);
+    }
+    // Get or set data in IndexedDB
+    public async Task<T> GetOrSetAsync<T>(string dbName, string key, Func<Task<T>> factory, string[]? tags = null, TimeSpan? expiration = null)
+    {
+        var existingData = await GetDataAsync<T>(dbName, key);
+        if (existingData != null)
+        {
+            return existingData;
+        }
+
+        var newData = await factory();
+        await SaveDataAsync(dbName, key, newData, tags, expiration);
+        return newData;
     }
 
     // Get data from IndexedDB by key

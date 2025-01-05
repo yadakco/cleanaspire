@@ -143,17 +143,17 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
             }, cancellationToken);
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
-        catch(ProblemDetails ex)
+        catch(ProblemDetails)
         {
             // Log and re-throw problem details exception
             throw;
         }
-        catch(ApiException ex)
+        catch(ApiException)
         {
             // Log and re-throw API exception
             throw;
         }
-        catch(Exception ex)
+        catch(Exception)
         {
             // Log and re-throw general exception
             throw;
