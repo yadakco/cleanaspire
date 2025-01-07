@@ -32,7 +32,7 @@ public static class NavbarMenu
                     new MenuItem
                     {
                         Label = "Stock Inquiry",
-                        Href = "",
+                        Href = "/stocks/index",
                         Status = PageStatus.Completed,
                         Description = "Check product stock levels."
                     },
