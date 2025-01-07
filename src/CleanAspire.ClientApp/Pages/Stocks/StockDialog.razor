@@ -4,9 +4,9 @@
     <DialogContent>
         <MudForm @ref="editForm">
             <div class="d-flex flex-column gap-2">
-                <ProductAutocomplete T="ProductDto" @bind-Value="@model.Product" DefaultProductId="@ProductId" Label="Product" Required="true" ErrorText="@L["Product is required."]" />
-                <MudTextField T="string" Label="Location" For="@(() => model.Location)" @bind-Value="model.Location" Required="true" ErrorText="@L["Location id is required."]" />
-                <MudNumericField T="int?" Label="Quantity" For="@(() => model.Quantity)" @bind-Value="model.Quantity" Validation="ValidateQuantity" Required="true" ErrorText="@L["Quantity must be greater than 0."]" />
+                <ProductAutocomplete T="ProductDto" @bind-Value="@model.Product" DefaultProductId="@ProductId" Label="@L["Product"]" Required="true" ErrorText="@L["Product is required."]" />
+                <MudTextField T="string" Label="@L["Location"]" For="@(() => model.Location)" @bind-Value="model.Location" Required="true" ErrorText="@L["Location is required."]" />
+                <MudNumericField T="int?" Label="@L["Quantity"]" For="@(() => model.Quantity)" @bind-Value="model.Quantity" Validation="ValidateQuantity" Required="true" ErrorText="@L["Quantity must be greater than 0."]" />
             </div>
         </MudForm>
     </DialogContent>
@@ -79,7 +79,7 @@
     {
         if (!value.HasValue || value <= 0)
         {
-            yield return "Quantity must be greater than 0.";
+            yield return L["Quantity must be greater than 0."];
         }
     }
     public class Model
