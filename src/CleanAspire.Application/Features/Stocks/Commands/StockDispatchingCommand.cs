@@ -55,12 +55,21 @@ public class StockDispatchingCommandHandler : IRequestHandler<StockDispatchingCo
         // Reduce the stock quantity
         existingStock.Quantity -= request.Quantity;
 
-        // Update the stock record
-        _context.Stocks.Update(existingStock);
+        // If stock quantity is zero, remove the stock record
+        if (existingStock.Quantity == 0)
+        {
+            _context.Stocks.Remove(existingStock);
+        }
+        else
+        {
+            // Update the stock record
+            _context.Stocks.Update(existingStock);
+        }
 
         // Save changes to the database
         await _context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }
+
 }
