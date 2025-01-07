@@ -11,7 +11,7 @@ using CleanAspire.Application.Features.Products.DTOs;
 using CleanAspire.Application.Features.Stocks.DTOs;
 
 namespace CleanAspire.Application.Features.Stocks.Queryies;
-public record StocksWithPaginationQuery(string Keywords, int PageNumber = 1, int PageSize = 15, string OrderBy = "Id", string SortDirection = "Descending") : IFusionCacheRequest<PaginatedResult<StockDto>>
+public record StocksWithPaginationQuery(string Keywords, int PageNumber = 0, int PageSize = 15, string OrderBy = "Id", string SortDirection = "Descending") : IFusionCacheRequest<PaginatedResult<StockDto>>
 {
     public IEnumerable<string>? Tags => new[] { "stocks" };
     public string CacheKey => $"stockswithpagination_{Keywords}_{PageNumber}_{PageSize}_{OrderBy}_{SortDirection}";
@@ -28,9 +28,9 @@ public class StocksWithPaginationQueryHandler : IRequestHandler<StocksWithPagina
 
     public async ValueTask<PaginatedResult<StockDto>> Handle(StocksWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var data = await _context.Stocks.OrderBy(request.OrderBy, request.SortDirection)
+        var data = await _context.Stocks.Include(x => x.Product).OrderBy(request.OrderBy, request.SortDirection)
                     .ProjectToPaginatedDataAsync(
-                        condition: x => x.Location.Contains(request.Keywords) || (x.Product != null && x.Product.Name.Contains(request.Keywords)),
+                        condition: x => x.Location.Contains(request.Keywords) || (x.Product != null && (x.Product.Name.Contains(request.Keywords) || x.Product.SKU.Contains(request.Keywords) || x.Product.Description.Contains(request.Keywords))),
                         pageNumber: request.PageNumber,
                         pageSize: request.PageSize,
                         mapperFunc: t => new StockDto
@@ -52,7 +52,6 @@ public class StocksWithPaginationQueryHandler : IRequestHandler<StocksWithPagina
                             Location = t.Location
                         },
                     cancellationToken: cancellationToken);
-
         return data;
     }
 }
