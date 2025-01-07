@@ -2,15 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Net.Http;
-using System.Net;
 using System.Net.Http.Json;
-using Aspire.Hosting.Testing;
-using CleanAspire.Application.Common.Models;
-using CleanAspire.Application.Features.Stocks.DTOs;
 using Projects;
-using k8s.KubeConfigModels;
-using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting;
 using Newtonsoft.Json.Linq;
 
