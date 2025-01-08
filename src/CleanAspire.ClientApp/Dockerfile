@@ -15,7 +15,7 @@ RUN dotnet workload update
 
 # Copy the entire source code and build the application in Release mode
 COPY . .
-RUN dotnet publish -c Release -o /app/publish -p:DefineConstants=STANDALONE
+RUN dotnet publish "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj" -c Release -o /app/publish -p:DefineConstants=STANDALONE
 
 # Stage 2: Serve the Blazor Client Application using Nginx
 FROM nginx:alpine AS final
