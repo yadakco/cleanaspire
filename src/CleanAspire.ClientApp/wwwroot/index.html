@@ -227,17 +227,6 @@
         <span class="dismiss">🗙</span>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script>
-        if (window.location.hostname.includes("standalone.blazorserver.com")) {
-            Blazor.start({
-                environment: "Standalone"
-            });
-        } else {
-            Blazor.start({
-                environment: "Production"
-            });
-        }
-    </script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="js/onlinestatus.js"></script>
