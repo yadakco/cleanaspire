@@ -10,18 +10,12 @@ RUN apt-get update && apt-get install -y python3 python3-pip && ln -s /usr/bin/p
 
 # Copy the project files and restore dependencies
 COPY ["src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj", "src/CleanAspire.ClientApp/"]
-RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
-
-# Install wasm-tools for AOT
 RUN dotnet workload install wasm-tools --skip-manifest-update
-RUN dotnet workload update
-
-# Clean and build
-RUN dotnet clean "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
+RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 
 # Copy the entire source code and build the application in Release mode
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj" -c Release -o /app/publish
 
 # Stage 2: Configure and Run the Blazor WebAssembly Host
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
