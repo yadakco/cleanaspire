@@ -67,7 +67,9 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
     - The system detects the online/offline status and fetches data from **IndexedDB** when offline, ensuring uninterrupted access to key features.  
 
  
+### How to Create a New Object in a CRUD Application: A Step-by-Step Guide
 
+https://github.com/neozhu/cleanaspire/issues/34
 
 ### 🌟 Why Choose CleanAspire?  
 
@@ -87,7 +89,7 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.61
+    image: blazordevlab/cleanaspire-api:0.0.62
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -96,7 +98,7 @@ services:
       - ASPNETCORE_HTTPS_PORTS=443
       - DatabaseSettings__DBProvider=sqlite
       - DatabaseSettings__ConnectionString=Data Source=CleanAspireDb.db
-      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7114
+      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://standalone.blazorserver.com,https://localhost:7114
       - Authentication__Google__ClientId=<your client id>
       - Authentication__Google__ClientSecret=<your client secret>
       - SendGrid__ApiKey=<your API key>
@@ -108,9 +110,8 @@ services:
       - "8019:80"
       - "8018:443"
 
-
   blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.61
+    image: blazordevlab/cleanaspire-webapp:0.0.62
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
@@ -120,6 +121,12 @@ services:
     ports:
       - "8015:80"
       - "8014:443"
+
+  standalone:
+    image: blazordevlab/cleanaspire-standalone:0.0.62
+    ports:
+      - "8020:80"
+      - "8021:443"
 
 
 
