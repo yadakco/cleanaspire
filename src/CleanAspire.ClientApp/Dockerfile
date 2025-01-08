@@ -12,7 +12,7 @@ RUN dotnet workload install wasm-tools --skip-manifest-update
 RUN dotnet restore "./src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 COPY . .
 WORKDIR "/src/src/CleanAspire.ClientApp"
-RUN dotnet publish "./CleanAspire.ClientApp.csproj" -c Release -o /app/build
+RUN dotnet build "./CleanAspire.ClientApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 
 # This stage is used to publish the service project to be copied to the final stage
