@@ -31,7 +31,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-          
+      - name: Build and push CleanAspire.Standalone image
+        run: |
+            docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-standalone:${{ steps.version.outputs.version }} -f src/CleanAspire.ClientApp/Dockerfile .
+            docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-standalone:${{ steps.version.outputs.version }}    
       - name: Build and push CleanAspire.WebApp image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-webapp:${{ steps.version.outputs.version }} -f src/CleanAspire.WebApp/Dockerfile .
