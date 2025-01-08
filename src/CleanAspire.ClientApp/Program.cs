@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CleanAspire.ClientApp;
-using Microsoft.JSInterop;
-using System.Globalization;
-using CleanAspire.ClientApp.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-var renderMode = Environment.GetEnvironmentVariable("BLAZOR_RENDER_MODE");
-
+var renderMode = builder.HostEnvironment.Environment;
 if (renderMode?.Equals("Standalone", StringComparison.OrdinalIgnoreCase) == true)
 {
     builder.RootComponents.Add<App>("#app");
