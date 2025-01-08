@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
+        <DefineConstants>DEFAULT</DefineConstants>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -11,14 +12,6 @@
         <RootNamespace>CleanAspire.ClientApp</RootNamespace>
         <AssemblyName>CleanAspire.ClientApp</AssemblyName>
     </PropertyGroup>
-    <!--
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <RunAOTCompilation>true</RunAOTCompilation>
-        <BlazorWebAssemblyEnableLinker>true</BlazorWebAssemblyEnableLinker>
-        <PublishTrimmed>true</PublishTrimmed>
-        <WasmEnableInterpreter>true</WasmEnableInterpreter>
-        <InvariantGlobalization>true</InvariantGlobalization>
-    </PropertyGroup>-->
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0 " />
@@ -39,10 +32,6 @@
 
     <ItemGroup>
         <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     </ItemGroup>
 
 </Project>
