@@ -2,6 +2,7 @@
 namespace CleanAspire.Application.Common.Models;
 public class PaginatedResult<T>
 {
+    public PaginatedResult() { }
     public PaginatedResult(IEnumerable<T> items, int total, int pageIndex, int pageSize)
     {
         Items = items;
