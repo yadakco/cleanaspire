@@ -23,29 +23,29 @@ RUN dotnet clean "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 COPY . .
 RUN dotnet publish -c Release -o /app/publish
 
-# Stage 2: Serve the Blazor Client Application using Nginx
-FROM nginx:alpine AS final
-WORKDIR /usr/share/nginx/html
+# Stage 2: Configure and Run the Blazor WebAssembly Host
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
 
 # Set ASPNETCORE_ENVIRONMENT to Standalone for the runtime environment
 ENV ASPNETCORE_ENVIRONMENT=Standalone
 
-# Install OpenSSL to create a self-signed certificate
-RUN apk add --no-cache openssl && \
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/CN=localhost"
-
-# Clean the default nginx content
-RUN rm -rf ./*
-
 # Copy the build output from the previous stage
-COPY --from=build /app/publish/wwwroot .
+COPY --from=build /app/publish .
 
-# Copy the generated self-signed certificate and configure Nginx for HTTPS
-COPY src/CleanAspire.ClientApp/nginx.conf /etc/nginx/nginx.conf
+# Install OpenSSL to create a self-signed certificate
+RUN apt-get update && apt-get install -y openssl && \
+    mkdir /https && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /https/aspnetcore.key -out /https/aspnetcore.crt \
+    -subj "/CN=localhost"
 
-# Expose port 80 for HTTP traffic and 443 for HTTPS traffic
+# Configure Kestrel to use HTTPS with the self-signed certificate
+ENV ASPNETCORE_URLS="http://+:80;https://+:443"
+
+# Expose ports for HTTP and HTTPS
 EXPOSE 80
 EXPOSE 443
 
-# Start Nginx
-CMD ["sh", "-c", "export ASPNETCORE_ENVIRONMENT=Standalone && nginx -g 'daemon off;'"]
+# Start the application using WebAssemblyHost
+ENTRYPOINT ["dotnet", "CleanAspire.ClientApp.dll"]
