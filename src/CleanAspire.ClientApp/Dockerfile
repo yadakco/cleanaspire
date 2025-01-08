@@ -1,6 +1,5 @@
 # Stage 1: Build the Blazor Client Application
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Install Python for AOT compilation
@@ -8,47 +7,36 @@ RUN apt-get update && apt-get install -y python3 python3-pip && ln -s /usr/bin/p
 
 # Copy the project files and restore dependencies
 COPY ["src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj", "src/CleanAspire.ClientApp/"]
+RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
+
+# Install wasm-tools for AOT
 RUN dotnet workload install wasm-tools --skip-manifest-update
-RUN dotnet restore "./src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
+RUN dotnet workload update
+
+# Copy the entire source code and build the application in Release mode
 COPY . .
-WORKDIR "/src/src/CleanAspire.ClientApp"
-RUN dotnet build "./CleanAspire.ClientApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish -c Release -o /app/publish
 
+# Stage 2: Serve the Blazor Client Application using Nginx
+FROM nginx:alpine AS final
+WORKDIR /usr/share/nginx/html
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./CleanAspire.ClientApp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Install OpenSSL to create a self-signed certificate
+RUN apk add --no-cache openssl && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/CN=localhost"
 
+# Clean the default nginx content
+RUN rm -rf ./*
 
-# Stage 2: Configure and Run the Blazor WebAssembly Host
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Copy the build output from the previous stage
+COPY --from=build /app/publish/wwwroot .
 
-# Install OpenSSL
-RUN apt-get update && apt-get install -y openssl
+# Copy the generated self-signed certificate and configure Nginx for HTTPS
+COPY src/CleanAspire.ClientApp/nginx.conf /etc/nginx/nginx.conf
 
-# Generate a self-signed certificate
-RUN mkdir -p /app/https && \
-    openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
-    -keyout /app/https/private.key -out /app/https/certificate.crt \
-    -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost" && \
-    openssl pkcs12 -export -out /app/https/aspnetapp.pfx \
-    -inkey /app/https/private.key -in /app/https/certificate.crt \
-    -password pass:CREDENTIAL_PLACEHOLDER
-
-
-# Configure Kestrel to use HTTPS with the self-signed certificate
-# Setup environment variables for the application to find the certificate
-ENV ASPNETCORE_ENVIRONMENT=Standalone
-ENV ASPNETCORE_URLS=http://+:80;https://+:443
-ENV ASPNETCORE_Kestrel__Certificates__Default__Password="CREDENTIAL_PLACEHOLDER"
-ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/app/https/aspnetapp.pfx"
-
-# Expose ports for HTTP and HTTPS
+# Expose port 80 for HTTP traffic and 443 for HTTPS traffic
 EXPOSE 80
 EXPOSE 443
 
-# Start the application using WebAssemblyHost
-ENTRYPOINT ["dotnet", "CleanAspire.ClientApp.dll"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
