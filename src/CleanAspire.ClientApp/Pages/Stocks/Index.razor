@@ -135,8 +135,7 @@
         var parameters = new DialogParameters<StockDialog>
         {
            {x=>x.Inbound, false},
-           {x=>x.ProductId,item.Product?.Id },
-           {x=>x.model, new StockDialog.Model(){ Location = item.Location, Quantity=item.Quantity } }
+           {x=>x.model, new StockDialog.Model(){ Location = item.Location, Quantity=item.Quantity, ProductId=item.ProductId } }
         };
         await DialogServiceHelper.ShowDialogAsync<StockDialog>(L["Stock dispatching"], parameters, new DialogOptions() { MaxWidth = MaxWidth.Small },
         async (state) =>
