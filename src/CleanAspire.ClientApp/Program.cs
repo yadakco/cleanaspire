@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CleanAspire.ClientApp;
-using Microsoft.JSInterop;
-using System.Globalization;
-using CleanAspire.ClientApp.Services.Interfaces;
+using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-//builder.RootComponents.Add<App>("#app");
-//builder.RootComponents.Add<HeadOutlet>("head::after");
-
+var renderMode = builder.HostEnvironment.Environment;
+if (renderMode?.Equals("Standalone", StringComparison.OrdinalIgnoreCase) == true)
+{
+    builder.RootComponents.Add<App>("#app");
+    builder.RootComponents.Add<HeadOutlet>("head::after");
+}
 // register the cookie handler
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddHttpClients(builder.Configuration);
