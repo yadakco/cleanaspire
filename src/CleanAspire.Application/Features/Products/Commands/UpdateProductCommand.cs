@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CleanAspire.Application.Features.Products.DTOs;
+using CleanAspire.Application.Features.Products.EventHandlers;
 using CleanAspire.Application.Pipeline;
 
 namespace CleanAspire.Application.Features.Products.Commands;
@@ -43,6 +44,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.Price = request.Price;
         product.Currency = request.Currency;
         product.UOM = request.UOM;
+        product.AddDomainEvent(new ProductUpdatedEvent(product));
         _context.Products.Update(product);
         await _context.SaveChangesAsync(cancellationToken);
         return Unit.Value;
