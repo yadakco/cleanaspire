@@ -16,6 +16,10 @@ RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 RUN dotnet workload install wasm-tools --skip-manifest-update
 RUN dotnet workload update
 
+# Clean and build
+RUN dotnet clean "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
+RUN dotnet workload install wasm-tools --skip-manifest-update
+
 # Copy the entire source code and build the application in Release mode
 COPY . .
 RUN dotnet publish -c Release -o /app/publish
