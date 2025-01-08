@@ -15,7 +15,7 @@ RUN dotnet restore "src/CleanAspire.Api/CleanAspire.Api.csproj"
 
 COPY . .
 WORKDIR /src/src/CleanAspire.Api
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish "src/CleanAspire.Api/CleanAspire.Api.csproj" -c Release -o /app/publish
 
 # Stage 2: Create the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
