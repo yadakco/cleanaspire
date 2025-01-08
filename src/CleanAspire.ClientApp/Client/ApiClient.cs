@@ -11,6 +11,7 @@ using CleanAspire.Api.Client.Refresh;
 using CleanAspire.Api.Client.Register;
 using CleanAspire.Api.Client.ResendConfirmationEmail;
 using CleanAspire.Api.Client.ResetPassword;
+using CleanAspire.Api.Client.Stocks;
 using CleanAspire.Api.Client.Tenants;
 using CleanAspire.Api.Client.Webpushr;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -81,6 +82,11 @@ namespace CleanAspire.Api.Client
         public global::CleanAspire.Api.Client.ResetPassword.ResetPasswordRequestBuilder ResetPassword
         {
             get => new global::CleanAspire.Api.Client.ResetPassword.ResetPasswordRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The stocks property</summary>
+        public global::CleanAspire.Api.Client.Stocks.StocksRequestBuilder Stocks
+        {
+            get => new global::CleanAspire.Api.Client.Stocks.StocksRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The tenants property</summary>
         public global::CleanAspire.Api.Client.Tenants.TenantsRequestBuilder Tenants
