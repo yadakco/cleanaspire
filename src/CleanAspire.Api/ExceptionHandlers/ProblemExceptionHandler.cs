@@ -98,6 +98,13 @@ public class ProblemExceptionHandler : IExceptionHandler
                 Detail = ex.Message,
                 Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
             },
+            InvalidOperationException ex => new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Invalid Operation",
+                Detail = ex.Message,
+                Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
+            },
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,

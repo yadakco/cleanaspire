@@ -67,7 +67,9 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
     - The system detects the online/offline status and fetches data from **IndexedDB** when offline, ensuring uninterrupted access to key features.  
 
  
+### How to Create a New Object in a CRUD Application: A Step-by-Step Guide
 
+https://github.com/neozhu/cleanaspire/issues/34
 
 ### 🌟 Why Choose CleanAspire?  
 
@@ -87,7 +89,7 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.61
+    image: blazordevlab/cleanaspire-api:0.0.62
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -110,7 +112,7 @@ services:
 
 
   blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.61
+    image: blazordevlab/cleanaspire-webapp:0.0.62
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
