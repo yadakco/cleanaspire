@@ -98,7 +98,7 @@ services:
       - ASPNETCORE_HTTPS_PORTS=443
       - DatabaseSettings__DBProvider=sqlite
       - DatabaseSettings__ConnectionString=Data Source=CleanAspireDb.db
-      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://localhost:7114
+      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://standalone.blazorserver.com,https://localhost:7114
       - Authentication__Google__ClientId=<your client id>
       - Authentication__Google__ClientSecret=<your client secret>
       - SendGrid__ApiKey=<your API key>
@@ -109,7 +109,6 @@ services:
     ports:
       - "8019:80"
       - "8018:443"
-
 
   blazorweb:
     image: blazordevlab/cleanaspire-webapp:0.0.62
@@ -122,6 +121,12 @@ services:
     ports:
       - "8015:80"
       - "8014:443"
+
+  standalone:
+    image: blazordevlab/cleanaspire-standalone:0.0.62
+    ports:
+      - "8020:80"
+      - "8021:443"
 
 
 
