@@ -4,13 +4,10 @@ using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-var renderMode = builder.HostEnvironment.Environment;
-Console.WriteLine($"Environment: {renderMode}");
-if (renderMode?.Equals("Standalone", StringComparison.OrdinalIgnoreCase) == true)
-{
-    builder.RootComponents.Add<App>("#app");
-    builder.RootComponents.Add<HeadOutlet>("head::after");
-}
+#if STANDALONE
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+#endif
 // register the cookie handler
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddHttpClients(builder.Configuration);
