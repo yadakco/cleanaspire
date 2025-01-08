@@ -49,4 +49,4 @@ EXPOSE 80
 EXPOSE 443
 
 # Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["sh", "-c", "export ASPNETCORE_ENVIRONMENT=Standalone && nginx -g 'daemon off;'"]
