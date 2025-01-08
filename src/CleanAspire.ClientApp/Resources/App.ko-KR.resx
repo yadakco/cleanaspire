@@ -648,4 +648,40 @@
   <data name="Blazor Aspire" xml:space="preserve">
     <value>블레이저 어스파이어</value>
   </data>
+  <data name="Product is required." xml:space="preserve">
+    <value>제품이 필요합니다</value>
+  </data>
+  <data name="Location is required." xml:space="preserve">
+    <value>위치가 필요합니다</value>
+  </data>
+  <data name="Quantity must be greater than 0." xml:space="preserve">
+    <value>수량은 0보다 커야 합니다</value>
+  </data>
+  <data name="Stock received successfully." xml:space="preserve">
+    <value>재고가 성공적으로 입고되었습니다</value>
+  </data>
+  <data name="Stock dispatched successfully." xml:space="preserve">
+    <value>재고가 성공적으로 출고되었습니다</value>
+  </data>
+  <data name="Commands" xml:space="preserve">
+    <value>명령</value>
+  </data>
+  <data name="Product Name" xml:space="preserve">
+    <value>제품 이름</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>위치</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>수량</value>
+  </data>
+  <data name="Receiving" xml:space="preserve">
+    <value>수령</value>
+  </data>
+  <data name="Stock receiving" xml:space="preserve">
+    <value>재고 수령</value>
+  </data>
+  <data name="Stock dispatching" xml:space="preserve">
+    <value>재고 출고</value>
+  </data>
 </root>

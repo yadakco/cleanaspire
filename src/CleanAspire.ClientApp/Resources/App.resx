@@ -648,4 +648,40 @@
   <data name="Blazor Aspire" xml:space="preserve">
     <value>Blazor Aspire</value>
   </data>
+  <data name="Product is required." xml:space="preserve">
+    <value>Product is required.</value>
+  </data>
+  <data name="Location is required." xml:space="preserve">
+    <value>Location is required.</value>
+  </data>
+  <data name="Quantity must be greater than 0." xml:space="preserve">
+    <value>Quantity must be greater than 0.</value>
+  </data>
+  <data name="Stock received successfully." xml:space="preserve">
+    <value>Stock received successfully.</value>
+  </data>
+  <data name="Stock dispatched successfully." xml:space="preserve">
+    <value>Stock dispatched successfully.</value>
+  </data>
+  <data name="Commands" xml:space="preserve">
+    <value>Commands</value>
+  </data>
+  <data name="Product Name" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Receiving" xml:space="preserve">
+    <value>Receiving</value>
+  </data>
+  <data name="Stock receiving" xml:space="preserve">
+    <value>Stock receiving</value>
+  </data>
+  <data name="Stock dispatching" xml:space="preserve">
+    <value>Stock dispatching</value>
+  </data>
 </root>

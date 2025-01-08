@@ -59,9 +59,9 @@ public static class QueryableExtensions
     public static async Task<PaginatedResult<TResult>> ProjectToPaginatedDataAsync<T, TResult>(
         this IOrderedQueryable<T> query,
         Expression<Func<T, bool>>? condition,
-        int pageNumber, 
+        int pageNumber,
         int pageSize,
-        Func<T, TResult> mapperFunc, 
+        Func<T, TResult> mapperFunc,
         CancellationToken cancellationToken = default) where T : class, IEntity
     {
         if (condition != null)
