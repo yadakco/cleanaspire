@@ -82,6 +82,9 @@ https://github.com/neozhu/cleanaspire/issues/34
 ### OpenAPI documentation
 - https://apiservice.blazorserver.com/scalar/v1
 
+### Blazor WebAssembly Standalone PWA
+- https://standalone.blazorserver.com/
+
 
 ### Here is an example of a docker-compose.yml file for a local Docker deployment:
 
@@ -89,7 +92,7 @@ https://github.com/neozhu/cleanaspire/issues/34
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.62
+    image: blazordevlab/cleanaspire-api:0.0.64
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -111,7 +114,7 @@ services:
       - "8018:443"
 
   blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.62
+    image: blazordevlab/cleanaspire-webapp:0.0.64
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
@@ -123,7 +126,7 @@ services:
       - "8014:443"
 
   standalone:
-    image: blazordevlab/cleanaspire-standalone:0.0.62
+    image: blazordevlab/cleanaspire-standalone:0.0.64
     ports:
       - "8020:80"
       - "8021:443"
