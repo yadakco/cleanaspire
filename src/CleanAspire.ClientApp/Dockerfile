@@ -1,9 +1,7 @@
 # Stage 1: Build the Blazor Client Application
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-# Set ASPNETCORE_ENVIRONMENT to Standalone during build
-ENV ASPNETCORE_ENVIRONMENT=Standalone
 
 # Install Python for AOT compilation
 RUN apt-get update && apt-get install -y python3 python3-pip && ln -s /usr/bin/python3 /usr/bin/python
@@ -11,31 +9,42 @@ RUN apt-get update && apt-get install -y python3 python3-pip && ln -s /usr/bin/p
 # Copy the project files and restore dependencies
 COPY ["src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj", "src/CleanAspire.ClientApp/"]
 RUN dotnet workload install wasm-tools --skip-manifest-update
-RUN dotnet restore "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
-
-# Copy the entire source code and build the application in Release mode
+RUN dotnet restore "./src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj"
 COPY . .
-RUN dotnet publish "src/CleanAspire.ClientApp/CleanAspire.ClientApp.csproj" -c Release -o /app/publish
+WORKDIR "/src/src/CleanAspire.ClientApp"
+RUN dotnet publish "./CleanAspire.ClientApp.csproj" -c Release -o /app/publish
+
+
+# This stage is used to publish the service project to be copied to the final stage
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./CleanAspire.ClientApp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
 
 # Stage 2: Configure and Run the Blazor WebAssembly Host
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
+COPY --from=publish /app/publish .
 
-# Set ASPNETCORE_ENVIRONMENT to Standalone for the runtime environment
-ENV ASPNETCORE_ENVIRONMENT=Standalone
+# Install OpenSSL
+RUN apt-get update && apt-get install -y openssl
 
-# Copy the build output from the previous stage
-COPY --from=build /app/publish .
+# Generate a self-signed certificate
+RUN mkdir -p /app/https && \
+    openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+    -keyout /app/https/private.key -out /app/https/certificate.crt \
+    -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost" && \
+    openssl pkcs12 -export -out /app/https/aspnetapp.pfx \
+    -inkey /app/https/private.key -in /app/https/certificate.crt \
+    -password pass:CREDENTIAL_PLACEHOLDER
 
-# Install OpenSSL to create a self-signed certificate
-RUN apt-get update && apt-get install -y openssl && \
-    mkdir /https && \
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /https/aspnetcore.key -out /https/aspnetcore.crt \
-    -subj "/CN=localhost"
 
 # Configure Kestrel to use HTTPS with the self-signed certificate
-ENV ASPNETCORE_URLS="http://+:80;https://+:443"
+# Setup environment variables for the application to find the certificate
+ENV ASPNETCORE_ENVIRONMENT=Standalone
+ENV ASPNETCORE_URLS=http://+:80;https://+:443
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password="CREDENTIAL_PLACEHOLDER"
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/app/https/aspnetapp.pfx"
 
 # Expose ports for HTTP and HTTPS
 EXPOSE 80
