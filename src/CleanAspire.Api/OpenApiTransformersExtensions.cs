@@ -4,6 +4,7 @@
 
 using Bogus;
 using CleanAspire.Application.Features.Products.Commands;
+using CleanAspire.Application.Features.Stocks.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -107,7 +108,18 @@ public static class OpenApiTransformersExtensions
                 ["Currency"] = new OpenApiString("USD"),
                 ["UOM"] = new OpenApiString("PCS")
             };
-
+            _examples[typeof(StockDispatchingCommand)] = new OpenApiObject
+            {
+                ["ProductId"] = new OpenApiString(Guid.NewGuid().ToString()),
+                ["Quantity"] = new OpenApiInteger(5),
+                ["Location"] = new OpenApiString("WH-01"),
+            };
+            _examples[typeof(StockReceivingCommand)] = new OpenApiObject
+            {
+                ["ProductId"] = new OpenApiString(Guid.NewGuid().ToString()),
+                ["Quantity"] = new OpenApiInteger(10),
+                ["Location"] = new OpenApiString("WH-01"),
+            };
         }
         public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
         {
