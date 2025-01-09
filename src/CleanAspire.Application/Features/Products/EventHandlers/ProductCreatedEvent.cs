@@ -1,12 +1,31 @@
-﻿namespace CleanAspire.Application.Features.Products.EventHandlers;
+﻿// Namespace: CleanAspire.Application.Features.Products.EventHandlers
+// Class: ProductCreatedEvent
+// Inherits from: DomainEvent, representing a base class for domain events
+
+namespace CleanAspire.Application.Features.Products.EventHandlers;
+/// <summary>
+/// Represents an event triggered when a product is created.
+/// Purpose:
+/// 1. To signal the creation of a product.
+/// 2. Used in the domain event notification mechanism to pass product details to subscribers.
+/// </summary>
 public class ProductCreatedEvent : DomainEvent
 {
+    /// <summary>
+    /// Constructor to initialize the event and pass the created product instance.
+    /// </summary>
+    /// <param name="item">The created product instance.</param>
     public ProductCreatedEvent(Product item)
     {
-        Item = item;
+        Item = item; // Assigns the provided product instance to the read-only property
     }
+
+    /// <summary>
+    /// Gets the product instance associated with the event.
+    /// </summary>
     public Product Item { get; }
 }
+
 /*
 public class ProductCreatedEventHandler : INotificationHandler<ProductCreatedEvent>
 {

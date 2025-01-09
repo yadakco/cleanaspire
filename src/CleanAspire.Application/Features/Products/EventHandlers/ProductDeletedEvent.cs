@@ -1,16 +1,31 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿// Namespace: CleanAspire.Application.Features.Products.EventHandlers
+// Class: ProductDeletedEvent
+// Inherits from: DomainEvent, representing a base class for domain events
 
 namespace CleanAspire.Application.Features.Products.EventHandlers;
+/// <summary>
+/// Represents an event triggered when a product is deleted.
+/// Purpose:
+/// 1. To signal the deletion of a product.
+/// 2. Used in the domain event notification mechanism to inform subscribers about the deleted product.
+/// </summary>
 public class ProductDeletedEvent : DomainEvent
 {
+    /// <summary>
+    /// Constructor to initialize the event and pass the deleted product instance.
+    /// </summary>
+    /// <param name="item">The deleted product instance.</param>
     public ProductDeletedEvent(Product item)
     {
-        Item = item;
+        Item = item; // Assigns the provided product instance to the read-only property
     }
+
+    /// <summary>
+    /// Gets the product instance associated with the event.
+    /// </summary>
     public Product Item { get; }
 }
+
 
 /*
 public class ProductDeletedEventHandler : INotificationHandler<ProductDeletedEvent>
