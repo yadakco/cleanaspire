@@ -66,6 +66,9 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
     - Uses **IndexedDB** to cache data locally, allowing the application to retrieve data and function offline.  
     - The system detects the online/offline status and fetches data from **IndexedDB** when offline, ensuring uninterrupted access to key features.  
 
+### How to generate code use Chat GPTs
+![chatgpt](./gpts.png)
+ [Link to CleanAspire Code Generator](https://chatgpt.com/g/g-677e40252ff88191933bb84567b62e7b-cleanaspire-code-generator)
  
 ### How to Create a New Object in a CRUD Application: A Step-by-Step Guide
 
