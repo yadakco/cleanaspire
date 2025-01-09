@@ -1,6 +1,32 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿// This class acts as a service proxy for managing products, supporting both online and offline operations.
+// It integrates caching, offline synchronization, and API interactions to enhance the application's reliability and user experience.
+
+// Purpose:
+// 1. **Online/Offline Mode Support**:
+//    - Provides seamless functionality in offline mode with caching and deferred synchronization.
+//    - Automatically syncs cached operations (create, update, delete) when the application returns online.
+
+// 2. **Caching**:
+//    - Uses a caching mechanism (via `ProductCacheService` and `ApiClientServiceProxy`) to store and retrieve product data efficiently.
+//    - Improves performance by reducing redundant API calls and enabling offline access to product data.
+
+// 3. **Error Handling**:
+//    - Wraps API calls with robust error handling to manage exceptions like `HttpValidationProblemDetails`, `ProblemDetails`, and general exceptions.
+//    - Logs errors to facilitate debugging and provides detailed error responses when necessary.
+
+// 4. **Key Features**:
+//    - `GetPaginatedProductsAsync`: Retrieves paginated product data, using cache if offline.
+//    - `GetProductByIdAsync`: Fetches a product by ID, falling back to cached data in offline mode.
+//    - `CreateProductAsync`: Creates a new product, supporting both online and offline scenarios.
+//    - `UpdateProductAsync`: Updates an existing product, with offline mode support.
+//    - `DeleteProductsAsync`: Deletes products, queuing commands for later synchronization if offline.
+//    - `SyncOfflineCachedDataAsync`: Synchronizes offline cached commands (create, update, delete) with the server upon reconnecting to the internet.
+
+// 5. **Integration**:
+//    - `NavigationManager`: Generates product-related URLs.
+//    - `IWebpushrService`: Sends notifications for important events (e.g., new product launch).
+//    - `OfflineSyncService`: Tracks and manages synchronization status.
+
 
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
@@ -13,24 +39,44 @@ using OneOf;
 
 namespace CleanAspire.ClientApp.Services.Products;
 
+/// <summary>
+/// This class acts as a service proxy for managing products, supporting both online and offline operations.
+/// It integrates caching, offline synchronization, and API interactions to enhance the application's reliability and user experience.
+/// </summary>
 public class ProductServiceProxy
 {
-
     private readonly NavigationManager _navigationManager;
     private readonly ProductCacheService _productCacheService;
     private readonly IWebpushrService _webpushrService;
     private readonly ApiClientServiceProxy _apiClientServiceProxy;
     private readonly ApiClient _apiClient;
-
     private readonly OnlineStatusInterop _onlineStatusInterop;
     private readonly OfflineModeState _offlineModeState;
     private readonly OfflineSyncService _offlineSyncService;
     private readonly string[] _cacheTags = new[] { "caching" };
     private bool _previousOnlineStatus;
-
     private readonly TimeSpan _cacheExpiration = TimeSpan.FromSeconds(15);
 
-    public ProductServiceProxy(NavigationManager navigationManager, ProductCacheService productCacheService, IWebpushrService webpushrService, ApiClientServiceProxy apiClientServiceProxy, ApiClient apiClient, OnlineStatusInterop onlineStatusInterop, OfflineModeState offlineModeState, OfflineSyncService offlineSyncService)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProductServiceProxy"/> class.
+    /// </summary>
+    /// <param name="navigationManager">The navigation manager.</param>
+    /// <param name="productCacheService">The product cache service.</param>
+    /// <param name="webpushrService">The web push notification service.</param>
+    /// <param name="apiClientServiceProxy">The API client service proxy.</param>
+    /// <param name="apiClient">The API client.</param>
+    /// <param name="onlineStatusInterop">The online status interop service.</param>
+    /// <param name="offlineModeState">The offline mode state.</param>
+    /// <param name="offlineSyncService">The offline sync service.</param>
+    public ProductServiceProxy(
+        NavigationManager navigationManager,
+        ProductCacheService productCacheService,
+        IWebpushrService webpushrService,
+        ApiClientServiceProxy apiClientServiceProxy,
+        ApiClient apiClient,
+        OnlineStatusInterop onlineStatusInterop,
+        OfflineModeState offlineModeState,
+        OfflineSyncService offlineSyncService)
     {
         _navigationManager = navigationManager;
         _productCacheService = productCacheService;
@@ -42,12 +88,20 @@ public class ProductServiceProxy
         _offlineSyncService = offlineSyncService;
         Initialize();
     }
+
+    /// <summary>
+    /// Initializes the service proxy by setting up the online status change event handler.
+    /// </summary>
     private void Initialize()
     {
         _onlineStatusInterop.OnlineStatusChanged -= OnOnlineStatusChanged;
         _onlineStatusInterop.OnlineStatusChanged += OnOnlineStatusChanged;
     }
 
+    /// <summary>
+    /// Handles the online status change event.
+    /// </summary>
+    /// <param name="isOnline">if set to <c>true</c> [is online].</param>
     private async void OnOnlineStatusChanged(bool isOnline)
     {
         if (_previousOnlineStatus == isOnline)
@@ -58,6 +112,12 @@ public class ProductServiceProxy
             await SyncOfflineCachedDataAsync();
         }
     }
+
+    /// <summary>
+    /// Retrieves paginated product data, using cache if offline.
+    /// </summary>
+    /// <param name="paginationQuery">The pagination query.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the paginated result of product DTO.</returns>
     public async Task<PaginatedResultOfProductDto> GetPaginatedProductsAsync(ProductsWithPaginationQuery paginationQuery)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
@@ -86,6 +146,11 @@ public class ProductServiceProxy
         }
     }
 
+    /// <summary>
+    /// Fetches a product by ID, falling back to cached data in offline mode.
+    /// </summary>
+    /// <param name="productId">The product identifier.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the product DTO or a KeyNotFoundException.</returns>
     public async Task<OneOf<ProductDto, KeyNotFoundException>> GetProductByIdAsync(string productId)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
@@ -113,6 +178,11 @@ public class ProductServiceProxy
         }
     }
 
+    /// <summary>
+    /// Creates a new product, supporting both online and offline scenarios.
+    /// </summary>
+    /// <param name="command">The create product command.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the product DTO or error details.</returns>
     public async Task<OneOf<ProductDto, HttpValidationProblemDetails, ProblemDetails>> CreateProductAsync(CreateProductCommand command)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
@@ -198,6 +268,12 @@ public class ProductServiceProxy
             }
         }
     }
+
+    /// <summary>
+    /// Updates an existing product, with offline mode support.
+    /// </summary>
+    /// <param name="command">The update product command.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating success or error details.</returns>
     public async Task<OneOf<bool, HttpValidationProblemDetails, ProblemDetails>> UpdateProductAsync(UpdateProductCommand command)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
@@ -280,6 +356,12 @@ public class ProductServiceProxy
             Detail = "Offline mode is disabled. Please enable offline mode to update products in offline mode."
         };
     }
+
+    /// <summary>
+    /// Deletes products, queuing commands for later synchronization if offline.
+    /// </summary>
+    /// <param name="productIds">The product identifiers.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a boolean indicating success or error details.</returns>
     public async Task<OneOf<bool, ProblemDetails>> DeleteProductsAsync(List<string> productIds)
     {
         var isOnline = await _onlineStatusInterop.GetOnlineStatusAsync();
@@ -326,6 +408,11 @@ public class ProductServiceProxy
             Detail = "Offline mode is disabled. Please enable offline mode to delete products in offline mode."
         };
     }
+
+    /// <summary>
+    /// Synchronizes offline cached commands (create, update, delete) with the server upon reconnecting to the internet.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task SyncOfflineCachedDataAsync()
     {
         var (totalCount, cachedCreateProductCommands, cachedUpdateProductCommands, cachedDeleteProductCommands) = await _productCacheService.GetAllPendingCommandsAsync();
