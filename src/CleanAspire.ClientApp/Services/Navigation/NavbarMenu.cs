@@ -1,11 +1,23 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿// This static class defines the structure and content of the navigation bar menu for the application.
+// It organizes menu items into a hierarchical structure with labels, icons, URLs, statuses, and descriptions.
+
+// Purpose:
+// 1. **Navigation Menu Structure**:
+//    - Provides a clear and organized layout of menu items for easy access to different sections of the application.
+//    - Supports submenus for grouping related functionality (e.g., Products, Orders, Reports, Help).
+
+// 2. **User Experience**:
+//    - Enhances the user experience by displaying icons (`StartIcon`, `EndIcon`) and descriptions for each menu item.
+//    - Displays the status of each menu item (e.g., `Completed`, `New`, `ComingSoon`), helping users identify available features.
 
 using MudBlazor;
 
 namespace CleanAspire.ClientApp.Services.Navigation;
 
+/// <summary>
+/// Represents the default navigation menu configuration for the application.
+/// Includes sections like Application, Reports, and Help with nested submenus.
+/// </summary>
 public static class NavbarMenu
 {
     public static List<MenuItem> Default = new List<MenuItem>

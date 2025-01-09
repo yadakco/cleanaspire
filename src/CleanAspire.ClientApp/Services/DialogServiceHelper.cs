@@ -1,4 +1,20 @@
-﻿using CleanAspire.ClientApp.Components;
+﻿// This class provides helper methods to streamline the usage of the dialog service in a Blazor application.
+// It encapsulates dialog interactions, simplifying the process of showing confirmation and custom dialogs.
+
+// Purpose:
+// 1. **Reusable Dialog Logic**:
+//    - Provides a unified interface for showing confirmation and custom dialogs with optional callback actions.
+//    - Reduces repetitive code by centralizing dialog configurations and result handling.
+
+// 2. **User Interaction**:
+//    - Enhances user experience by offering configurable dialogs for confirmations or custom content components.
+//    - Supports optional callback actions for both confirmation and cancellation scenarios.
+
+// Key Features:
+// - `ShowConfirmationDialog`: Displays a pre-defined confirmation dialog with title, content, and confirm/cancel actions.
+// - `ShowDialogAsync<T>`: Shows a customizable dialog based on the generic component `T`, allowing flexible input/output through parameters and actions.
+
+using CleanAspire.ClientApp.Components;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
