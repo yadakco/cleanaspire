@@ -1,6 +1,14 @@
-﻿// A record that defines the DeleteProductCommand, which encapsulates the data needed to delete products by their IDs
-using CleanAspire.Application.Features.Products.EventHandlers;
-using CleanAspire.Application.Pipeline;
+﻿// This code defines a command and its handler for deleting products from a database.
+// The DeleteProductCommand encapsulates product IDs, supporting cache refresh and validation.
+// The DeleteProductCommandHandler processes the command, removes products, triggers domain events, and saves changes.
+
+
+// A record that defines the DeleteProductCommand, which encapsulates the data needed to delete products by their IDs
+using CleanAspire.Application.Features.Products.EventHandlers; // Contains event handlers related to Product events
+using CleanAspire.Application.Pipeline; // Contains pipeline behaviors and related interfaces
+
+// Namespace for organizing related classes and features
+namespace CleanAspire.Application.Features.Products.Commands;
 
 public record DeleteProductCommand(params IEnumerable<string> Ids) // Takes a list of product IDs as parameters
     : IFusionCacheRefreshRequest<Unit>,                           // Implements interface for cache refresh requests

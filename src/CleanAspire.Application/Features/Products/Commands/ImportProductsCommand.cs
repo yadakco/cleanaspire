@@ -1,4 +1,9 @@
-﻿using System.Globalization;
+﻿// This code defines a command and its handler for importing products from a CSV file.
+// The ImportProductsCommand encapsulates the input stream, supporting cache refresh and validation.
+// The ImportProductsCommandHandler processes the command, reads CSV data, maps to entities, adds domain events, and saves changes.
+
+
+using System.Globalization;
 using CleanAspire.Application.Features.Products.DTOs;
 using CleanAspire.Application.Features.Products.EventHandlers;
 using CleanAspire.Application.Pipeline;

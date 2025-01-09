@@ -1,11 +1,7 @@
-﻿/*This code defines a CreateProductCommand and its handler to create a new product within a CQRS architecture. 
- * The CreateProductCommand encapsulates necessary data such as SKU, Name, Category, Description, Price, Currency, and UOM. 
- * It implements IFusionCacheRefreshRequest<ProductDto> for cache updates and IRequiresValidation for data validation. The handler,
- * CreateProductCommandHandler, processes the command by creating a Product entity, 
- * adding a ProductCreatedEvent domain event, saving the product to the database via IApplicationDbContext, 
- * and returning a ProductDto with the product's basic information. 
- * This design ensures clear separation of concerns and maintainability.
- */
+﻿// This code defines a command and its handler for creating a new product in the database.
+// The CreateProductCommand encapsulates the required data to create a product.
+// The CreateProductCommandHandler processes the command, creates a product entity, adds a domain event, saves it to the database, and returns a ProductDto.
+
 
 // Using directives for necessary namespaces, bringing in external types used in the code
 using CleanAspire.Application.Features.Products.DTOs; // Contains data transfer objects (DTOs) for the Product feature
@@ -17,8 +13,8 @@ namespace CleanAspire.Application.Features.Products.Commands;
 
 // A record that defines the CreateProductCommand, which encapsulates the data needed to create a new product
 public record CreateProductCommand(
-    string SKU,                          // The stock-keeping unit, a unique identifier for the product
-    string Name,                         // The name of the product
+    string SKU,                          // The stock-keeping unit, a unique identifier for the product, corresponding to the SKU field in ProductDto
+    string Name,                         // The name of the product, corresponding to the SKU field in ProductDto
     ProductCategoryDto? Category,        // The category of the product, nullable, referencing ProductCategoryDto definition
     string? Description,                 // A description of the product, nullable, corresponding to the Description field in ProductDto
     decimal Price,                       // The price of the product, matching the Price field in ProductDto

@@ -1,12 +1,7 @@
-﻿/*
-This C# code defines a feature for updating product information in an application using the Clean Architecture principles. It includes:
-UpdateProductCommand: A record that encapsulates the data needed to update a product.
-Implements IFusionCacheRefreshRequest<Unit> and IRequiresValidation interfaces for cache refresh and validation support.
-Includes properties such as Id, SKU, Name, Category, etc.
-UpdateProductCommandHandler: A handler class that processes the UpdateProductCommand.
-Uses IApplicationDbContext to interact with the database.
-Updates the product details, raises a domain event (ProductUpdatedEvent), and persists changes to the database.
-*/
+﻿// This code defines a command and its handler for updating product details in the database.
+// The UpdateProductCommand encapsulates the necessary data to update a product.
+// The UpdateProductCommandHandler processes the command, validates existence, updates product details, triggers a domain event, and saves changes.
+
 
 using CleanAspire.Application.Features.Products.DTOs; // Import DTOs related to products.
 using CleanAspire.Application.Features.Products.EventHandlers; // Import event handlers for product-related events.
@@ -16,14 +11,14 @@ namespace CleanAspire.Application.Features.Products.Commands; // Define the name
 
 // A record representing the command to update a product.
 public record UpdateProductCommand(
-    string Id, // Product ID.
-    string SKU, // Stock Keeping Unit, a unique identifier for the product.
-    string Name, // Product name.
-    ProductCategoryDto? Category, // Optional category of the product.
-    string? Description, // Optional product description.
-    decimal Price, // Product price.
-    string? Currency, // Optional currency code (e.g., USD, EUR).
-    string? UOM // Optional Unit of Measurement (e.g., kg, pcs).
+    string Id, // Product ID. corresponding to the Id field in ProductDto
+    string SKU, // Stock Keeping Unit, a unique identifier for the product. corresponding to the SKU field in ProductDto
+    string Name, // Product name. corresponding to the Name field in ProductDto
+    ProductCategoryDto? Category, // Optional category of the product. corresponding to the ProductCategoryDto field in ProductDto
+    string? Description, // Optional product description. corresponding to the Description field in ProductDto
+    decimal Price, // Product price. corresponding to the Price field in ProductDto
+    string? Currency, // Optional currency code (e.g., USD, EUR). corresponding to the Currency field in ProductDto
+    string? UOM // Optional Unit of Measurement (e.g., kg, pcs). corresponding to the UOM field in ProductDto
 ) : IFusionCacheRefreshRequest<Unit>, // Interface for cache refresh requests.
     IRequiresValidation // Interface indicating that the command requires validation.
 {

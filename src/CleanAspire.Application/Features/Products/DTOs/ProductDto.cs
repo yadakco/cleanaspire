@@ -1,6 +1,7 @@
-﻿/* This section defines a Data Transfer Object (DTO) and an enumeration to represent product information and its possible categories.
- * These classes are used to simplify and standardize how data is transferred between different layers of the application, ensuring separation of concerns and maintainability.
- */
+﻿// This code defines a data transfer object (DTO) for products and an enumeration for product categories.
+// The ProductDto class encapsulates product details for data transfer between application layers.
+// The ProductCategoryDto enum provides predefined categories for products.
+
 namespace CleanAspire.Application.Features.Products.DTOs; // Define the namespace for product-related DTOs.
 
 // A DTO representing a product, used to transfer data between application layers.
