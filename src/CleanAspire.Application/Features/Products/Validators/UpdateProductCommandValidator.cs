@@ -1,7 +1,4 @@
-﻿// Defines a validator for the UpdateProductCommand, ensuring data integrity and correctness of input values.
-
-
-using CleanAspire.Application.Features.Products.Commands;
+﻿using CleanAspire.Application.Features.Products.Commands;
 
 namespace CleanAspire.Application.Features.Products.Validators;
 /// <summary>
