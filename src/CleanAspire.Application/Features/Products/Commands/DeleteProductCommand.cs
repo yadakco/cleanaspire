@@ -1,51 +1,45 @@
-﻿// This code defines a command and its handler for deleting products from a database.
-// The DeleteProductCommand encapsulates product IDs, supporting cache refresh and validation.
-// The DeleteProductCommandHandler processes the command, removes products, triggers domain events, and saves changes.
+﻿// Summary:
+// This file defines a command and its handler for deleting products from the database. 
+// The DeleteProductCommand encapsulates the product IDs to be deleted, while the 
+// DeleteProductCommandHandler processes the command, removes the corresponding products, 
+// triggers domain events such as ProductDeletedEvent, and commits the changes. This ensures 
+// a structured and efficient approach to handling product deletions.
 
+using CleanAspire.Application.Features.Products.EventHandlers;
+using CleanAspire.Application.Pipeline;
 
-// A record that defines the DeleteProductCommand, which encapsulates the data needed to delete products by their IDs
-using CleanAspire.Application.Features.Products.EventHandlers; // Contains event handlers related to Product events
-using CleanAspire.Application.Pipeline; // Contains pipeline behaviors and related interfaces
-
-// Namespace for organizing related classes and features
 namespace CleanAspire.Application.Features.Products.Commands;
 
-public record DeleteProductCommand(params IEnumerable<string> Ids) // Takes a list of product IDs as parameters
-    : IFusionCacheRefreshRequest<Unit>,                           // Implements interface for cache refresh requests
-      IRequiresValidation                                         // Implements interface for validation requirements
+// Command object that encapsulates the IDs of products to be deleted.
+public record DeleteProductCommand(params IEnumerable<string> Ids)
+    : IFusionCacheRefreshRequest<Unit>,
+      IRequiresValidation
 {
-    // Optional tags for categorizing the command, useful for logging or debugging
     public IEnumerable<string>? Tags => new[] { "products" };
 }
 
-// Handler class responsible for processing the DeleteProductCommand
 public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 {
-    private readonly IApplicationDbContext _dbContext; // Database context for interacting with the data layer
+    private readonly IApplicationDbContext _dbContext;
 
-    // Constructor to inject dependencies, including logger and database context
     public DeleteProductCommandHandler(ILogger<DeleteProductCommandHandler> logger, IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    // Asynchronously handles the DeleteProductCommand
     public async ValueTask<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        // Retrieves products from the database that match the provided IDs
         var products = _dbContext.Products.Where(p => request.Ids.Contains(p.Id));
 
-        // Iterates through each product to add a deletion domain event and remove it from the database context
         foreach (var product in products)
         {
-            product.AddDomainEvent(new ProductDeletedEvent(product)); // Adds domain event for product deletion
-            _dbContext.Products.Remove(product);                      // Removes product from the database
+            product.AddDomainEvent(new ProductDeletedEvent(product));
+            _dbContext.Products.Remove(product);
         }
 
-        // Saves changes asynchronously to the database
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        // Returns a Unit value to signal successful completion
         return Unit.Value;
     }
 }
+

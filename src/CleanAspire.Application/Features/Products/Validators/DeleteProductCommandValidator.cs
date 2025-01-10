@@ -1,6 +1,4 @@
-﻿// Defines a validator for the DeleteProductCommand, ensuring the validity of product IDs for deletion.
-
-using CleanAspire.Application.Features.Products.Commands;
+﻿using CleanAspire.Application.Features.Products.Commands;
 
 namespace CleanAspire.Application.Features.Products.Validators;
 /// <summary>

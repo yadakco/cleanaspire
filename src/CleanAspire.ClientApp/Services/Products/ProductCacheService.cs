@@ -12,17 +12,6 @@
 // 3. **Data Integrity**:
 //    - Updates cached data to reflect deletions and changes, maintaining consistency between cache and server state.
 
-// 4. **Key Features**:
-//    - `SaveOrUpdateProductAsync`: Saves or updates a product in the cache.
-//    - `GetProductAsync`: Retrieves a product from the cache.
-//    - `SaveOrUpdatePaginatedProductsAsync`: Caches paginated product data.
-//    - `UpdateDeletedProductsAsync`: Updates cached data after deleting products.
-//    - `StoreOfflineCreateCommandAsync`, `StoreOfflineUpdateCommandAsync`, `StoreOfflineDeleteCommandAsync`: Caches offline commands for later synchronization.
-//    - `GetAllPendingCommandsAsync`: Retrieves all pending offline commands.
-//    - `ClearCommands`: Clears all cached offline commands.
-//    - `GenerateProductCacheKey`, `GeneratePaginationCacheKey`: Generates unique keys for caching products and paginated data.
-
-
 using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.JsInterop;
 

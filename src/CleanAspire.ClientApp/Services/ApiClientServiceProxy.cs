@@ -1,19 +1,4 @@
-﻿// This class provides a service proxy for interacting with an API, incorporating caching and error handling mechanisms.
-// It uses IndexedDb for local caching and integrates with a logging system to handle API-related errors effectively.
-
-// Purpose:
-// 1. **Caching API Responses**:
-//    - `QueryAsync` method retrieves data from the cache or fetches it via the provided factory function and stores it with optional tags and expiration.
-//    - `ClearCache` method removes cached data associated with specific tags.
-
-// 2. **Error-Handled API Calls**:
-//    - `ExecuteAsync` method wraps API calls with robust error handling, returning either the response, validation issues, or generic problem details.
-//    - Handles specific exceptions (e.g., `HttpValidationProblemDetails`, `ProblemDetails`, and `ApiException`) and logs errors for easier debugging.
-
-// 3. **Seamless API Integration**:
-//    - Simplifies calling APIs and managing cached data, improving performance and resilience of the application.
-
-using CleanAspire.Api.Client.Models;
+﻿using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.JsInterop;
 using Microsoft.Kiota.Abstractions;
 using OneOf;

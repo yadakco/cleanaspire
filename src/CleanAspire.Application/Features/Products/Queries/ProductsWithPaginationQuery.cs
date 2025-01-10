@@ -1,6 +1,4 @@
-﻿// Defines a query to retrieve products with pagination and the corresponding handler to process the query.
-
-using CleanAspire.Application.Features.Products.DTOs;
+﻿using CleanAspire.Application.Features.Products.DTOs;
 
 namespace CleanAspire.Application.Features.Products.Queries;
 /// <summary>

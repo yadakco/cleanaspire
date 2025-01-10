@@ -1,29 +1,53 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.JSInterop;
 
 namespace CleanAspire.ClientApp.Services.JsInterop;
 
+/// <summary>
+/// Provides methods to interact with IndexedDB for caching purposes.
+/// </summary>
 public sealed class IndexedDbCache
 {
+    /// <summary>
+    /// The name of the IndexedDB database.
+    /// </summary>
     public const string DATABASENAME = "CleanAspire.IndexedDB";
     private readonly IJSRuntime _jsRuntime;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexedDbCache"/> class.
+    /// </summary>
+    /// <param name="jsRuntime">The JavaScript runtime.</param>
     public IndexedDbCache(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
     }
 
-    // Save data to IndexedDB with optional tags
+    /// <summary>
+    /// Saves data to IndexedDB with optional tags and expiration.
+    /// </summary>
+    /// <typeparam name="T">The type of the data to save.</typeparam>
+    /// <param name="dbName">The name of the database.</param>
+    /// <param name="key">The key to identify the data.</param>
+    /// <param name="value">The data to save.</param>
+    /// <param name="tags">Optional tags to associate with the data.</param>
+    /// <param name="expiration">Optional expiration time for the data.</param>
     public async Task SaveDataAsync<T>(string dbName, string key, T value, string[]? tags = null, TimeSpan? expiration = null)
     {
         var expirationMs = expiration.HasValue ? (int)expiration.Value.TotalMilliseconds : (int?)null;
         await _jsRuntime.InvokeVoidAsync("indexedDbStorage.saveData", dbName, key, value, tags ?? Array.Empty<string>(), expirationMs);
     }
-    // Get or set data in IndexedDB
+
+    /// <summary>
+    /// Gets data from IndexedDB or sets it if it does not exist.
+    /// </summary>
+    /// <typeparam name="T">The type of the data.</typeparam>
+    /// <param name="dbName">The name of the database.</param>
+    /// <param name="key">The key to identify the data.</param>
+    /// <param name="factory">The factory function to create the data if it does not exist.</param>
+    /// <param name="tags">Optional tags to associate with the data.</param>
+    /// <param name="expiration">Optional expiration time for the data.</param>
+    /// <returns>The data from the cache or the newly created data.</returns>
     public async Task<T> GetOrSetAsync<T>(string dbName, string key, Func<Task<T>> factory, string[]? tags = null, TimeSpan? expiration = null)
     {
         var existingData = await GetDataAsync<T>(dbName, key);
@@ -37,43 +61,63 @@ public sealed class IndexedDbCache
         return newData;
     }
 
-    // Get data from IndexedDB by key
+    /// <summary>
+    /// Gets data from IndexedDB by key.
+    /// </summary>
+    /// <typeparam name="T">The type of the data.</typeparam>
+    /// <param name="dbName">The name of the database.</param>
+    /// <param name="key">The key to identify the data.</param>
+    /// <returns>The data from the cache.</returns>
     public async Task<T> GetDataAsync<T>(string dbName, string key)
     {
         return await _jsRuntime.InvokeAsync<T>("indexedDbStorage.getData", dbName, key);
     }
 
-    // Get all data by tags (supports array of tags)
+    /// <summary>
+    /// Gets all data from IndexedDB by tags.
+    /// </summary>
+    /// <typeparam name="T">The type of the data.</typeparam>
+    /// <param name="dbName">The name of the database.</param>
+    /// <param name="tags">The tags to filter the data.</param>
+    /// <returns>A dictionary of key-value pairs of the data.</returns>
     public async Task<Dictionary<string, T>> GetDataByTagsAsync<T>(string dbName, string[] tags)
     {
-        // Call the JavaScript function and retrieve a list of { key, value }
-        var results = await _jsRuntime.InvokeAsync<List<Dictionary<string, object>>>(
-            "indexedDbStorage.getDataByTags", dbName, tags);
+        var results = await _jsRuntime.InvokeAsync<List<Dictionary<string, object>>>("indexedDbStorage.getDataByTags", dbName, tags);
 
-        // Convert the results to a dictionary
         return results.ToDictionary(
-            result => result["key"].ToString(), // Extract the key as a string
+            result => result["key"].ToString(),
             result =>
             {
-                // Handle deserialization of 'value'
                 var jsonElement = result["value"];
                 return JsonSerializer.Deserialize<T>(jsonElement.ToString(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
         );
     }
-    // Delete specific data by key
+
+    /// <summary>
+    /// Deletes specific data from IndexedDB by key.
+    /// </summary>
+    /// <param name="dbName">The name of the database.</param>
+    /// <param name="key">The key to identify the data.</param>
     public async Task DeleteDataAsync(string dbName, string key)
     {
         await _jsRuntime.InvokeVoidAsync("indexedDbStorage.deleteData", dbName, key);
     }
 
-    // Delete all data by tags (supports array of tags)
+    /// <summary>
+    /// Deletes all data from IndexedDB by tags.
+    /// </summary>
+    /// <param name="dbName">The name of the database.</param>
+    /// <param name="tags">The tags to filter the data.</param>
     public async Task DeleteDataByTagsAsync(string dbName, string[] tags)
     {
         await _jsRuntime.InvokeVoidAsync("indexedDbStorage.deleteDataByTags", dbName, tags);
     }
 
-    // Clear all data from IndexedDB store
+    /// <summary>
+    /// Clears all data from the IndexedDB store.
+    /// </summary>
+    /// <param name="dbName">The name of the database.</param>
     public async Task ClearDataAsync(string dbName)
     {
         await _jsRuntime.InvokeVoidAsync("indexedDbStorage.clearData", dbName);
