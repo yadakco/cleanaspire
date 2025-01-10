@@ -11,6 +11,12 @@
 
 With a focus on **Clean Architecture** and **extreme code simplicity**, CleanAspire provides developers with the tools to create responsive and maintainable web applications with minimal effort. The template also supports **Microsoft.Kiota** to simplify API client generation, ensuring consistency and productivity in every project.  
 
+### 🎉 Auto-generate Code Using Chat GPTs
+
+![chatgpt](./gpts.png)
+ [Link to CleanAspire Code Generator](https://chatgpt.com/g/g-677e40252ff88191933bb84567b62e7b-cleanaspire-code-generator)
+ 
+
 ### 🌐 Offline Support  
 
 CleanAspire fully supports **offline mode** through its integrated PWA capabilities, enabling your application to function seamlessly without an internet connection. By leveraging **Service Workers** and **browser caching**, the application can store essential resources and data locally, ensuring quick load times and uninterrupted access. Additionally, CleanAspire offers streamlined configuration options to help developers manage caching strategies and data synchronization effortlessly, guaranteeing that users receive the latest updates once the network is restored.
@@ -66,10 +72,7 @@ By incorporating robust offline capabilities, CleanAspire empowers developers to
     - Uses **IndexedDB** to cache data locally, allowing the application to retrieve data and function offline.  
     - The system detects the online/offline status and fetches data from **IndexedDB** when offline, ensuring uninterrupted access to key features.  
 
-### How to generate code use Chat GPTs
-![chatgpt](./gpts.png)
- [Link to CleanAspire Code Generator](https://chatgpt.com/g/g-677e40252ff88191933bb84567b62e7b-cleanaspire-code-generator)
- 
+
 ### How to Create a New Object in a CRUD Application: A Step-by-Step Guide
 
 https://github.com/neozhu/cleanaspire/issues/34
@@ -95,7 +98,7 @@ https://github.com/neozhu/cleanaspire/issues/34
 version: '3.8'
 services:
   apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.64
+    image: blazordevlab/cleanaspire-api:0.0.66
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -117,7 +120,7 @@ services:
       - "8018:443"
 
   blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.64
+    image: blazordevlab/cleanaspire-webapp:0.0.66
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
@@ -129,7 +132,7 @@ services:
       - "8014:443"
 
   standalone:
-    image: blazordevlab/cleanaspire-standalone:0.0.64
+    image: blazordevlab/cleanaspire-standalone:0.0.66
     ports:
       - "8020:80"
       - "8021:443"
