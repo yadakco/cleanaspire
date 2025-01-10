@@ -8,14 +8,14 @@
 
   <ItemGroup>
       <PackageReference Include="CsvHelper" Version="33.0.1" />
-      <PackageReference Include="FluentValidation" Version="11.11.0" />
-      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+      <PackageReference Include="FluentValidation" Version="12.0.0-preview1" />
+      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1" />
       <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
       <PackageReference Include="Mediator.SourceGenerator" Version="3.0.0-preview.27">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.0.0-preview-3" />
+      <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.0.0-preview-4" />
     <ProjectReference Include="..\CleanAspire.Domain\CleanAspire.Domain.csproj" />
   </ItemGroup>
 

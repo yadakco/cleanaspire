@@ -1,8 +1,4 @@
-﻿// Using CleanAspire.Application.Features.Products.DTOs for data transfer objects
-// Namespace: CleanAspire.Application.Features.Products.Queries
-// Defines a query and its handler to retrieve all products from the database
-
-using CleanAspire.Application.Features.Products.DTOs;
+﻿using CleanAspire.Application.Features.Products.DTOs;
 
 namespace CleanAspire.Application.Features.Products.Queries;
 /// <summary>

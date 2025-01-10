@@ -1,8 +1,4 @@
-﻿// Namespace: CleanAspire.Application.Features.Products.EventHandlers
-// Class: ProductDeletedEvent
-// Inherits from: DomainEvent, representing a base class for domain events
-
-namespace CleanAspire.Application.Features.Products.EventHandlers;
+﻿namespace CleanAspire.Application.Features.Products.EventHandlers;
 /// <summary>
 /// Represents an event triggered when a product is deleted.
 /// Purpose:

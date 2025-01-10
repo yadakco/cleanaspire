@@ -14,20 +14,6 @@
 //    - Wraps API calls with robust error handling to manage exceptions like `HttpValidationProblemDetails`, `ProblemDetails`, and general exceptions.
 //    - Logs errors to facilitate debugging and provides detailed error responses when necessary.
 
-// 4. **Key Features**:
-//    - `GetPaginatedProductsAsync`: Retrieves paginated product data, using cache if offline.
-//    - `GetProductByIdAsync`: Fetches a product by ID, falling back to cached data in offline mode.
-//    - `CreateProductAsync`: Creates a new product, supporting both online and offline scenarios.
-//    - `UpdateProductAsync`: Updates an existing product, with offline mode support.
-//    - `DeleteProductsAsync`: Deletes products, queuing commands for later synchronization if offline.
-//    - `SyncOfflineCachedDataAsync`: Synchronizes offline cached commands (create, update, delete) with the server upon reconnecting to the internet.
-
-// 5. **Integration**:
-//    - `NavigationManager`: Generates product-related URLs.
-//    - `IWebpushrService`: Sends notifications for important events (e.g., new product launch).
-//    - `OfflineSyncService`: Tracks and manages synchronization status.
-
-
 using CleanAspire.Api.Client;
 using CleanAspire.Api.Client.Models;
 using CleanAspire.ClientApp.Services.JsInterop;
