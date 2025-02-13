@@ -87,9 +87,14 @@ https://github.com/neozhu/cleanaspire/issues/34
 
 ### OpenAPI documentation
 - https://apiservice.blazorserver.com/scalar/v1
+- https://cleanapi.blazors.app:8443/scalar/v1
+
+### Demo site
+- https://cleanweb.blazors.app:8443/
 
 ### Blazor WebAssembly Standalone PWA
 - https://standalone.blazorserver.com/
+- https://standalone.blazors.app:8443/
 
 
 ### Here is an example of a docker-compose.yml file for a local Docker deployment:
@@ -97,8 +102,9 @@ https://github.com/neozhu/cleanaspire/issues/34
 ```yml
 version: '3.8'
 services:
-  apiservice:
-    image: blazordevlab/cleanaspire-api:0.0.69
+  cleanapi:
+    image: blazordevlab/cleanaspire-api:0.0.70
+    container_name: cleanapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - AllowedHosts=*
@@ -107,37 +113,69 @@ services:
       - ASPNETCORE_HTTPS_PORTS=443
       - DatabaseSettings__DBProvider=sqlite
       - DatabaseSettings__ConnectionString=Data Source=CleanAspireDb.db
-      - AllowedCorsOrigins=https://cleanaspire.blazorserver.com,https://standalone.blazorserver.com,https://localhost:7114
-      - Authentication__Google__ClientId=<your client id>
-      - Authentication__Google__ClientSecret=<your client secret>
-      - SendGrid__ApiKey=<your API key>
-      - SendGrid__DefaultFromEmail=<your email>
+      - ClientBaseUrl=https://web.cleanaspire.blazors.app:8443
+      - AllowedCorsOrigins=https://cleanweb.blazors.app:8443,https://standalone.blazors.app:8443
+      - SendGrid__ApiKey=<your-api-key>
+      - SendGrid__DefaultFromEmail=noreply@blazorserver.com
+      - Authentication__Google__ClientId=<your-client-id>
+      - Authentication__Google__ClientSecret=<your-secret-key>
       - Webpushr__Token=<your-webpushr-token>
-      - Webpushr__ApiKey=<your-webpushr-api-keys>
+      - Webpushr__ApiKey=<your-webpushr-api-key>
       - Webpushr__PublicKey=<your-webpushr-public-key>
-    ports:
-      - "8019:80"
-      - "8018:443"
-
-  blazorweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.69
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cleanapi-secure.entrypoints=https"
+      - "traefik.http.routers.cleanapi-secure.rule=Host(`cleanapi.blazors.app`)"
+      - "traefik.http.routers.cleanapi-secure.tls=true"
+      - "traefik.http.routers.cleanapi-secure.service=cleanapi"
+      - "traefik.http.services.cleanapi.loadbalancer.server.port=443"
+      - "traefik.http.services.cleanapi.loadbalancer.server.scheme=https"
+      - "traefik.docker.network=proxy"
+    networks:
+      proxy:
+    security_opt:
+      - no-new-privileges:true
+  cleanweb:
+    image: blazordevlab/cleanaspire-webapp:0.0.70
+    container_name: cleanweb
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - AllowedHosts=*
       - ASPNETCORE_URLS=http://+:80;https://+:443
       - ASPNETCORE_HTTP_PORTS=80
       - ASPNETCORE_HTTPS_PORTS=443
-    ports:
-      - "8015:80"
-      - "8014:443"
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cleanweb-secure.entrypoints=https"
+      - "traefik.http.routers.cleanweb-secure.rule=Host(`cleanweb.blazors.app`)"
+      - "traefik.http.routers.cleanweb-secure.tls=true"
+      - "traefik.http.routers.cleanweb-secure.service=cleanweb"
+      - "traefik.http.services.cleanweb.loadbalancer.server.port=443"
+      - "traefik.http.services.cleanweb.loadbalancer.server.scheme=https"
+      - "traefik.docker.network=proxy"
+    networks:
+      proxy:
+    security_opt:
+      - no-new-privileges:true
   standalone:
-    image: blazordevlab/cleanaspire-standalone:0.0.69
-    ports:
-      - "8020:80"
-      - "8021:443"
-
-
+    container_name: standalone
+    image: blazordevlab/cleanaspire-standalone:0.0.70
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.standalone-secure.entrypoints=https"
+      - "traefik.http.routers.standalone-secure.rule=Host(`standalone.blazors.app`)"
+      - "traefik.http.routers.standalone-secure.tls=true"
+      - "traefik.http.routers.standalone-secure.service=standalone"
+      - "traefik.http.services.standalone.loadbalancer.server.port=443"
+      - "traefik.http.services.standalone.loadbalancer.server.scheme=https"
+      - "traefik.docker.network=proxy"
+    networks:
+      proxy:
+    security_opt:
+      - no-new-privileges:true
+networks:
+  proxy:
+    external: true
 
 ```
 
