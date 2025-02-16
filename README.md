@@ -227,6 +227,81 @@ networks:
    - Use the `Token` and `API Key` securely on the server-side for API communication with Webpushr.
 
 
+
+
+### Steps to Add a New Entity Class
+
+1. **Create a New Entity Class:**
+   - Create a new class for the entity (e.g., `Product.cs`) in the `Entities` directory of the `CleanAspire.Domain` project.
+   - This class should typically inherit from `BaseAuditableEntity` and implement the `IAuditTrial` interface, which allows you to track audit information such as created and modified timestamps.
+
+   ```csharp
+   public class Product : BaseAuditableEntity, IAuditTrial
+   {
+       public int Id { get; set; }
+       public string Name { get; set; }
+       public decimal Price { get; set; }
+       // Other properties...
+   }
+   ```
+
+2. **Add `DbSet<Product>` to `IApplicationDbContext`:**
+   - In the `IApplicationDbContext.cs` file in the `CleanAspire.Application` project, add a `DbSet<Product>` property to represent the collection of `Product` entities in the database.
+
+   ```csharp
+   public interface IApplicationDbContext
+   {
+       DbSet<Product> Products { get; }
+       // Other DbSets...
+   }
+   ```
+
+3. **Implement `DbSet<Product>` in `ApplicationDbContext`:**
+   - In the `ApplicationDbContext.cs` file in the `CleanAspire.Infrastructure` project, implement the `DbSet<Product>` property to interact with the database.
+
+   ```csharp
+   public class ApplicationDbContext : DbContext, IApplicationDbContext
+   {
+       public DbSet<Product> Products { get; set; }
+       // Other DbSets...
+
+       protected override void OnModelCreating(ModelBuilder modelBuilder)
+       {
+           base.OnModelCreating(modelBuilder);
+           // Additional configurations
+       }
+   }
+   ```
+
+4. **Define Entity Configuration for `Product`:**
+   - Define any necessary configurations for the `Product` entity, such as foreign keys, field lengths, etc.
+   - Create a new configuration class (`ProductConfiguration.cs`) in the `Persistence\Configurations` directory under the `CleanAspire.Infrastructure` project. This is where you can specify constraints and configurations specific to the entity.
+
+   ```csharp
+   public class ProductConfiguration : IEntityTypeConfiguration<Product>
+   {
+       public void Configure(EntityTypeBuilder<Product> builder)
+       {
+           builder.Property(p => p.Name).HasMaxLength(100);
+           // Add other property configurations here...
+       }
+   }
+   ```
+
+5. **Create Migration:**
+   - Ensure that the correct startup project is selected. It is crucial to have either `CleanAspire.AppHost` or `CleanAspire.Api` set as the startup project.
+   - Open the **Package Manager Console** in Visual Studio and set the default project to the one that matches your database configuration in `appsettings.json` (e.g., `Migrators.SQLite`, `Migrators.PostgreSQL`, or `Migrators.MSSQL`).
+
+     - In **Package Manager Console**:
+     ```powershell
+     PM> Add-Migration Product
+     PM> Update-Database
+     ```
+
+   - These commands will create the migration for the new `Product` entity and update the database accordingly.
+
+
+
 ### Architecture
 
 CleanAspire is structured following the **Clean Architecture** approach, dividing the solution into distinct layers:
