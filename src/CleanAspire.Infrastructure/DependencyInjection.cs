@@ -38,10 +38,12 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<MinioOptions>(configuration.GetSection(MinioOptions.Key))
+            .AddSingleton(s => s.GetRequiredService<IOptions<MinioOptions>>().Value);
         services
             .AddDatabase(configuration)
             .AddFusionCacheService()
-            .AddScoped<IUploadService, UploadService>();
+            .AddScoped<IUploadService, MinioUploadService>();
  
 
         return services;

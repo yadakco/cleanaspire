@@ -14,7 +14,7 @@ namespace CleanAspire.Infrastructure.Services;
 /// <summary>
 /// Service for uploading files.
 /// </summary>
-public class UploadService : IUploadService
+public class FileUploadService : IUploadService
 {
     private static readonly string NumberPattern = " ({0})";
 
@@ -60,13 +60,14 @@ public class UploadService : IUploadService
     /// remove file
     /// </summary>
     /// <param name="filename"></param>
-    public void Remove(string filename)
+    public Task RemoveAsync(string filename)
     {
         var removefile = Path.Combine(Directory.GetCurrentDirectory(), filename);
         if (File.Exists(removefile))
         {
             File.Delete(removefile);
         }
+        return Task.CompletedTask;
     }
     /// <summary>
     /// Gets the next available filename based on the given path.

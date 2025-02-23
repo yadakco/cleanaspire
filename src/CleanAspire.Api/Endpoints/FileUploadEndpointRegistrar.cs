@@ -6,13 +6,14 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using CleanAspire.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Serilog.Sinks.File;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Antiforgery;
 
 namespace CleanAspire.Api.Endpoints;
 
@@ -50,11 +51,10 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                     UploadType.Document,
                     stream.ToArray(),
                     request.Overwrite,
-                    Path.GetExtension(file.FileName),
                     request.Folder
                 );
                 var result = await uploadService.UploadAsync(uploadRequest);
-                var fileUrl = $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
+                var fileUrl = result.StartsWith("https://") ? result : $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
                 response.Add(new FileUploadResponse { Path = result, Url = fileUrl, Size = size });
             }
             return TypedResults.Ok(response);
@@ -90,11 +90,10 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                                 UploadType.Images,
                                 outStream.ToArray(),
                                 request.Overwrite,
-                                Path.GetExtension(file.FileName),
                                 request.Folder
                             ));
-                            var fileUrl = $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
-                            response.Add(new FileUploadResponse { Url = fileUrl, Path = result, Size = outStream.Length });
+                            var fileUrl = result.StartsWith("https://") ? result : $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
+                            response.Add(new FileUploadResponse { Url = fileUrl, Path = result, Size = imgstream.Length });
                         }
                     }
                 }
@@ -105,16 +104,13 @@ public class FileUploadEndpointRegistrar : IEndpointRegistrar
                         UploadType.Images,
                         imgstream.ToArray(),
                         request.Overwrite,
-                        Path.GetExtension(file.FileName),
                         request.Folder
                     );
                     var result = await uploadService.UploadAsync(uploadRequest);
-                    var fileUrl = $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
+                    string fileUrl = result.StartsWith("https://") ? result : $"{requestScheme}://{requestHost}/{result.Replace("\\", "/")}";
                     response.Add(new FileUploadResponse { Url = fileUrl, Path = result, Size = imgstream.Length });
                 }
-
             }
-
             return TypedResults.Ok(response);
         }).Accepts<ImageUploadRequest>("multipart/form-data")
         .Produces<IEnumerable<FileUploadResponse>>()
