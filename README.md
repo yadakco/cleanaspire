@@ -103,7 +103,7 @@ https://github.com/neozhu/cleanaspire/issues/34
 version: '3.8'
 services:
   cleanapi:
-    image: blazordevlab/cleanaspire-api:0.0.70
+    image: blazordevlab/cleanaspire-api:0.0.73
     container_name: cleanapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -122,6 +122,10 @@ services:
       - Webpushr__Token=<your-webpushr-token>
       - Webpushr__ApiKey=<your-webpushr-api-key>
       - Webpushr__PublicKey=<your-webpushr-public-key>
+      - Minio__Endpoint=<your-minio-server>
+      - Minio__AccessKey=<your-minio-key>
+      - Minio__SecretKey=<your-minio-secret>
+      - Minio__BucketName=demo
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cleanapi-secure.entrypoints=https"
@@ -136,7 +140,7 @@ services:
     security_opt:
       - no-new-privileges:true
   cleanweb:
-    image: blazordevlab/cleanaspire-webapp:0.0.70
+    image: blazordevlab/cleanaspire-webapp:0.0.73
     container_name: cleanweb
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
@@ -159,7 +163,7 @@ services:
       - no-new-privileges:true
   standalone:
     container_name: standalone
-    image: blazordevlab/cleanaspire-standalone:0.0.70
+    image: blazordevlab/cleanaspire-standalone:0.0.73
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.standalone-secure.entrypoints=https"
