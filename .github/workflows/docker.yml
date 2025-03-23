@@ -49,25 +49,35 @@ jobs:
       #     docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }} -f src/CleanAspire.Api/Dockerfile .
       #     docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }}
 
-      - name: Update docker-compose file with new version
+      - name: Update version in docker-compose file
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          sed -i "s|blazordevlab/cleanaspire-api:[0-9.]*|blazordevlab/cleanaspire-api:${{ steps.version.outputs.version }}|g" deploy/docker-compose.yml
-          sed -i "s|blazordevlab/cleanaspire-webapp:[0-9.]*|blazordevlab/cleanaspire-webapp:${{ steps.version.outputs.version }}|g" deploy/docker-compose.yml
-          sed -i "s|blazordevlab/cleanaspire-standalone:[0-9.]*|blazordevlab/cleanaspire-standalone:${{ steps.version.outputs.version }}|g" deploy/docker-compose.yml
+          echo "Updating docker-compose file with version ${{ steps.version.outputs.version }}"
+          sed -i 's#blazordevlab/cleanaspire-api:[0-9a-zA-Z\.\-]*#blazordevlab/cleanaspire-api:${{ steps.version.outputs.version }}#' deploy/docker-compose.yml
+          sed -i 's#blazordevlab/cleanaspire-webapp:[0-9a-zA-Z\.\-]*#blazordevlab/cleanaspire-webapp:${{ steps.version.outputs.version }}#' deploy/docker-compose.yml
+          sed -i 's#blazordevlab/cleanaspire-standalone:[0-9a-zA-Z\.\-]*#blazordevlab/cleanaspire-standalone:${{ steps.version.outputs.version }}#' deploy/docker-compose.yml
 
-      - name: Configure git
+      - name: Create Pull Request branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          # Create a new branch to update docker-compose file
+          NEW_BRANCH="update-compose-version-${{ steps.version.outputs.version }}"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout -b $NEW_BRANCH
+          git add deploy/docker-compose.yml
+          git commit -m "Update Docker Compose file to version ${{ steps.version.outputs.version }}"
+          git push origin $NEW_BRANCH
 
-      - name: Create Pull Request to update docker-compose version
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.ACTION_TOKEN }}
-          commit-message: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
-          branch: update-docker-compose-${{ steps.version.outputs.version }}
-          title: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
-          body: |
-            This PR updates the image versions in deploy/docker-compose.yml to ${{ steps.version.outputs.version }}.
+      - name: Create Pull Request with GitHub CLI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.MY_TOKEN }}
+        run: |
+          NEW_BRANCH="update-compose-version-${{ steps.version.outputs.version }}"
+          gh pr create --base main --head $NEW_BRANCH \
+            --title "Update Docker Compose to version ${{ steps.version.outputs.version }}" \
+            --body "Automatically updating Docker Compose file version references to ${{
+            steps.version.outputs.version }}"
         
 
