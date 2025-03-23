@@ -3,8 +3,12 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - "deploy/**"
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - "deploy/**"
   workflow_dispatch:
 
 jobs:
@@ -44,3 +48,17 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }} -f src/CleanAspire.Api/Dockerfile .
           docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }}
+
+            - name: Configure git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Create Pull Request to update docker-compose version
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
+          branch: update-docker-compose-${{ steps.version.outputs.version }}
+          title: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
+          body: |
+            This PR updates the image versions in deploy/docker-compose.yml to ${{ steps.version.outputs.version }}.
