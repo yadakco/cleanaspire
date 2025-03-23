@@ -29,25 +29,31 @@ jobs:
       - run: git tag ${{ steps.version.outputs.version }}
       - run: git push origin ${{ steps.version.outputs.version }}    
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      # - name: Log in to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push CleanAspire.Standalone image
-        run: |
-            docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-standalone:${{ steps.version.outputs.version }} -f src/CleanAspire.ClientApp/Dockerfile .
-            docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-standalone:${{ steps.version.outputs.version }}    
-      - name: Build and push CleanAspire.WebApp image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-webapp:${{ steps.version.outputs.version }} -f src/CleanAspire.WebApp/Dockerfile .
-          docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-webapp:${{ steps.version.outputs.version }}
+      # - name: Build and push CleanAspire.Standalone image
+      #   run: |
+      #       docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-standalone:${{ steps.version.outputs.version }} -f src/CleanAspire.ClientApp/Dockerfile .
+      #       docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-standalone:${{ steps.version.outputs.version }}    
+      # - name: Build and push CleanAspire.WebApp image
+      #   run: |
+      #     docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-webapp:${{ steps.version.outputs.version }} -f src/CleanAspire.WebApp/Dockerfile .
+      #     docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-webapp:${{ steps.version.outputs.version }}
 
-      - name: Build and push CleanAspire.Api image
+      # - name: Build and push CleanAspire.Api image
+      #   run: |
+      #     docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }} -f src/CleanAspire.Api/Dockerfile .
+      #     docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }}
+
+      - name: Update docker-compose file with new version
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }} -f src/CleanAspire.Api/Dockerfile .
-          docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }}
+          sed -i "s|blazordevlab/cleanaspire-api:[0-9.]*|blazordevlab/cleanaspire-api:${{ steps.version.outputs.version }}|g" deploy/docker-compose.yml
+          sed -i "s|blazordevlab/cleanaspire-webapp:[0-9.]*|blazordevlab/cleanaspire-webapp:${{ steps.version.outputs.version }}|g" deploy/docker-compose.yml
+          sed -i "s|blazordevlab/cleanaspire-standalone:[0-9.]*|blazordevlab/cleanaspire-standalone:${{ steps.version.outputs.version }}|g" deploy/docker-compose.yml
 
       - name: Configure git
         run: |
