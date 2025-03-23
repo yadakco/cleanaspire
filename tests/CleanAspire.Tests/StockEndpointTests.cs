@@ -129,6 +129,9 @@ public class StockEndpointTests
         _httpClient?.Dispose();
         _httpClientHandler?.Dispose();
 
+        // Dispose of the _resourceNotificationService if it's not null
+        _resourceNotificationService?.Dispose();
+
         // Dispose of the _app if it's not null
         if (_app is not null)
         {
