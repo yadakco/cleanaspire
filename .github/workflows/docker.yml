@@ -49,7 +49,7 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }} -f src/CleanAspire.Api/Dockerfile .
           docker push ${{ secrets.DOCKER_USERNAME }}/cleanaspire-api:${{ steps.version.outputs.version }}
 
-            - name: Configure git
+      - name: Configure git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
