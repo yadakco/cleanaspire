@@ -69,3 +69,4 @@ jobs:
           title: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
           body: |
             This PR updates the image versions in deploy/docker-compose.yml to ${{ steps.version.outputs.version }}.
+
