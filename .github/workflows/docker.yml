@@ -63,6 +63,7 @@ jobs:
       - name: Create Pull Request to update docker-compose version
         uses: peter-evans/create-pull-request@v4
         with:
+          token: ${{ secrets.ACTION_TOKEN }}
           commit-message: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
           branch: update-docker-compose-${{ steps.version.outputs.version }}
           title: "Update docker-compose versions to ${{ steps.version.outputs.version }}"
