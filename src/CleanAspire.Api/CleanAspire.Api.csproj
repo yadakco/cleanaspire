@@ -24,7 +24,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.4" />
-        <PackageReference Include="Scalar.AspNetCore" Version="2.2.1" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.2.5" />
         <PackageReference Include="Scrutor" Version="6.0.1" />
        
         <PackageReference Include="StrongGrid" Version="0.111.0" />
