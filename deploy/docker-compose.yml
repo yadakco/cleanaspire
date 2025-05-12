@@ -16,6 +16,9 @@ services:
       - SendGrid__DefaultFromEmail=${APISERVICE_SendGrid__DefaultFromEmail}
       - Authentication__Google__ClientId=${APISERVICE_Authentication__Google__ClientId}
       - Authentication__Google__ClientSecret=${APISERVICE_Authentication__Google__ClientSecret}
+      - Authentication__Microsoft__ClientId=${APISERVICE_Authentication__Microsoft__ClientId}
+      - Authentication__Microsoft__ClientSecret=${APISERVICE_Authentication__Microsoft__ClientSecret}
+      - Authentication__Microsoft__TenantId=${APISERVICE_Authentication__Microsoft__TenantId}
       - Webpushr__Token=${APISERVICE_Webpushr__Token}
       - Webpushr__ApiKey=${APISERVICE_Webpushr__ApiKey}
       - Webpushr__PublicKey=${APISERVICE_Webpushr__PublicKey}
