@@ -164,7 +164,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
     {
         try
         {
-            await apiClient.Account.Google.SignIn.PostAsync(q =>
+            await apiClient.Account.Microsoft.SignIn.PostAsync(q =>
             {
                 q.QueryParameters.Code = authorizationCode;
                 q.QueryParameters.State = state;
