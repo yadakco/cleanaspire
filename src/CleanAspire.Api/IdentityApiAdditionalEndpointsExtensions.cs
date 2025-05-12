@@ -2,21 +2,22 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using CleanAspire.Domain.Identities;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text.Encodings.Web;
-using System.Text;
-using Microsoft.AspNetCore.Identity.Data;
-using Google.Apis.Auth;
-using CleanAspire.Infrastructure.Persistence;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
+using CleanAspire.Domain.Identities;
+using CleanAspire.Infrastructure.Persistence;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
@@ -455,13 +456,13 @@ public static class IdentityApiAdditionalEndpointsExtensions
             //    { "state", new[] { "The state parameter does not match the redirect URI." } }
             //});
             //    }
-
+            var scopes = "openid profile email User.Read offline_access";
             var microsoftAuthUrl =
                 $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize?" +
                 $"response_type=code&" +
                 $"client_id={Uri.EscapeDataString(clientId)}&" +
                 $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
-                $"scope=openid%20profile%20email%20User.Read&" +
+                $"scope={Uri.EscapeDataString(scopes)}&" +
                 $"state={Uri.EscapeDataString(state)}&" +
                 $"response_mode=query";
             return Results.Ok(microsoftAuthUrl);
@@ -541,24 +542,15 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
             try
             {
-                // Get user information using the access token
-                var client = httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenContent.access_token);
-                var userInfoResponse = await client.GetAsync("https://graph.microsoft.com/v1.0/me");
-
-                if (!userInfoResponse.IsSuccessStatusCode)
+                var handler = new JwtSecurityTokenHandler();
+                var principal = handler.ReadJwtToken(tokenContent.access_token);
+                var email = principal.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+                if (string.IsNullOrEmpty(email))
                 {
-                    var responseMessage = await userInfoResponse.Content.ReadAsStringAsync();
-                    return Results.BadRequest($"Failed to retrieve user information. {responseMessage}");
+                    return Results.BadRequest("Email not found in the token claims.");
                 }
-
-                var userInfo = await userInfoResponse.Content.ReadFromJsonAsync<MicrosoftUserInfo>();
-                if (userInfo?.mail is null && userInfo?.userPrincipalName is null)
-                {
-                    return Results.BadRequest("Email information not found in the user profile");
-                }
-
-                var email = userInfo.mail ?? userInfo.userPrincipalName;
+                var oid = principal.Claims.FirstOrDefault(c => c.Type == "oid")?.Value;
+                var given_name = principal.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
                 var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
                 var dbcontext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                 var signInManager = context.RequestServices.GetRequiredService<SignInManager<TUser>>();
@@ -583,7 +575,7 @@ public static class IdentityApiAdditionalEndpointsExtensions
                     appUser.TenantId = microsofttenantId;
                     appUser.Email = email;
                     appUser.UserName = email;
-                    appUser.Nickname = userInfo.displayName;
+                    appUser.Nickname = given_name;
                     appUser.Provider = "Microsoft";
                     appUser.AvatarUrl = "";
                     appUser.LanguageCode = "en-US";
@@ -598,11 +590,11 @@ public static class IdentityApiAdditionalEndpointsExtensions
                         return Results.BadRequest("Failed to create a new user.");
                     }
 
-                    await userManager.AddLoginAsync(user, new UserLoginInfo("Microsoft", userInfo.id, "Microsoft"));
+                    await userManager.AddLoginAsync(user, new UserLoginInfo("Microsoft", oid, "Microsoft"));
                 }
 
                 signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
-                var loginResult = await signInManager.ExternalLoginSignInAsync("Microsoft", userInfo.id, isPersistent: false);
+                var loginResult = await signInManager.ExternalLoginSignInAsync("Microsoft", oid, isPersistent: false);
                 if (!loginResult.Succeeded)
                 {
                     return Results.BadRequest("External login failed.");
