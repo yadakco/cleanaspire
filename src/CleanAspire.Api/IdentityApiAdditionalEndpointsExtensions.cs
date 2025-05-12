@@ -17,8 +17,6 @@ using Microsoft.AspNetCore.Identity.Data;
 using Google.Apis.Auth;
 using CleanAspire.Infrastructure.Persistence;
 using System.Globalization;
-using Npgsql;
-using Dapper;
 namespace CleanAspire.Api;
 
 public static class IdentityApiAdditionalEndpointsExtensions
