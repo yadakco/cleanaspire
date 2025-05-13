@@ -549,14 +549,14 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 {
                     return Results.BadRequest("Email not found in the token claims.");
                 }
-                var oid = principal.Claims.FirstOrDefault(c => c.Type == "oid")?.Value;
+                var oid = principal.Claims.FirstOrDefault(c => c.Type == "oid")?.Value ?? tokenContent.id_token;
                 var given_name = principal.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
                 var userManager = context.RequestServices.GetRequiredService<UserManager<TUser>>();
                 var dbcontext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                 var signInManager = context.RequestServices.GetRequiredService<SignInManager<TUser>>();
 
-                TUser? user = null;
-
+                var user = await userManager.FindByEmailAsync(email);
+                
                 // If user is still null, create using UserManager
                 if (user == null)
                 {
@@ -589,12 +589,16 @@ public static class IdentityApiAdditionalEndpointsExtensions
                     {
                         return Results.BadRequest("Failed to create a new user.");
                     }
-
+                    await userManager.AddLoginAsync(user, new UserLoginInfo("Microsoft", oid, "Microsoft"));
+                }
+                else
+                {
+                    var userId= await userManager.GetUserIdAsync(user);
                     await userManager.AddLoginAsync(user, new UserLoginInfo("Microsoft", oid, "Microsoft"));
                 }
 
                 signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
-                var loginResult = await signInManager.ExternalLoginSignInAsync("Microsoft", oid, isPersistent: false);
+                var loginResult = await signInManager.ExternalLoginSignInAsync("Microsoft", oid, isPersistent: true);
                 if (!loginResult.Succeeded)
                 {
                     return Results.BadRequest("External login failed.");
