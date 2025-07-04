@@ -8,8 +8,8 @@ services:
       dockerfile: src/CleanAspire.Api/Dockerfile
     container_name: cleanaspire-api
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "8037:80"
+      - "8036:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80;https://+:443
@@ -47,8 +47,8 @@ services:
       dockerfile: src/CleanAspire.WebApp/Dockerfile
     container_name: cleanaspire-webapp
     ports:
-      - "8081:80"
-      - "8444:443"
+      - "8035:80"
+      - "8034:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80;https://+:443
@@ -73,8 +73,8 @@ services:
       dockerfile: src/CleanAspire.ClientApp/Dockerfile
     container_name: cleanaspire-clientapp
     ports:
-      - "8082:80"
-      - "8445:443"
+      - "8031:80"
+      - "8032:443"
     environment:
       - NGINX_HOST=localhost
       - NGINX_PORT=80
