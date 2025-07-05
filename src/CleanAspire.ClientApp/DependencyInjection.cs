@@ -1,6 +1,5 @@
 ﻿
 using System.Globalization;
-using Blazor.Analytics;
 using Blazored.LocalStorage;
 using CleanAspire.Api.Client;
 using CleanAspire.ClientApp.Configurations;
@@ -22,6 +21,7 @@ using Microsoft.Kiota.Serialization.Multipart;
 using Microsoft.Kiota.Serialization.Text;
 using MudBlazor;
 using MudBlazor.Services;
+using Soenneker.Blazor.Google.Analytics.Registrars;
 
 namespace CleanAspire.ClientApp;
 
@@ -79,7 +79,7 @@ public static class DependencyInjection
 
         // MudBlazor Integration
         services.TryAddMudBlazor(configuration);
-        services.AddGoogleAnalytics("G-KSEECM2NT8");
+        services.AddGoogleAnalyticsInteropAsScoped();
     }
 
     public static void AddHttpClients(this IServiceCollection services, IConfiguration configuration)

@@ -1,4 +1,6 @@
-﻿
+﻿@using Soenneker.Blazor.Google.Analytics
+@using Soenneker.Blazor.Google.Analytics.Abstract
+@inject IGoogleAnalyticsInterop GoogleAnalyticsInterop
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -11,4 +13,10 @@
         </LayoutView>
     </NotFound>
 </Router>
-<NavigationTracker />
+@code {
+protected override async Task OnInitializedAsync()
+{
+        await GoogleAnalyticsInterop.Init("G-KSEECM2NT8");
+   
+}
+}
