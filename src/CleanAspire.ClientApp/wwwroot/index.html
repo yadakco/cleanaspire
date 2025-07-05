@@ -149,74 +149,73 @@
                     padding-bottom: 0.15rem;
                     margin-bottom: 1px;
                 }
-
         </style>
         <script>
-                    const logoAnimation = anime.timeline({
-                        autoplay: true,
-                        delay: 200
-                    });
-
-                    logoAnimation.add({
-                        targets: '#logo',
-                        translateY: [-100, 0],
-                        opacity: [0, 1],
-                        elasticity: 600,
-                        duration: 900
-                    }).add({
-                        targets: '#logo-hexagon',
-                        rotate: [-180, 0],
-                        duration: 1000,
-                        elasticity: 600,
-                        offset: '-=200'
-                    }).add({
-                        targets: '#logo-circle',
-                        scale: [0, 1],
-                        duration: 600,
-                        easing: 'easeOutElastic(1, .8)',
-                        offset: '-=100'
-                    }).add({
-                        targets: '#logo-mask',
-                        scale: [0, 1],
-                        duration: 500,
-                        elasticity: 600,
-                        offset: '-=350'
-                    }).add({
-                        targets: '#logo-text span',
-                        opacity: [0, 1],
-                        translateX: ['-3.5em', 0],
-                        easing: 'easeOutExpo',
-                        duration: 300,
-                        offset: '-=350',
-                        delay: anime.stagger(100, { start: 500 }) // delay each character
-                    }).add({
-                        targets: '#logo-text p',
-                        opacity: [0, 1],
-                        translateX: ['-1.5em', 0],
-                        easing: 'easeOutExpo',
-                        duration: 100,
-                    }).add({
-                        targets: '#logo-text .progress',
-                        opacity: [0, 1],
-                        translateX: ['-1.5em', 0],
-                        easing: 'easeOutExpo',
-                        duration: 100,
-                    }).finished.then(() => {
-            const totalDuration = 3000;
-            const characterDuration = 500;
-            const staggerDelay = (totalDuration - characterDuration) / (6 - 1);
-
-            anime({
-                targets: '#logo-text span.blazor',
-                opacity: [0.8, 0, 1, 0.5, 1, 0, 0.9],
-                scale: [0.9, 1, 1.1, 1, 1.1, 1, 0.9],
-                translateX: ['0rem', '-0.1rem'],
-                easing: 'easeInOutSine',
-                duration: characterDuration,
-                delay: anime.stagger(staggerDelay, { start: 0 }),
-                loop: true
+            const logoAnimation = anime.timeline({
+                autoplay: true,
+                delay: 200
             });
-                    });
+
+            logoAnimation.add({
+                targets: '#logo',
+                translateY: [-100, 0],
+                opacity: [0, 1],
+                elasticity: 600,
+                duration: 900
+            }).add({
+                targets: '#logo-hexagon',
+                rotate: [-180, 0],
+                duration: 1000,
+                elasticity: 600,
+                offset: '-=200'
+            }).add({
+                targets: '#logo-circle',
+                scale: [0, 1],
+                duration: 600,
+                easing: 'easeOutElastic(1, .8)',
+                offset: '-=100'
+            }).add({
+                targets: '#logo-mask',
+                scale: [0, 1],
+                duration: 500,
+                elasticity: 600,
+                offset: '-=350'
+            }).add({
+                targets: '#logo-text span',
+                opacity: [0, 1],
+                translateX: ['-3.5em', 0],
+                easing: 'easeOutExpo',
+                duration: 300,
+                offset: '-=350',
+                delay: anime.stagger(100, { start: 500 }) // delay each character
+            }).add({
+                targets: '#logo-text p',
+                opacity: [0, 1],
+                translateX: ['-1.5em', 0],
+                easing: 'easeOutExpo',
+                duration: 100,
+            }).add({
+                targets: '#logo-text .progress',
+                opacity: [0, 1],
+                translateX: ['-1.5em', 0],
+                easing: 'easeOutExpo',
+                duration: 100,
+            }).finished.then(() => {
+                const totalDuration = 3000;
+                const characterDuration = 500;
+                const staggerDelay = (totalDuration - characterDuration) / (6 - 1);
+
+                anime({
+                    targets: '#logo-text span.blazor',
+                    opacity: [0.8, 0, 1, 0.5, 1, 0, 0.9],
+                    scale: [0.9, 1, 1.1, 1, 1.1, 1, 0.9],
+                    translateX: ['0rem', '-0.1rem'],
+                    easing: 'easeInOutSine',
+                    duration: characterDuration,
+                    delay: anime.stagger(staggerDelay, { start: 0 }),
+                    loop: true
+                });
+            });
 
         </script>
     </div>
@@ -233,20 +232,22 @@
     <script src="js/webpushr.js"></script>
     <script src="js/indexeddbstorage.js"></script>
     <script src="js/downloadfile.js"></script>
+    <script src="_content/Blazor-Analytics/blazor-analytics.js"></script>
     <script>
         window.displayModeInterop = {
             getDisplayMode: function () {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                return 'standalone';
+                if (window.matchMedia('(display-mode: standalone)').matches) {
+                    return 'standalone';
+                }
+                if (window.matchMedia('(display-mode: fullscreen)').matches) {
+                    return 'fullscreen';
+                }
+                if (window.matchMedia('(display-mode: minimal-ui)').matches) {
+                    return 'minimal-ui';
+                }
+                return 'browser';
             }
-            if (window.matchMedia('(display-mode: fullscreen)').matches) {
-                return 'fullscreen';
-            }
-            if (window.matchMedia('(display-mode: minimal-ui)').matches) {
-                return 'minimal-ui';
-            }
-            return 'browser';
-        }};
+        };
     </script>
 </body>
 
