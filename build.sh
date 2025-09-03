@@ -1,0 +1,1 @@
+dotnet run --project src/CleanAspire.AppHost
